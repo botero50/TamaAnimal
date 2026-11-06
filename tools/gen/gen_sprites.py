@@ -7,6 +7,9 @@ web/sprites-<region>.pak (published, one per region so a player can install a pa
 TPAK format (little-endian): "TPAK", u16 count, count x { u8 nameLen, name, u32 size }, then the
 data of each file in the same order. The installer splits it and sends each file to the board.
 
+The card folder is /animals, on purpose: a reused card can hold other games' /mons files with the
+same names, and those must never be drawn as animals.
+
     python tools/gen/gen_sprites.py
 """
 import json
@@ -55,7 +58,7 @@ def main():
     with open(os.path.join(MONS, 'thumbs.bin'), 'wb') as f:
         f.write(th)
     for region, lo, hi in REGIONS:
-        entries = [('mons/thumbs.bin', th)] + [('mons/' + files[i][0], files[i][1]) for i in range(lo, hi + 1)]
+        entries = [('animals/thumbs.bin', th)] + [('animals/' + files[i][0], files[i][1]) for i in range(lo, hi + 1)]
         out = os.path.join(WEB, f'sprites-{region}.pak')
         with open(out, 'wb') as o:
             o.write(b'TPAK' + struct.pack('<H', len(entries)))

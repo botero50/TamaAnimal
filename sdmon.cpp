@@ -22,11 +22,11 @@ bool SprtMon::load(int16_t dexNum, bool shiny) {
   if (!sdReady) return false;
 
   char path[28];
-  snprintf(path, sizeof(path), "/mons/p%s%03u.bin", shiny ? "s" : "", (unsigned)dexNum);
+  snprintf(path, sizeof(path), "/animals/p%s%03u.bin", shiny ? "s" : "", (unsigned)dexNum);
   File f = SD_MMC.open(path, FILE_READ);
   const bool noShinyFile = !f;
   if (!f && shiny) {  // sin shiny SPRT: usa el normal
-    snprintf(path, sizeof(path), "/mons/p%03u.bin", (unsigned)dexNum);
+    snprintf(path, sizeof(path), "/animals/p%03u.bin", (unsigned)dexNum);
     f = SD_MMC.open(path, FILE_READ);
   }
   if (!f) return false;
@@ -102,7 +102,7 @@ void SprtMon::unload() {
 
 bool SdThumbs::load() {
   if (!sdReady) return false;
-  File f = SD_MMC.open("/mons/thumbs.bin", FILE_READ);
+  File f = SD_MMC.open("/animals/thumbs.bin", FILE_READ);
   if (!f) {
     Serial.println("no thumbs.bin (gallery without thumbnails)");
     return false;
@@ -157,7 +157,7 @@ void sdScanRegionArt(bool verbose) {
     bool all = true;
     for (int i = 0; i < 3 && all; i++) {
       char path[28];
-      snprintf(path, sizeof(path), "/mons/p%03u.bin", (unsigned)probe[i]);
+      snprintf(path, sizeof(path), "/animals/p%03u.bin", (unsigned)probe[i]);
       File f = SD_MMC.open(path, FILE_READ);
       if (!f) all = false; else f.close();
     }
@@ -173,7 +173,7 @@ bool sdBegin() {
   sdReady = SD_MMC.begin("/sdcard", true /* modo 1-bit */, true /* formatea si no monta */);
   if (sdReady) {
     Serial.printf("SD mounted: %llu MB\n", SD_MMC.cardSize() / (1024ULL * 1024ULL));
-    SD_MMC.mkdir("/mons");
+    SD_MMC.mkdir("/animals");
     sdScanRegionArt();
   } else {
     Serial.println("SD not detected (the game uses the flash sprites)");
@@ -234,10 +234,10 @@ bool SdMon::load(int16_t dexNum, bool shiny) {
   if (!sdReady) return false;
 
   char path[24];
-  snprintf(path, sizeof(path), "/mons/%s%03u.bin", shiny ? "s" : "", (unsigned)dexNum);
+  snprintf(path, sizeof(path), "/animals/%s%03u.bin", shiny ? "s" : "", (unsigned)dexNum);
   File f = SD_MMC.open(path, FILE_READ);
   if (!f && shiny) {  // no shiny variant: use the normal one
-    snprintf(path, sizeof(path), "/mons/%03u.bin", (unsigned)dexNum);
+    snprintf(path, sizeof(path), "/animals/%03u.bin", (unsigned)dexNum);
     f = SD_MMC.open(path, FILE_READ);
   }
   if (!f) {
@@ -304,7 +304,7 @@ void SdMon::unload() {
 // ---------------------------------------------------------------------------
 // USB upload protocol (to fill the SD without taking it out of the board):
 //   PUT <path> <bytes>\n  + raw data   -> "OK" ... "DONE"
-//   LS\n                                   -> listing of /mons
+//   LS\n                                   -> listing of /animals
 // Usar con tools/send_sd.py
 // ---------------------------------------------------------------------------
 
@@ -320,7 +320,7 @@ bool sdSerialCommand(const String &line) {
     if (!path.startsWith("/")) path = "/" + path;
     // Sprites only: this path arrives straight from the serial line, and the save's
     // safety copies live on this same card.
-    if (!path.startsWith("/mons/") || path.indexOf("..") >= 0) {
+    if (!path.startsWith("/animals/") || path.indexOf("..") >= 0) {
       Serial.println("ERR");
       return true;
     }
@@ -354,7 +354,7 @@ bool sdSerialCommand(const String &line) {
     Serial.println(remaining == 0 ? "DONE" : "ERR");
     return true;
   } else if (line == "LS") {
-    File dir = SD_MMC.open("/mons");
+    File dir = SD_MMC.open("/animals");
     if (dir) {
       File e;
       while ((e = dir.openNextFile())) {

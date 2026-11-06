@@ -140,6 +140,8 @@
     <p class="note">⏱️ <b>This part takes a few minutes, and that is normal.</b> The sprites go
        over the USB serial link. Leave the tab open and the card in. The progress bar moves
        the whole time.</p>
+    <p class="note">🗂️ Used this card with another game before? That is fine. Tamanimals keeps its animals in its
+       own <code>animals</code> folder and ignores everything else on the card, so send your regions here.</p>
     <p class="note">Close the step-1 install tab first (only one program can use
        the port at a time).</p>
     <div class="row">
@@ -210,7 +212,7 @@ async function waitFor(token, timeoutMs = 6000) {
 
 const enc = new TextEncoder();
 
-// sends one file to the board with the PUT protocol (name includes the mons/ prefix)
+// sends one file to the board with the PUT protocol (name includes the animals/ prefix)
 async function sendOne(name, data) {
   await writer.write(enc.encode(`PUT ${name} ${data.length}\n`));
   if (!await waitFor('OK')) return false;
@@ -554,7 +556,7 @@ for (const b of document.querySelectorAll('[data-region]')) b.onclick = () => lo
 document.getElementById('files').onchange = async (ev) => {
   const files = [...ev.target.files];
   const items = [];
-  for (const f of files) items.push({ name: 'mons/' + f.name, data: new Uint8Array(await f.arrayBuffer()) });
+  for (const f of files) items.push({ name: 'animals/' + f.name, data: new Uint8Array(await f.arrayBuffer()) });
   log(`${items.length} files. Sending...`);
   await sendAll(items);
 };
