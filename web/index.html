@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tamanimals · Installer</title>
+<style>
+  :root { --bg:#f2efe1; --ink:#2a2a36; --accent:#4f93c4; --ok:#58b868; --bad:#e8503a; --track:#d8d2bd; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, sans-serif; background:var(--bg);
+         color:var(--ink); line-height:1.6; }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  h1 { font-size: 2rem; margin: 0 0 .25rem; }
+  h2 { font-size: 1.25rem; margin: 2.5rem 0 .5rem; }
+  .sub { color:#6b6b76; margin: 0 0 1.5rem; }
+  .step { background:#fff; border:1px solid var(--track); border-radius:14px; padding:1.25rem 1.5rem; margin: 1rem 0; }
+  .num { display:inline-flex; width:26px; height:26px; border-radius:50%; background:var(--accent); color:#fff;
+         align-items:center; justify-content:center; font-weight:600; margin-right:.5rem; font-size:.9rem; }
+  button { font: inherit; font-weight:500; padding:.6rem 1.2rem; border-radius:10px; border:1px solid var(--ink);
+           background:#fff; cursor:pointer; }
+  button:hover { background:var(--bg); }
+  button:disabled { opacity:.5; cursor:default; }
+  esp-web-install-button { display:inline-block; }
+  esp-web-install-button[install-unsupported] { display:none; }
+  .unsupported { display:none; color:var(--bad); font-weight:500; }
+  .row { display:flex; gap:.75rem; align-items:center; flex-wrap:wrap; }
+  #log { font-family: ui-monospace, monospace; font-size:.85rem; background:#1b1b25; color:#d8dcf0;
+         border-radius:10px; padding:.75rem 1rem; margin-top:1rem; max-height:220px; overflow:auto; white-space:pre-wrap; display:none; }
+  #savelog, #wifilog, #installlog { font-family: ui-monospace, monospace; font-size:.85rem; background:#1b1b25; color:#d8dcf0;
+         border-radius:10px; padding:.75rem 1rem; margin-top:1rem; max-height:160px; overflow:auto; white-space:pre-wrap; display:none; }
+  .bar { height:10px; background:var(--track); border-radius:5px; overflow:hidden; margin-top:.75rem; display:none; }
+  .bar > div { height:100%; width:0; background:var(--ok); transition: width .15s; }
+  code { background:#0001; padding:.1em .4em; border-radius:5px; }
+  a { color:var(--accent); }
+  .note { font-size:.9rem; color:#6b6b76; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🦁 Tamanimals <small id="fwver"></small></h1>
+  <p class="sub">A virtual pet with <span id="dexn">hundreds of</span> real animals from Africa, Asia and the Americas for the Waveshare ESP32-S3-Touch-AMOLED-1.75.
+     Install it from your browser — no Arduino, no drivers.</p>
+
+  <p class="unsupported" id="unsupported">
+    ⚠️ Your browser doesn't support Web Serial. Use <b>Chrome</b> or <b>Edge</b> on a computer.
+  </p>
+
+  <div class="step" style="border-left:4px solid #e8503a;background:#fff6f4">
+    <p><b>⚠️ Board not showing up? Read this first — it is almost always this.</b></p>
+    <p>A brand-new board <b>does not appear as a serial port at all</b>. The firmware it
+       ships with never switches USB on, so your computer sees nothing and it looks like a
+       dead board or a broken cable. It is neither. Put it in <b>download mode</b>:</p>
+    <p style="font-size:1.05em"><b>hold BOOT&nbsp;→ tap RESET&nbsp;→ let go of BOOT</b></p>
+    <p class="note">The two small buttons next to the USB-C socket. Nothing on screen will
+       change — that is normal. Now press install and the port will be there.
+       After Tamanimals is on it, this is never needed again.</p>
+    <p class="note">Still nothing? Use a cable that carries <b>data</b> (a charge-only USB-C
+       cable powers the board perfectly and carries nothing), and plug <b>straight into your
+       computer</b> rather than through a hub.</p>
+  </div>
+
+  <h2><span class="num">💾</span>Save or restore your pet</h2>
+  <div class="step" style="border-left:4px solid var(--ok)">
+    <p>Step 1 below takes a backup for you before it installs. Use <b>Save my pet</b>
+       to take one any other time: it downloads a small file of your animal, field guide,
+       coins and items, after checking that the file is complete. If anything goes wrong,
+       <b>Restore my pet</b> puts it all back. New board? Skip this.</p>
+    <div class="row">
+      <button id="petsave">💾 Save my pet</button>
+      <button id="petload">♻️ Restore my pet</button>
+      <input id="petfile" type="file" accept=".txt" hidden>
+    </div>
+    <p class="note">Pick the board's port when asked. Close any other tab or program
+       using the board first: only one can use the port at a time.</p>
+    <pre id="savelog"></pre>
+  </div>
+
+  <h2><span class="num">📶</span>Optional: Wi-Fi for the real time and the weather</h2>
+  <div class="step">
+    <p>The board's clock has no battery of its own, so it forgets the time when the
+       power runs out. With your Wi-Fi it sets the time from the internet by itself
+       (every few hours, for a few seconds) and can show the weather outside: grey
+       skies, rain, snow and the temperature. Do this <b>after</b> installing.</p>
+    <div class="row" style="flex-wrap:wrap;gap:8px">
+      <input id="wssid" placeholder="Wi-Fi name" maxlength="32" autocomplete="off">
+      <input id="wpass" type="password" placeholder="Wi-Fi password" maxlength="64" autocomplete="off">
+    </div>
+    <p><label><input id="wgeo" type="checkbox" checked> Show the weather (asks for this
+       computer's location, rounded to about 1 km)</label></p>
+    <p><label><input id="wny" type="checkbox" checked> Snow from New York: when it never
+       snows where you live, the ball shows New York's snow on days it snows there</label></p>
+    <div class="row">
+      <button id="wsend">📶 Send to the board</button>
+      <button id="wforget">Forget Wi-Fi</button>
+    </div>
+    <p class="note">Only 2.4 GHz networks work (the board has no 5 GHz radio). The
+       password stays on the board: it is not in <b>Save my pet</b> backups and is not
+       sent anywhere else. The weather comes from
+       <a href="https://open-meteo.com/">Open-Meteo</a>, which gets only the rounded
+       location.</p>
+    <pre id="wifilog"></pre>
+  </div>
+
+  <h2><span class="num">1</span>Flash the firmware</h2>
+  <div class="step">
+    <p>Plug the board in via USB and press <b>Back up, then install</b>. Pick the port
+       when asked. It saves your pet to a file and checks the file is complete, and only
+       then shows <b>Install now</b>. Press that and pick the port again, because the
+       browser asks once for each. The install takes about a minute, with no drivers
+       on any OS.</p>
+    <div class="row"><button id="backupinstall">💾 Back up, then install</button></div>
+    <div id="installgate" hidden>
+      <p><b>Ready to install.</b></p>
+      <esp-web-install-button manifest="manifest.json">
+        <button slot="activate">⚡ Install now</button>
+        <span slot="unsupported">Browser not supported (use Chrome/Edge).</span>
+        <span slot="not-allowed">Needs HTTPS.</span>
+      </esp-web-install-button>
+    </div>
+    <pre id="installlog"></pre>
+    <p class="note">New board with nothing to save? <a href="#" id="skipbackup">Install without a backup</a>.</p>
+    <p class="note" style="border-left:4px solid #e8503a;padding-left:10px">
+       🔄 <b>Updating? Leave "Erase device" unchecked.</b> The installer asks
+       once, with the box already unchecked — click <b>Next</b> without ticking
+       it and your animal, field guide and stamps all survive, because the
+       firmware is written around the save rather than over it. Tick that box
+       and everything is gone, with no undo. The sprites on the microSD are
+       untouched either way.<br><br>
+       A backup is still the only real safety net, which is why this step takes one
+       first (the same as typing <code>EXPORT</code> on the serial console).<br><br>
+       A fresh board with nothing on it can be erased safely, and on a board
+       that has never run Tamanimals it makes no difference either way.</p>
+  </div>
+
+  <h2><span class="num">2</span>Load the sprites onto the microSD</h2>
+  <div class="step">
+    <p>Put a microSD into the board (it formats itself). Press <b>Connect board</b>,
+       then a region. Any one of them works on its own, and the others can be added later
+       without redoing this one. Africa is simply the usual place to start.</p>
+    <p class="note">⏱️ <b>This part takes a few minutes, and that is normal.</b> The sprites go
+       over the USB serial link. Leave the tab open and the card in. The progress bar moves
+       the whole time.</p>
+    <p class="note">Close the step-1 install tab first (only one program can use
+       the port at a time).</p>
+    <div class="row">
+      <button id="connect">🔌 Connect board</button>
+      <button id="auto" data-region="africa" disabled>⬇️ Africa (145 animals, ~7 MB)</button>
+      <button id="autoa" data-region="asia" disabled>⬇️ Asia (55 animals, ~3 MB)</button>
+      <button id="autom" data-region="americas" disabled>⬇️ Americas (125 animals, ~6 MB)</button>
+    </div>
+    <p class="note">Have your own <code>.bin</code> files? <label style="cursor:pointer;text-decoration:underline">pick them manually<input id="files" type="file" accept=".bin" multiple disabled hidden></label></p>
+    <p class="note">🎨 Every sprite is drawn by code. See <a href="https://github.com/botero50/TamaAnimal#regenerating-the-content" target="_blank">how to change or regenerate them</a>.</p>
+    <p class="note">If the sending stops, press the same button again: it carries on from where it was. Changed the card since? <a href="#" id="sendover">Send everything again</a>.</p>
+    <div class="bar" id="bar"><div></div></div>
+    <pre id="log"></pre>
+  </div>
+
+  <h2>How to play</h2>
+  <p>Care for your egg until it hatches, then feed it, play with it, train it and fill your
+     field guide. Tap the animal to pet it; swipe to open the field guide (sideways), the
+     stat card (up) or set the clock (down); the physical PWR button turns the screen off
+     (short press) or everything off (long press).
+     More in the <a href="https://github.com/botero50/TamaAnimal" target="_blank">repository</a>.</p>
+  <p class="note">All animals, art, music and calls in Tamanimals were made for this project.
+     The firmware engine started from open-source (MIT) work by Quique Tortosa, Dylan Dao and
+     Cheng Ren; the full list is in the
+     <a href="https://github.com/botero50/TamaAnimal/blob/main/CREDITS.md" target="_blank">credits</a>.</p>
+</div>
+
+<script type="module" src="https://unpkg.com/esp-web-tools@10.4.0/dist/web/install-button.js"
+        integrity="sha384-9XfyvAabgkISlB/Xb3OpshGKpZx0TOt5Mmu78SeiNU3so/p4o2s9m66vy6Utdnom" crossorigin="anonymous"></script>
+<script src="savefile.js"></script>
+<script>
+// The firmware version and species count come from the manifest the installer flashes
+// from, so this page never carries its own copy of either number.
+fetch('manifest.json').then((r) => r.json()).then((m) => {
+  if (m.version) document.getElementById('fwver').textContent = 'firmware v' + m.version;
+  if (m.dex_count) document.getElementById('dexn').textContent = m.dex_count;
+}).catch(() => {});
+const log = (m) => { const el = document.getElementById('log'); el.style.display='block';
+  el.textContent += m + '\n'; el.scrollTop = el.scrollHeight; };
+const supported = 'serial' in navigator;
+if (!supported) { document.getElementById('unsupported').style.display='block';
+  document.getElementById('connect').disabled = true; }
+
+let port, reader, writer, lineBuf = '';
+
+async function readLine(timeoutMs = 6000) {
+  const deadline = Date.now() + timeoutMs;
+  while (true) {
+    const nl = lineBuf.indexOf('\n');
+    if (nl >= 0) { const l = lineBuf.slice(0, nl).trim(); lineBuf = lineBuf.slice(nl + 1); return l; }
+    if (Date.now() > deadline) return null;
+    const { value, done } = await reader.read();
+    if (done) return null;
+    lineBuf += new TextDecoder().decode(value);
+  }
+}
+
+async function waitFor(token, timeoutMs = 6000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const l = await readLine(deadline - Date.now());
+    if (l === null) return false;
+    if (l === token) return true;
+    if (l === 'ERR') return false;
+  }
+  return false;
+}
+
+const enc = new TextEncoder();
+
+// sends one file to the board with the PUT protocol (name includes the mons/ prefix)
+async function sendOne(name, data) {
+  await writer.write(enc.encode(`PUT ${name} ${data.length}\n`));
+  if (!await waitFor('OK')) return false;
+  for (let i = 0; i < data.length; i += 2048) {
+    await writer.write(data.slice(i, i + 2048));
+    if (!await waitFor('#')) return false;
+  }
+  return await waitFor('DONE', 30000);
+}
+
+// splits the sprites.pak bundle (TPAK) into its individual files
+function parsePak(buf) {
+  const dv = new DataView(buf), td = new TextDecoder();
+  if (td.decode(new Uint8Array(buf, 0, 4)) !== 'TPAK') throw new Error('invalid bundle');
+  const count = dv.getUint16(4, true);
+  let off = 6; const items = [];
+  for (let i = 0; i < count; i++) {
+    const nl = dv.getUint8(off); off += 1;
+    const name = td.decode(new Uint8Array(buf, off, nl)); off += nl;
+    const size = dv.getUint32(off, true); off += 4;
+    items.push({ name, size });
+  }
+  let pos = off;
+  for (const it of items) { it.data = new Uint8Array(buf, pos, it.size); pos += it.size; }
+  return items;
+}
+
+// Which files already reached the card, by name and size, so a cut does not mean
+// sending 40 MB again. A bundle rebuilt with different sizes is sent afresh.
+const SENT_KEY = 'tamanimals-sent-files';
+function loadSent() {
+  try { return new Set(JSON.parse(localStorage.getItem(SENT_KEY) || '[]')); } catch (e) { return new Set(); }
+}
+function saveSent(sent) {
+  try { localStorage.setItem(SENT_KEY, JSON.stringify([...sent])); } catch (e) {}
+}
+
+async function sendAll(items) {
+  const bar = document.getElementById('bar'); bar.style.display = 'block';
+  const fill = bar.firstElementChild;
+  const sent = loadSent();
+  const key = (it) => it.name + ':' + it.data.length;
+  let done = 0, fail = 0, skipped = 0;
+  for (const it of items) {
+    if (sent.has(key(it))) {
+      skipped++;
+    } else {
+      let ok = false;
+      try {
+        ok = await sendOne(it.name, it.data);
+      } catch (e) {
+        log('The connection was lost: ' + e.message);
+        log('Reload the page, connect again and press the same button. It carries on from here.');
+        return;
+      }
+      if (ok) { sent.add(key(it)); saveSent(sent); }
+      else { log('   failed ' + it.name); fail++; }
+    }
+    done++;
+    fill.style.width = (done / items.length * 100) + '%';
+  }
+  if (skipped) log(`${skipped} files were already on the card.`);
+  if (fail) { log(`${fail} files failed. Press the same button again to retry just those.`); return; }
+  for (const it of items) sent.delete(key(it));   // all there: a later re-send starts clean
+  saveSent(sent);
+  log(`Done (${done}/${items.length}). Restart the board (PWR button).`);
+}
+document.getElementById('sendover').onclick = (ev) => {
+  ev.preventDefault();
+  saveSent(new Set());
+  log('Forgot what was sent: the next load sends everything.');
+};
+
+// ---------- save / restore the pet (EXPORT / IMPORT over serial) ----------
+// Each button opens the port, does its one job and closes it again, so the
+// installer in step 1 can have the port straight after.
+const slog = (m) => { const el = document.getElementById('savelog'); el.style.display = 'block';
+  el.textContent += m + '\n'; el.scrollTop = el.scrollHeight; };
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+async function withPort(job) {
+  if (port && port.readable) { slog('Close the board connection in step 2 first (reload the page).'); return; }
+  let p, rd, wr;
+  try {
+    p = await navigator.serial.requestPort();
+    await p.open({ baudRate: 115200 });
+    rd = p.readable.getReader(); wr = p.writable.getWriter();
+    let buf = '', pending = null;      // one read in flight, kept across timeouts so no data is lost
+    const td = new TextDecoder();
+    const line = async (ms) => {          // the next line, or null after ms
+      const end = Date.now() + ms;
+      while (true) {
+        const nl = buf.indexOf('\n');
+        if (nl >= 0) { const l = buf.slice(0, nl).trim(); buf = buf.slice(nl + 1); return l; }
+        const left = end - Date.now();
+        if (left <= 0) return null;
+        if (!pending) pending = rd.read();
+        const r = await Promise.race([pending, sleep(left).then(() => null)]);
+        if (!r) return null;
+        pending = null;
+        if (r.done) return null;
+        buf += td.decode(r.value);
+      }
+    };
+    await sleep(300);
+    await job((t) => wr.write(enc.encode(t + '\n')), line);
+  } catch (e) {
+    if (e.name !== 'NotFoundError') slog('Error: ' + e.message);
+  } finally {
+    try { rd && await rd.cancel(); } catch (e) {}   // ends the read still in flight
+    try { rd && rd.releaseLock(); } catch (e) {}
+    try { wr && wr.releaseLock(); } catch (e) {}
+    try { p && await p.close(); } catch (e) {}
+  }
+}
+
+// Reads the save and downloads it, but only once it passes the check. USB can drop
+// a line now and then, so a read that fails is tried again before giving up.
+// Answers 'saved', 'none' (nothing answered: no Tamanimals running) or 'bad'.
+async function takeBackup(send, line, say) {
+  say('Reading the save...');
+  let reason = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    while (await line(200) !== null) {}   // drop anything printed so far
+    await send('EXPORT');
+    const out = []; let started = false;
+    while (true) {
+      const l = await line(5000);
+      if (l === null) break;
+      if (l.startsWith('# Tamanimals save')) { started = true; out.length = 0; }
+      if (!started) continue;
+      out.push(l);
+      if (l === 'IMPORT') break;          // the empty IMPORT closes the block
+    }
+    if (!started) continue;
+    const text = out.join('\n') + '\n';
+    const r = checkSave(text, true);
+    if (!r.ok) { reason = r.reason; say('That read failed the check: ' + reason + '. Trying again...'); continue; }
+    const d = new Date(), z = (n) => String(n).padStart(2, '0');   // local time, as on the clock
+    const stamp = d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + '-' + z(d.getHours()) + z(d.getMinutes());
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+    a.download = 'tamanimals-save-' + stamp + '.txt';
+    a.click();
+    say('Saved ' + a.download + ' (' + r.bytes + ' bytes, checked and complete). Keep it somewhere safe.');
+    return 'saved';
+  }
+  return reason ? 'bad' : 'none';
+}
+
+document.getElementById('petsave').onclick = () => withPort(async (send, line) => {
+  const got = await takeBackup(send, line, slog);
+  if (got === 'none') slog('No save came back. Is Tamanimals running on the board? Try again.');
+  if (got === 'bad') slog('The backup never came through complete, so nothing was saved. Check the cable and try again.');
+});
+
+// ---------- step 1: back up, then install ----------
+// The install button appears only once there is a good backup or the player has said
+// there is nothing to save. It takes its own click because a browser only shows the
+// port picker straight after one, and reading the save takes longer than that allows.
+const ilog = (m) => { const el = document.getElementById('installlog'); el.style.display = 'block';
+  el.textContent += m + '\n'; el.scrollTop = el.scrollHeight; };
+function showInstall() {
+  const gate = document.getElementById('installgate');
+  gate.hidden = false;
+  gate.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+document.getElementById('backupinstall').onclick = async () => {
+  let got = null;
+  await withPort(async (send, line) => { got = await takeBackup(send, line, ilog); });
+  if (got === 'saved') {          // the port is closed again by now, so the installer can have it
+    ilog('Now press Install now, and leave "Erase device" unticked.');
+    showInstall();
+  } else if (got === 'bad') {
+    ilog('The backup never came through complete, so nothing will be installed. Check the cable and try again.');
+  } else if (got === 'none') {
+    ilog('Nothing answered, so there was nothing to back up.');
+    if (confirm('No pet answered on this board. That is normal for a new board.\n\nIf this board has a pet on it, press Cancel and check the cable. Install without a backup?')) showInstall();
+  }
+};
+document.getElementById('skipbackup').onclick = (ev) => {
+  ev.preventDefault();
+  if (confirm('Install without a backup? If this board has a pet on it, take a backup first.')) showInstall();
+};
+
+document.getElementById('petload').onclick = () => document.getElementById('petfile').click();
+document.getElementById('petfile').onchange = async (ev) => {
+  const f = ev.target.files[0]; ev.target.value = '';
+  if (!f) return;
+  const checked = checkSave(await f.text(), false);
+  if (!checked.ok) {
+    slog('That file cannot be restored: ' + checked.reason + '. Nothing was changed.');
+    return;
+  }
+  const lines = checked.lines;
+  if (!confirm('Replace the pet on the board with the one in ' + f.name + '?')) return;
+  await withPort(async (send, line) => {
+    slog('Restoring ' + f.name + '...');
+    await send('IMPORT 0');              // an odd chunk: clears any half-received import
+    await sleep(100);
+    for (const l of lines.slice(0, -1)) { await send(l); await sleep(40); }
+    while (await line(200) !== null) {}  // drop anything printed so far
+    await send('IMPORT');
+    while (true) {
+      const l = await line(6000);
+      if (l === null) { slog('No answer from the board. Try again.'); return; }
+      if (l === 'IMPORT OK') { slog('Restored! The board restarts by itself.'); return; }
+      if (l.startsWith('IMPORT ')) { slog('The board refused the save (' + l + '). Nothing was changed.'); return; }
+    }
+  });
+};
+
+// ---------- Wi-Fi: real time and weather (WIFI / TZ / GEO over serial) ----------
+const wlog = (m) => { const el = document.getElementById('wifilog'); el.style.display = 'block';
+  el.textContent += m + '\n'; el.scrollTop = el.scrollHeight; };
+const here = () => new Promise((ok) => {
+  if (!navigator.geolocation) return ok(null);
+  navigator.geolocation.getCurrentPosition((p) => ok(p.coords), () => ok(null), { timeout: 15000, maximumAge: 3600000 });
+});
+async function answered(line) {          // DONE, or false on ERR / silence
+  while (true) {
+    const l = await line(3000);
+    if (l === null || l === 'ERR') return false;
+    if (l === 'DONE') return true;
+  }
+}
+document.getElementById('wsend').onclick = async () => {
+  const ssid = document.getElementById('wssid').value.trim(), pass = document.getElementById('wpass').value;
+  if (!ssid) { wlog('Type the Wi-Fi name first.'); return; }
+  if (/[\t\r\n]/.test(ssid + pass)) { wlog('The name or password has a tab or a line break in it.'); return; }
+  let geo = null;
+  if (document.getElementById('wgeo').checked) {
+    wlog('Asking the browser where this computer is...');
+    geo = await here();
+    if (!geo) wlog('No location (refused or unavailable): the clock still works, without the weather.');
+  }
+  await withPort(async (send, line) => {
+    while (await line(200) !== null) {}  // drop the boot chatter
+    await send('TZ ' + (-new Date().getTimezoneOffset()));
+    if (!await answered(line)) { wlog('No answer from the board. Is Tamanimals running on it?'); return; }
+    if (geo) {
+      await send('GEO ' + geo.latitude.toFixed(2) + ' ' + geo.longitude.toFixed(2));
+      if (!await answered(line)) { wlog('The board did not take the location.'); return; }
+    }
+    await send('WIFI ' + ssid + '\t' + pass);
+    if (!await answered(line)) { wlog('The board did not take the Wi-Fi details.'); return; }
+    await send('NYSNOW ' + (document.getElementById('wny').checked ? 1 : 0));
+    await answered(line);                // an older firmware just ignores it
+    await send('WIFISYNC');
+    await answered(line);
+    wlog('Done! The board connects in a few seconds and sets its clock' + (geo ? ' and the weather.' : '.') +
+         ' Settings -> About on the board shows whether it worked.');
+  });
+};
+document.getElementById('wforget').onclick = () => withPort(async (send, line) => {
+  while (await line(200) !== null) {}
+  await send('WIFIOFF');
+  wlog(await answered(line) ? 'The board forgot the Wi-Fi details.' : 'No answer from the board.');
+});
+
+document.getElementById('connect').onclick = async () => {
+  try {
+    port = await navigator.serial.requestPort();
+    await port.open({ baudRate: 115200 });
+    reader = port.readable.getReader();
+    writer = port.writable.getWriter();
+    lineBuf = '';
+    log('Connected. Press "Load sprites".');
+    for (const b of document.querySelectorAll('[data-region]')) b.disabled = false;
+    document.getElementById('files').disabled = false;
+    probeRegions();      // grey out any region that has no bundle to download
+    document.getElementById('connect').disabled = true;
+  } catch (e) { log('Could not connect: ' + e.message); }
+};
+
+// One bundle per region, served from this same site, so a player can take one and add
+// another later without re-sending what is already on the card.
+function pakUrls(region) {
+  return [`sprites-${region}.pak`];
+}
+
+async function fetchPak(region) {
+  let last;
+  for (const url of pakUrls(region)) {
+    try {
+      const resp = await fetch(url);
+      if (resp.ok) return await resp.arrayBuffer();
+      last = new Error('HTTP ' + resp.status);
+    } catch (e) { last = e; }
+  }
+  throw last || new Error('not found');
+}
+
+// HEAD, not a ranged GET: a ranged GET against a server that ignores Range --
+// python's http.server does -- starts streaming the whole file just to find out the
+// file exists. HEAD sends headers only, and both a local server and GitHub
+// Pages support it.
+// A region whose sprites have not been packed yet should not present a button
+// that can only fail -- "Failed to fetch" means nothing to somebody installing
+// this for the first time.
+async function probeRegions() {
+  for (const b of document.querySelectorAll('[data-region]')) {
+    const region = b.dataset.region;
+    let found = false;
+    for (const url of pakUrls(region)) {
+      try {
+        const r = await fetch(url, { method: 'HEAD' });
+        if (r.ok) { found = true; break; }
+      } catch (e) { /* try the next */ }
+    }
+    if (!found) {
+      b.disabled = true;
+      b.textContent = b.textContent.replace(/^⬇️ /, '') .replace(/ \(.*\)$/, '') + ' — not published yet';
+      b.title = 'No sprite bundle exists for this region yet. ';
+    }
+  }
+}
+
+async function loadRegion(btn) {
+  const region = btn.dataset.region;
+  if (!writer) { log('Connect the board first.'); return; }
+  btn.disabled = true;
+  log(`Downloading the ${region} sprite bundle (this is the slow part)...`);
+  let items;
+  try {
+    items = parsePak(await fetchPak(region));
+  } catch (e) {
+    log(`Could not download the ${region} bundle: ` + e.message);
+    log(`Check your connection and try again.`);
+    btn.disabled = false;
+    return;
+  }
+  log(`${items.length} ${region} sprites. Sending over USB...`);
+  await sendAll(items);
+  log(`${region} done. You can load another region, or stop here.`);
+}
+// Driven off the markup, so adding a region is ONE new button and nothing
+// else. This was three separate hardcoded id lists.
+for (const b of document.querySelectorAll('[data-region]')) b.onclick = () => loadRegion(b);
+
+document.getElementById('files').onchange = async (ev) => {
+  const files = [...ev.target.files];
+  const items = [];
+  for (const f of files) items.push({ name: 'mons/' + f.name, data: new Uint8Array(await f.arrayBuffer()) });
+  log(`${items.length} files. Sending...`);
+  await sendAll(items);
+};
+</script>
+</body>
+</html>

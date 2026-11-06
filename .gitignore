@@ -1,0 +1,18 @@
+# build output, including the microSD files gen_sprites.py draws
+build/
+
+# local safety copies
+backups/
+
+# Python
+__pycache__/
+
+# macOS
+.DS_Store
+
+# emulator save state
+tamanimals.nvs
+tamanimals.nvs.*
+
+# old local sprite files, never published
+tools/sdcard/

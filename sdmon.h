@@ -1,0 +1,129 @@
+#pragma once
+#include <string.h>
+#include <Arduino.h>
+#include "dex.h"
+#include "noart.h"
+
+// TPK1 animated sprite (legacy format, fallback path). The project uses
+// SPRT/TPK2 (SprtMon) for everything; this path stays inactive if there is no NNN.bin on the SD.
+// The indexed data lives in PSRAM; the palette is RGB565.
+struct SdMon {
+  bool loaded = false;
+  uint16_t w = 0, h = 0, frames = 0, frameMs = 100;
+  uint8_t scale = 2;       // integer zoom factor when drawing
+  uint16_t palCount = 0;
+  uint16_t pal[256];
+  uint8_t *data = nullptr;  // frames * w * h indices (0xFF = transparent)
+
+  bool load(int16_t dexNum, bool shiny = false);
+  void unload();
+};
+
+// actions of the SPRT sprites (TPK2 format)
+enum : uint8_t {
+  SPRT_IDLE = 0, SPRT_WALKL, SPRT_WALKR, SPRT_SLEEP, SPRT_EAT, SPRT_HURT,
+  SPRT_ATTACK, SPRT_POSE, SPRT_HOP, SPRT_NOD, SPRT_BREATH, SPRT_SIT,
+  SPRT_NACTS
+};
+
+struct SprtAct {
+  uint8_t w = 0, h = 0, frames = 0;
+  uint8_t base = 0;  // row+1 of the lowest pixel (anchor by the feet, not the canvas)
+  uint16_t ms[24];
+  const uint8_t *data = nullptr;  // frames * w * h in the blob
+};
+
+// multi-action SPRT sprite loaded from the SD into PSRAM
+struct SprtMon {
+  bool loaded = false;
+  // WHICH species is actually in here. It exists so a test can prove the file
+  // that got opened matches the dex that was asked for: dexNum was a uint8_t,
+  // so every species past 255 wrapped -- 258 ANIMAL loaded p002.bin and a
+  // the Americas creature appeared on screen as ANIMAL.
+  int16_t dex = 0;
+  uint16_t palCount = 0;
+  uint16_t pal[256];
+  uint8_t *blob = nullptr;
+  SprtAct acts[SPRT_NACTS];
+
+  bool load(int16_t dexNum, bool shiny = false);
+  void unload();
+  bool has(uint8_t a) const { return loaded && a < SPRT_NACTS && acts[a].frames > 0; }
+};
+
+
+// The photo album: up to ALBUM_MAX photos at half size (ALBUM_W x ALBUM_W RGB565)
+// in /album on the SD card as BMPs a computer opens; the oldest non-favourite is
+// overwritten first. The bookkeeping is album.h. "newest" counts from 0 = the newest.
+#include "album.h"
+bool albumSave(const uint16_t *fb466);       // downscales the screen and writes the next photo
+uint8_t albumCount();
+bool albumLoad(uint8_t newest, uint16_t *out);
+uint16_t *albumBuffer();                     // room for one photo (PSRAM)
+bool albumIsFav(uint8_t newest);
+bool albumToggleFav(uint8_t newest);         // false: already ALBUM_FAV_MAX favourites
+bool albumDelete(uint8_t newest);
+uint8_t albumDeleteAllButFav();              // how many went
+void albumMigrate();                         // at boot: old .raw photos become .bmp
+
+// gallery thumbnails (the whole thumbs.bin in PSRAM)
+// Both of these judge what comes off the card, so the ball and the emulator's
+// stand-in share them and the tests exercise the real checks.
+// A frame duration of 0 would freeze the animation.
+inline uint16_t sprtFrameMs(uint16_t ms) { return ms ? ms : 100; }
+// The picture for a dex number in a loaded thumbs.bin, or null if the file's table
+// points outside it: a cut or damaged file must not read outside the buffer.
+inline const uint8_t *thumbAt(const uint8_t *data, uint32_t size, uint16_t count, int16_t dex) {
+  if (!data || dex < 1 || dex > count || 6UL + 4UL * count > size) return nullptr;
+  uint32_t off;
+  memcpy(&off, data + 6 + 4 * (dex - 1), 4);
+  if (size < 3 || off > size - 3) return nullptr;              // w, h, colours
+  uint32_t need = 3 + (uint32_t)data[off + 2] * 2 + (uint32_t)data[off] * data[off + 1];
+  if (need > size || off > size - need) return nullptr;        // and the whole picture
+  return data + off;
+}
+
+struct SdThumbs {
+  uint32_t size = 0;      // bytes in data
+  bool loaded = false;
+  uint8_t *data = nullptr;
+  uint16_t count = 0;
+  bool load();
+  const uint8_t *get(int16_t dex) const;  // blob: w,h,palCount,pal[],idx[]
+};
+extern SdThumbs thumbs;
+
+bool sdBegin();                 // mounts the SD (SDMMC 1-bit), true if there is a card
+// The three species sdScanRegionArt() looks for to decide a region's pack is on
+// the card. Inline and free of any SD dependency so the tests can check them --
+// A PROBE MUST LAND ON A SPECIES THAT IS ACTUALLY PACKED. a later region's midpoint is
+// 765 ANIMAL, which the sprite set has no sprite for, so p765.bin exists in no
+// pack and the region reported NEEDS PACK however completely it was installed.
+// i is 0..2: the first, middle and last packed species of the region.
+static inline int16_t sdRegionProbe(uint8_t r, uint8_t i) {
+  const RegionInfo &rg = REGIONS[r % REGION_COUNT];
+  int16_t want = (i == 0) ? rg.lo : (i == 1) ? (int16_t)((rg.lo + rg.hi) / 2) : rg.hi;
+  for (int16_t d = want; d <= rg.hi; d++) if (speciesHasArt(d)) return d;
+  for (int16_t d = want; d >= rg.lo; d--) if (speciesHasArt(d)) return d;
+  return want;                      // a region with no art at all cannot happen
+}
+
+// Narrows gRegionArt to the packs actually present. `verbose` logs one line per
+// region, which is what the boot report wants; the runtime rescan passes false so
+// its output cannot interleave with the PUT transfer protocol the host is parsing.
+void sdScanRegionArt(bool verbose = true);
+bool sdSerialCommand(const String &line);  // PUT/LS over USB; true if it handles it
+// The safety copies of the save (phase 39): /save/safe0.tps and safe1.tps.
+bool sdCopyWrite(uint8_t slot, const uint8_t *data, size_t n);
+size_t sdCopyRead(uint8_t slot, uint8_t *out, size_t cap);   // 0 if absent or too big
+void sdCopyClear();
+// How full the save area is, in NVS entries. False if it cannot say.
+bool nvsUsage(uint16_t *used, uint16_t *total);
+extern bool sdReady;
+extern bool sdDirty;  // true after receiving files: reload the sprite
+// A region's pack can arrive AFTER the card was mounted -- the web installer
+// streams it over PUT into the running firmware -- and gRegionArt was computed
+// once in sdBegin(). Without this the region stayed locked reading NEEDS PACK
+// until the board was rebooted, which looked exactly like the download failing.
+// The main loop rescans when this is set; the transfer itself is never delayed.
+extern bool sdArtDirty;
