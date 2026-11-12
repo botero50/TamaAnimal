@@ -37,6 +37,8 @@ int main() {
   p.dbgHatchAs(1, false);
   cared(p);
   ck(p.growth == GROW_CUB, "an animal hatches as a cub");
+  gNow += 120000; p.update(gNow);
+  ck(!(p.medals & MED_FINAL), "a cub has not reached its final form medal");
 
   atLevel(p, GROW_JUV_LEVEL - 1);
   ck(!p.canEvolveNow(), "a cub does not grow before its level");
@@ -59,6 +61,8 @@ int main() {
   ck(p.canEvolveNow(), "and grows again at its level");
   p.evolve();
   ck(p.growth == GROW_ADULT && p.speciesId == sp, "into an adult of the same species");
+  gNow += 120000; p.update(gNow);   // medals are checked on the minute tick
+  ck(p.medals & MED_FINAL, "and growing up is what earns that medal");
   atLevel(p, 70);
   ck(!p.canEvolveNow() && p.nextGrowLevel() == 0, "an adult never grows further");
 
