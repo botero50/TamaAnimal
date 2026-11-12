@@ -12,7 +12,7 @@ bool sdDirty = false;
 bool sdArtDirty = false;
 SdThumbs thumbs;
 
-bool SprtMon::load(int16_t dexNum, bool shiny) {
+bool SprtMon::load(int16_t dexNum, bool shiny, uint8_t growth) {
   // int16_t, NOT uint8_t. The dex reached 386 and this did not follow, so
   // everything from 256 up wrapped into Africa: ANIMAL (258) opened
   // p002.bin and drew an ANIMAL. Same trap that caught DexEntry::evolvesTo
@@ -21,13 +21,23 @@ bool SprtMon::load(int16_t dexNum, bool shiny) {
   unload();
   if (!sdReady) return false;
 
+  // The stage's own file first (c = cub, j = juvenile, p = adult), then the adult's, so a
+  // card with only adult packs still shows the animal. A shiny file wins where one exists.
   char path[28];
-  snprintf(path, sizeof(path), "/animals/p%s%03u.bin", shiny ? "s" : "", (unsigned)dexNum);
-  File f = SD_MMC.open(path, FILE_READ);
-  const bool noShinyFile = !f;
-  if (!f && shiny) {  // sin shiny SPRT: usa el normal
-    snprintf(path, sizeof(path), "/animals/p%03u.bin", (unsigned)dexNum);
-    f = SD_MMC.open(path, FILE_READ);
+  const char pre[2] = { growth == 0 ? 'c' : growth == 1 ? 'j' : 'p', 'p' };
+  File f;
+  bool noShinyFile = true;
+  for (int i = 0; i < 2 && !f; i++) {
+    if (i && pre[1] == pre[0]) break;
+    if (shiny) {
+      snprintf(path, sizeof(path), "/animals/%cs%03u.bin", pre[i], (unsigned)dexNum);
+      f = SD_MMC.open(path, FILE_READ);
+      if (f) noShinyFile = false;
+    }
+    if (!f) {
+      snprintf(path, sizeof(path), "/animals/%c%03u.bin", pre[i], (unsigned)dexNum);
+      f = SD_MMC.open(path, FILE_READ);
+    }
   }
   if (!f) return false;
 

@@ -32,6 +32,9 @@ struct PartyMon {
   // Appended at the END of the struct on purpose -- Party::begin() migrates
   // older, shorter blobs by length, and that only works if nothing moved.
   uint8_t moves[MOVE_SLOTS] = { 0, 0, 0, 0 };
+  // Growth stage (pet.h GROW_*). Appended for the same reason as moves[]: an older,
+  // shorter record migrates with this left at its default, an adult.
+  uint8_t growth = 2;
 
   bool empty() const { return dex < 1; }
 };

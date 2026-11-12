@@ -9,7 +9,7 @@ const SaveField SAVE_FIELDS[] = {
   // the creature
   { "init", SK_BOOL },  { "full", SK_U8 },    { "joy", SK_U8 },
   { "ene", SK_U8 },     { "hyg", SK_U8 },     { "poop", SK_U8 },
-  { "wgt", SK_U8 },     { "age", SK_U32 },    { "dexn", SK_I16 },
+  { "wgt", SK_U8 },     { "age", SK_U32 },    { "dexn", SK_I16 },  { "grow", SK_U8 },
   { "eggT2", SK_I16 },  { "crack", SK_U8 },   { "mist", SK_U8 },
   { "sleep", SK_BOOL }, { "lend", SK_U8 },    { "seen", SK_U32 },
   { "bond", SK_U8 },    { "nick", SK_STR },   { "froz", SK_BOOL },

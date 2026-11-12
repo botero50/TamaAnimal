@@ -46,7 +46,7 @@ struct SprtMon {
   uint8_t *blob = nullptr;
   SprtAct acts[SPRT_NACTS];
 
-  bool load(int16_t dexNum, bool shiny = false);
+  bool load(int16_t dexNum, bool shiny = false, uint8_t growth = 2);   // growth: 0 cub, 1 juvenile, 2 adult
   void unload();
   bool has(uint8_t a) const { return loaded && a < SPRT_NACTS && acts[a].frames > 0; }
 };

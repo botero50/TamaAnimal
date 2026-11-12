@@ -324,6 +324,7 @@ void Pet::reviveFrom(const PartyMon &m) {
   neglectTicks = 0;
   speciesId = m.dex;
   prevSpeciesId = -1;
+  growth = prevGrowth = m.growth <= GROW_ADULT ? m.growth : GROW_ADULT;
   eggTaps = 0;
   starterPick = false;
   shiny = m.shiny != 0;
@@ -375,6 +376,7 @@ void Pet::snapshotForParty() {
   endedMon.trDef = trDef;
   endedMon.trSpe = trSpe;
   endedMon.shiny = shiny ? 1 : 0;
+  endedMon.growth = growth;        // banked at the stage it reached
   for (int i = 0; i < MOVE_SLOTS; i++) endedMon.moves[i] = moves[i];  // frozen too
   strncpy(endedMon.nick, nick, sizeof(endedMon.nick) - 1);
   endedMon.nick[sizeof(endedMon.nick) - 1] = 0;
@@ -1187,6 +1189,7 @@ void Pet::release() {
 
 void Pet::hatch() {
   speciesId = eggTarget;
+  growth = prevGrowth = GROW_CUB;   // every animal starts as a cub
   bornDay = today();             // its birthday: a party every month from now
   wishKind = WISH_NONE;
   shiny = eggShiny;
@@ -1227,7 +1230,10 @@ bool Pet::canEvolveNow() const {
   if (frozen) return false;     // frozen at the form it was banked in
   if (isEgg() || sleeping || ceremony != CER_NONE) return false;
   const DexEntry &d = DEX_TBL[speciesId];
-  if (d.evolvesTo == 0) return false;
+  if (d.evolvesTo == 0) {          // animals do not change species: they grow up instead
+    if (growth >= GROW_ADULT) return false;
+    return level() >= (uint16_t)nextGrowLevel() && lowestStat() >= 40;
+  }
   // evoPen is the day owed for retiring the PREVIOUS creature early. It rides
   // on the same threshold careMistakes already moves, so there is one rule for
   // "this creature evolves later" rather than two that can disagree.
@@ -1235,10 +1241,25 @@ bool Pet::canEvolveNow() const {
          lowestStat() >= 40;
 }
 
+int16_t Pet::nextGrowLevel() const {
+  if (growth >= GROW_ADULT) return 0;
+  // the SAME delays the old evolution threshold had, so care still matters
+  return (growth == GROW_CUB ? GROW_JUV_LEVEL : GROW_ADULT_LEVEL) + careMistakes + evoPen;
+}
+
 void Pet::evolve() {
   if (!canEvolveNow()) return;
   const DexEntry &d = DEX_TBL[speciesId];
   prevSpeciesId = speciesId;
+  prevGrowth = growth;
+  if (d.evolvesTo == 0) {          // grow up: same species, the next stage
+    growth++;
+    checkLearnGates();
+    sfxPlay(SFX_EVOLVE);
+    evolveUntil = millis() + EVOLVE_ANIM_MS;
+    save();
+    return;
+  }
   int16_t next = d.evolvesTo;
   speciesId = next;
   registerSpecies(speciesId);
@@ -3251,6 +3272,7 @@ void Pet::save() {
   prefs.putBytes("dexsh", dexShinyReg, sizeof(dexShinyReg));
   prefs.putUInt("age", ageMinutes);
   prefs.putShort("dexn", speciesId);
+  prefs.putUChar("grow", growth);
   prefs.putShort("eggT2", eggTarget);
   prefs.putUChar("crack", eggTaps);
   prefs.putUChar("mist", careMistakes);
@@ -3456,6 +3478,9 @@ void Pet::load() {
   ageMinutes = prefs.getUInt("age", 0);
   if (prefs.isKey("dexn")) {
     speciesId = prefs.getShort("dexn", -1);
+    growth = prefs.getUChar("grow", GROW_ADULT);   // absent on an older save: an adult
+    if (growth > GROW_ADULT) growth = GROW_ADULT;
+    prevGrowth = growth;
     eggTarget = prefs.getShort("eggT2", 4);
   } else {
     // migration from the version with flash indices (0-8)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Draws every animal, writes the microSD files and packs them for the web installer.
 
-Output: build/sdcard/mons/pNNN.bin + thumbs.bin (scratch, gitignored) and
+Output: build/sdcard/mons/{p,j,c}NNN.bin (adult, juvenile, cub) + thumbs.bin (scratch, gitignored) and
 web/sprites-<region>.pak (published, one per region so a player can install a part).
 
 TPAK format (little-endian): "TPAK", u16 count, count x { u8 nameLen, name, u32 size }, then the
@@ -42,12 +42,14 @@ def main():
     os.makedirs(MONS, exist_ok=True)
     os.makedirs(WEB, exist_ok=True)
     files = {}
+    # three files per animal: c = cub, j = juvenile, p = adult (the firmware falls back to p)
     for a in ANIMALS:
-        data = sl.tpk2(a['name'], a['arch'])
-        name = f'p{a["id"]:03d}.bin'
-        with open(os.path.join(MONS, name), 'wb') as f:
-            f.write(data)
-        files[a['id']] = (name, data)
+        for stage, prefix in sl.STAGE_PREFIX.items():
+            data = sl.tpk2(a['name'], a['arch'], stage)
+            name = f'{prefix}{a["id"]:03d}.bin'
+            with open(os.path.join(MONS, name), 'wb') as f:
+                f.write(data)
+            files[(a['id'], prefix)] = (name, data)
     blobs = [thumb(a) for a in ANIMALS]
     pos = 6 + 4 * len(blobs)
     offs = []
@@ -58,7 +60,7 @@ def main():
     with open(os.path.join(MONS, 'thumbs.bin'), 'wb') as f:
         f.write(th)
     for region, lo, hi in REGIONS:
-        entries = [('animals/thumbs.bin', th)] + [('animals/' + files[i][0], files[i][1]) for i in range(lo, hi + 1)]
+        entries = [('animals/thumbs.bin', th)] + [('animals/' + files[(i, pre)][0], files[(i, pre)][1]) for i in range(lo, hi + 1) for pre in 'pjc']
         out = os.path.join(WEB, f'sprites-{region}.pak')
         with open(out, 'wb') as o:
             o.write(b'TPAK' + struct.pack('<H', len(entries)))

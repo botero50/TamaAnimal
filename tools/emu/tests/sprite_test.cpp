@@ -16,6 +16,14 @@
 #include "sdmon.h"
 #include <cstdio>
 #include <cstring>
+#include <sys/stat.h>
+#ifdef _WIN32
+#include <direct.h>
+#define MKDIR(d) _mkdir(d)
+#else
+#define MKDIR(d) mkdir(d, 0755)
+#endif
+#include <string>
 uint32_t g_seed=7; FakeSerial Serial; FakeESP ESP; FakeWire Wire;
 volatile int g_touchX=0,g_touchY=0; volatile bool g_touchDown=false;
 uint32_t millis(){return 0;}
@@ -90,6 +98,36 @@ int main(){
     ck(!m.load(0, false), "dex 0 loads nothing");
     ck(!m.load(-1, false), "nor a negative dex");
     ck(!m.load(9999, false), "nor one past the table");
+  }
+
+  // growth stages: a cub draws its own art, and a card holding only the adult files
+  // (the packs from before growth stages) still shows the animal rather than nothing
+  {
+    auto frame = [](const SprtMon &m) { return std::string((const char *)m.acts[0].data, (size_t)m.acts[0].w * m.acts[0].h); };
+    SprtMon adult, cub, juv;
+    bool okA = adult.load(1, false, 2), okC = cub.load(1, false, 0), okJ = juv.load(1, false, 1);
+    ck(okA && okC && okJ, "an animal loads at every growth stage");
+    ck(okA && okC && frame(adult) != frame(cub), "and a cub is not drawn as the adult");
+    ck(okC && okJ && frame(cub) != frame(juv), "nor a juvenile as the cub");
+    std::string adultPixels = okA ? frame(adult) : "";
+    adult.unload(); cub.unload(); juv.unload();
+
+    // copy just p001.bin into a folder of its own (in the working directory)
+    const char *only = "adult_only_sprites";
+    MKDIR(only);
+    {
+      FILE *in = fopen(SPRITE_DIR "/p001.bin", "rb"), *out = fopen("adult_only_sprites/p001.bin", "wb");
+      char buf[4096]; size_t n;
+      while (in && out && (n = fread(buf, 1, sizeof(buf), in)) > 0) fwrite(buf, 1, n, out);
+      if (in) fclose(in);
+      if (out) fclose(out);
+    }
+    emuSetSpriteDir(only);
+    SprtMon fb;
+    ck(fb.load(1, false, 0) && frame(fb) == adultPixels, "with only adult files, a cub falls back to the adult art");
+    fb.unload();
+    remove("adult_only_sprites/p001.bin");
+    emuSetSpriteDir(SPRITE_DIR);
   }
 
   printf("%s\n", bad?"FAILURES":"all good");

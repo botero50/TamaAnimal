@@ -39,17 +39,24 @@ static uint8_t *slurp(const std::string &path, uint32_t *size) {
   return b;
 }
 
-bool SprtMon::load(int16_t dexNum, bool shiny) {
+bool SprtMon::load(int16_t dexNum, bool shiny, uint8_t growth) {
   if (dexNum < 1 || dexNum > 999) return false;
   unload();
-  char p[300];   // the sprite directory is a full host path here, unlike the card's /mons
-  snprintf(p, sizeof(p), "%s/p%s%03u.bin", g_spriteDir.c_str(), shiny ? "s" : "", (unsigned)dexNum);
+  char p[300];   // the sprite directory is a full host path here, unlike the card's /animals
   uint32_t size = 0;
-  blob = slurp(p, &size);
-  const bool noShinyFile = !blob;
-  if (!blob) {
-    snprintf(p, sizeof(p), "%s/p%03u.bin", g_spriteDir.c_str(), (unsigned)dexNum);
-    blob = slurp(p, &size);
+  const char pre[2] = { growth == 0 ? 'c' : growth == 1 ? 'j' : 'p', 'p' };
+  bool noShinyFile = true;
+  for (int i = 0; i < 2 && !blob; i++) {
+    if (i && pre[1] == pre[0]) break;
+    if (shiny) {
+      snprintf(p, sizeof(p), "%s/%cs%03u.bin", g_spriteDir.c_str(), pre[i], (unsigned)dexNum);
+      blob = slurp(p, &size);
+      if (blob) noShinyFile = false;
+    }
+    if (!blob) {
+      snprintf(p, sizeof(p), "%s/%c%03u.bin", g_spriteDir.c_str(), pre[i], (unsigned)dexNum);
+      blob = slurp(p, &size);
+    }
   }
   if (!blob) return false;
   if (size < 7 || memcmp(blob, "TPK2", 4) != 0) { unload(); return false; }

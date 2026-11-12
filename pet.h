@@ -32,6 +32,11 @@ inline void sweepTimer(uint32_t &t, uint32_t now) { if (t && (int32_t)(t - now) 
 // Retiring a creature BEFORE it has earned its farewell costs the NEXT one a
 // day's worth of evolution. Derived from MINUTES_PER_LEVEL rather than written
 // as 24, so it stays "a day" if the level rate is ever retuned.
+// Growth stages. Animals do not change species: they grow from a cub to a juvenile to an
+// adult, at these levels plus the same delays evolution had (care mistakes, an early retire).
+enum : uint8_t { GROW_CUB = 0, GROW_JUV = 1, GROW_ADULT = 2 };
+#define GROW_JUV_LEVEL 16
+#define GROW_ADULT_LEVEL 36
 #define EVO_PENALTY_LEVELS ((uint8_t)((24UL * 60) / MINUTES_PER_LEVEL))
 #define RUNAWAY_TICKS 60                   // runs away after 1 h with EVERYTHING at zero
 // Night, by the RTC: 21:00 to 06:00 (was midnight: an evening with the screen
@@ -482,6 +487,8 @@ public:
   uint32_t ageMinutes = 0;
   int16_t speciesId = -1;      // field guide number (1..DEX_COUNT), -1 = egg
   int16_t prevSpeciesId = -1;  // for the evolution animation
+  uint8_t growth = GROW_ADULT;     // GROW_CUB..GROW_ADULT; a save from before growth stages is an adult
+  uint8_t prevGrowth = GROW_ADULT; // for the grow-up animation
   uint8_t careMistakes = 0;   // mistakes: each one delays evolution by 1 level
   bool sleeping = false;
   uint32_t lastSeenEpoch = 0;   // last RTC time seen (for offline progression)
@@ -1096,6 +1103,7 @@ public:
   bool inTotalNeglect() const { return !fullness && !joy && !energy && !hygiene; }
   bool canRunawayNow() const;   // total neglect for 1h: ready to run away (sad button)
   // the user decides in a dialog; "keep/stay together" postpones and re-offers later
+  int16_t nextGrowLevel() const;   // level it grows up at, with its delays; 0 once adult
   bool wantEvolveButton() const { return canEvolveNow() && level() > evoDeclinedLv; }
   bool wantFarewellButton() const { return canFarewellNow() && ageMinutes >= farDeclinedAge; }
   void declineEvolve() { evoDeclinedLv = level(); }              // re-offers on level up

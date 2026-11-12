@@ -25,12 +25,16 @@ def rgb565(v):
 
 
 class Canvas:
-    def __init__(self, size):
+    def __init__(self, size, zoom=1.0):
+        """zoom < 1 draws the same plan smaller, still standing on the ground and centred."""
         self.n = size
-        self.f = size / 40.0
+        self.f = size / 40.0 * zoom
+        self.ox = int(round(size / 2 * (1 - zoom)))
+        self.oy = int(round(size * 38 / 40 * (1 - zoom)))
         self.g = [[None] * size for _ in range(size)]
 
     def put(self, x, y, c):
+        x, y = x + self.ox, y + self.oy
         if 0 <= x < self.n and 0 <= y < self.n:
             self.g[y][x] = c
 
@@ -244,15 +248,16 @@ def primate(c, a, pose):
     if not low:
         c.rect(bx - 6, by + 4, bx - 3, 38 + dy - (ph == 0), dark)
         c.rect(bx + 3, by + 4, bx + 6, 38 + dy - (ph == 2), dark)
-    c.oval(bx, by, 8, 7.5, col)
-    c.oval(bx, by + 1, 5, 5, belly)
-    c.line(bx - 7, by - 3, bx - 9, by + 5 - (ph == 1) * 2, 2.6, col)
-    c.line(bx + 7, by - 3, bx + 9, by + 5 - (ph == 3) * 2, 2.6, col)
-    hx, hy = bx + 1, by - 11 + pose.get('head', 0)
-    c.oval(hx - 6, hy, 2.4, 2.4, belly)
-    c.oval(hx + 6, hy, 2.4, 2.4, belly)
-    c.oval(hx, hy, 6.4, 6, col)
-    c.oval(hx + 1, hy + 2, 4, 3.2, a.get('face', belly))
+    bs, hs = a.get('bs', 1.0), a.get('hs', 1.0)     # body and head scale (young ones: small body, big head)
+    c.oval(bx, by, 8 * bs, 7.5 * bs, col)
+    c.oval(bx, by + 1, 5 * bs, 5 * bs, belly)
+    c.line(bx - 7 * bs, by - 3, bx - 9 * bs, by + 5 - (ph == 1) * 2, 2.6, col)
+    c.line(bx + 7 * bs, by - 3, bx + 9 * bs, by + 5 - (ph == 3) * 2, 2.6, col)
+    hx, hy = bx + 1, by - 4 - 7 * bs * hs + pose.get('head', 0)
+    c.oval(hx - 6 * hs, hy, 2.4 * hs, 2.4 * hs, belly)
+    c.oval(hx + 6 * hs, hy, 2.4 * hs, 2.4 * hs, belly)
+    c.oval(hx, hy, 6.4 * hs, 6 * hs, col)
+    c.oval(hx + 1, hy + 2, 4 * hs, 3.2 * hs, a.get('face', belly))
     if a.get('mark') != col:
         c.oval(hx, hy - 4, 4, 1.6, a['mark'])
     eye(c, hx - 1, hy - 1, pose)
@@ -303,7 +308,8 @@ def low_reptile(c, a, pose):
         c.oval(bx + i * 2.6, by - 3, 1, 1, a['mark'])
     hx, hy = bx + 11 * long, by - 2 + pose.get('head', 0)
     jaw = a.get('jaw', 5)
-    c.oval(hx, hy, 4.5, 3.5, col)
+    hs = a.get('hs', 1.0)
+    c.oval(hx, hy, 4.5 * hs, 3.5 * hs, col)
     c.rect(hx + 2, hy - 1, hx + 2 + jaw, hy + 2, col)
     if pose.get('mouth') or lunge:
         c.rect(hx + 2, hy + 2, hx + 2 + jaw, hy + 3, 'R')
@@ -501,10 +507,86 @@ PLAN = {'wader': bird, 'flightless': bird, 'penguin': bird, 'raptor': bird, 'par
         'lizard': low_reptile, 'croc': low_reptile, 'turtle': turtle, 'frog': frog, 'fish': fish, 'dolphin': fish, 'manatee': fish, 'scorpion': scorpion}
 
 
-def draw(name, arch, pose, size=40):
-    c = Canvas(size)
-    a = look(name, arch)
-    PLAN.get(arch, quad)(c, a, pose)
+# Growth stages: 0 cub, 1 juvenile, 2 adult. Young ones are drawn from the same plan with a young
+# body's proportions: a bigger head, shorter legs and neck, no horns, tusks or mane, softer colours.
+STAGE_CUB, STAGE_JUV, STAGE_ADULT = 0, 1, 2
+STAGE_PREFIX = {STAGE_CUB: 'c', STAGE_JUV: 'j', STAGE_ADULT: 'p'}
+QUADS = set('cat dog giraffe zebra elephant rhino hippo bovine antelope camel pig bear sloth armadillo small'.split())
+BIRDS = set('wader flightless penguin raptor parrot bird'.split())
+SOFTER = {'Y': 'y', 'c': 'Y', 'C': 'c', 'O': 'o', 'G': 'g', 'B': 'b', 'R': 'r', 'P': 'p', 'd': 'T', 'L': 'l', 'M': 'N'}
+
+
+def stage_look(a, arch, stage):
+    """Returns (plan, look, zoom) for a growth stage."""
+    plan = PLAN.get(arch, quad)
+    if stage >= STAGE_ADULT:
+        return plan, a, 1.0
+    cub = stage == STAGE_CUB
+    t = 0.0 if cub else 0.55
+
+    def mix(baby, adult):
+        return baby + (adult - baby) * t
+    zoom = 1.0
+    if arch in QUADS:
+        a['body'] = a.get('body', 1.0) * mix(.68, 1.0)
+        a['leg'] = a.get('leg', 8) * mix(.55, 1.0)
+        a['neck'] = a.get('neck', 5) * mix(.55, 1.0)
+        a['head'] = a.get('head', 5) * mix(1.12, 1.0)
+        a['neckw'] = a.get('neckw', 5) * mix(.75, 1.0)
+        a['legw'] = a.get('legw', 3) * mix(.85, 1.0)
+        a['snout'] = max(1, round(a.get('snout', 2) * mix(.6, 1.0)))
+        if cub:
+            a.pop('horn', None)
+            a['tusk'] = False
+            if a.get('mane'):                    # lion cubs: no mane, faint spots
+                a['mane'] = False
+                a['pattern'] = 'spots'
+                a['mark'] = 'c'
+            if arch in ('bear', 'dog'):
+                a['ear'] = 'round'
+            if a.get('tail') == 'tuft':
+                a['tail'] = 'thin'
+        elif a.get('horn') == 'curve':
+            a['horn'] = 'ossicone'               # little nubs
+    elif arch in BIRDS:
+        a['rx'] = a.get('rx', 9) * mix(.8, 1.0)
+        a['ry'] = a.get('ry', 7) * mix(.95, 1.0)
+        a['head'] = a.get('head', 4.5) * mix(1.25, 1.0)
+        a['leg'] = a.get('leg', 7) * mix(.45, 1.0)
+        a['neck'] = a.get('neck', 1) * mix(.3, 1.0)
+        a['tail'] = a.get('tail', 8) * mix(.25, 1.0)
+        if cub:                                  # a downy chick
+            a['crest'] = False
+            if a.get('beak') in ('long', 'huge'):
+                a['beak'] = 'short'
+            down = 's' if arch in ('raptor', 'penguin') else 'y'
+            a.update(col=down, belly='w', mark=down, dark='S' if down == 's' else 'Y', headcol=down)
+            if arch == 'penguin':
+                a.update(col='S', dark='k', mark='S', headcol='S')
+    elif arch == 'primate':
+        a['bs'] = mix(.7, 1.0)
+        a['hs'] = mix(.95, 1.0)
+        zoom = mix(.85, 1.0)
+    elif arch == 'frog' and cub:                 # frogs start as tadpoles
+        plan = fish
+        a.update(rx=6, ry=4.5, mark=a['dark'], belly=a['col'], finw=1.5, finup=3)
+        zoom = .8
+    elif arch in ('croc', 'lizard', 'snake', 'turtle', 'frog'):
+        a['hs'] = mix(1.35, 1.0)
+        a['long'] = a.get('long', 1.0) * mix(.8, 1.0)
+        a['jaw'] = max(1, round(a.get('jaw', 5) * mix(.5, 1.0)))
+        zoom = mix(.62, .85)
+    else:                                        # fish, dolphins, manatees, scorpions
+        zoom = mix(.58, .8)
+    if cub and arch not in ('cat',):
+        a['col'] = SOFTER.get(a['col'], a['col'])
+    return plan, a, zoom
+
+
+def draw(name, arch, pose, size=40, stage=STAGE_ADULT):
+    plan, a, zoom = stage_look(look(name, arch), arch, stage)
+    c = Canvas(size, zoom)
+    plan(c, a, pose)
     return c.finish()
 
 
@@ -532,7 +614,7 @@ def grid_indexed(grid, order):
     return bytes(0xFF if c is None else idx[c] for row in grid for c in row)
 
 
-def tpk2(name, arch):
+def tpk2(name, arch, stage=STAGE_ADULT):
     """A complete sprite file in the firmware's TPK2 format."""
     import struct
     out = bytearray(b'TPK2')
@@ -545,7 +627,7 @@ def tpk2(name, arch):
         for _ in poses:
             out += struct.pack('<H', ms)
         for p in poses:
-            g = draw(name, arch, p)
+            g = draw(name, arch, p, stage=stage)
             if act == ACTION_WALK_LEFT:
                 g = [list(reversed(r)) for r in g]
             out += grid_indexed(g, LETTERS)

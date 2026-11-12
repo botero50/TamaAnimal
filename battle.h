@@ -27,6 +27,7 @@ struct Combatant {
   bool recharge = false;     // EF_RECHARGE spent this creature's next turn
   uint8_t charging = 0;      // EF_CHARGE move already wound up
   bool shiny = false;        // which sprite variant to stream
+  uint8_t growth = 2;        // and which growth stage (2 = adult: wild ones and rangers' teams)
   char name[12] = "";
 
   bool fainted() const { return hp == 0; }

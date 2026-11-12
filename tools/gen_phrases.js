@@ -32,7 +32,7 @@ const G = {
     ['No me siento bien...', 'I don\'t feel well...', 'Je ne me sens pas bien...', 'Mir geht es nicht gut...', 'Non mi sento bene...', 'Nao me sinto bem...', '我不太舒服...', '몸이 안 좋아...'],
     ['Me duele la pancita', 'My tummy hurts', 'J\'ai mal au ventre', 'Mein Bauch tut weh', 'Mi fa male la pancia', 'Minha barriga doi', '我肚子疼', '배가 아파'],
     ['Achis! Achis!', 'Achoo! Achoo!', 'Atchoum ! Atchoum !', 'Hatschi! Hatschi!', 'Ecci! Ecci!', 'Atchim! Atchim!', '阿嚏!阿嚏!', '에취! 에취!'],
-    ['Vamos al Centro?', 'Can we go to the Center?', 'On va au Centre ?', 'Gehen wir ins Center?', 'Andiamo al Centro?', 'Vamos ao Centro?', '去宝可梦中心吧?', '센터에 갈까?'],
+    ['Vamos al Centro?', 'Can we go to the Center?', 'On va au Centre ?', 'Gehen wir ins Center?', 'Andiamo al Centro?', 'Vamos ao Centro?', '去兽医院吧?', '센터에 갈까?'],
     ['Una medicina, porfa', 'Some medicine, please', 'Un medicament, stp', 'Etwas Medizin, bitte', 'Una medicina, per favore', 'Um remedio, por favor', '请给我药', '약 좀 줘'],
   ],
   LONELY: [
@@ -106,7 +106,7 @@ const G = {
   ],
   CLOUD: [
     ['Cuantas nubes...', 'So many clouds...', 'Que de nuages...', 'So viele Wolken...', 'Quante nuvole...', 'Quantas nuvens...', '好多云...', '구름이 많아...'],
-    ['Esa nube parece un animal', 'That cloud looks like a animal', 'Ce nuage ressemble a un animal', 'Die Wolke sieht aus wie ein animal', 'Quella nuvola sembra un animal', 'Aquela nuvem parece um animal', '那朵云像宝可梦', '저 구름 포켓몬 같아'],
+    ['Esa nube parece un animal', 'That cloud looks like an animal', 'Ce nuage ressemble a un animal', 'Die Wolke sieht aus wie ein Tier', 'Quella nuvola sembra un animale', 'Aquela nuvem parece um animal', '那朵云像动物', '저 구름 동물 같아'],
     ['Esta nublado hoy', 'It\'s cloudy today', 'C\'est nuageux aujourd hui', 'Heute ist es wolkig', 'Oggi e nuvoloso', 'Esta nublado hoje', '今天多云', '오늘은 흐려'],
   ],
   RAIN: [
@@ -204,7 +204,7 @@ const G = {
     ['Siempre estare contigo', 'I\'ll always be with you', 'Je serai toujours avec toi', 'Ich bin immer bei dir', 'Saro sempre con te', 'Sempre estarei com voce', '我会一直陪着你', '항상 곁에 있을게'],
     ['Confio en ti', 'I trust you', 'J\'ai confiance en toi', 'Ich vertraue dir', 'Mi fido di te', 'Confio em voce', '我相信你', '널 믿어'],
     ['Juntos somos fuertes', 'Together we\'re strong', 'Ensemble on est forts', 'Zusammen sind wir stark', 'Insieme siamo forti', 'Juntos somos fortes', '在一起我们很强', '함께라면 강해'],
-    ['Eres el mejor entrenador', 'You\'re the best trainer', 'Tu es le meilleur dresseur', 'Du bist der beste Trainer', 'Sei il miglior allenatore', 'Voce e o melhor treinador', '你是最棒的训练家', '넌 최고의 트레이너야'],
+    ['Eres el mejor guarda', 'You\'re the best ranger', 'Tu es le meilleur gardien', 'Du bist der beste Ranger', 'Sei la miglior guardia', 'Voce e o melhor guarda', '你是最棒的护林员', '넌 최고의 레인저야'],
   ],
   EVOLVE: [
     ['Siento que voy a cambiar...', 'I feel like I\'m about to change...', 'Je sens que je vais changer...', 'Ich glaube, ich veraendere mich...', 'Sento che sto per cambiare...', 'Sinto que vou mudar...', '我觉得我要变了...', '곧 변할 것 같아...'],

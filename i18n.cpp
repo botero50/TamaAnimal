@@ -9,7 +9,7 @@ Lang gLang = LANG_DEFAULT;
 static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
   // ---------------- ES ----------------
   {
-    "Esta evolucionando!", "Nam nam!", "Le gusta!", "Tiene hambre!", "Necesita un bano!",
+    "Esta creciendo!", "Nam nam!", "Le gusta!", "Tiene hambre!", "Necesita un bano!",
     "Esta agotado...", "Esta triste...", "Esta rellenito...", "Es SHINY!!", "Esta feliz",
     "GRACIAS! Hasta siempre", "Se ha escapado...", "Adios! Se despide...",
     "HUEVO", "Huevo legendario!?", "Huevo raro!", "Toca el huevo...", "Se mueve!", "Esta a punto!",
@@ -27,12 +27,12 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "NOMBRE:", "toca para volver",
     "COM", "FEL", "ENE", "LIM",
     "REC %u",
-    "PROGRESO", "Nv.%u", "%u min para Nv.%u", "EVOLUCION", "Forma final",
-    "Listo para evolucionar!", "Sube todo a 40 para evolucionar",
-    "Evoluciona en %u niv.", "Descuidos: %u",
+    "PROGRESO", "Nv.%u", "%u min para Nv.%u", "CRECIMIENTO", "Ya es adulto",
+    "Listo para crecer!", "Sube todo a 40 para crecer",
+    "Crece en %u niv.", "Descuidos: %u",
     "ON", "OFF",
-    "EVOLUCIONAR", "%s quiere decirte algo...", "%s se siente abandonado...",
-    "Evolucionar?", "Mantener forma", "Despedirse?", "Despedirse", "Quedaros juntos",
+    "CRECER", "%s quiere decirte algo...", "%s se siente abandonado...",
+    "Crecer?", "Todavia no", "Despedirse?", "Despedirse", "Quedaros juntos",
     "Elige tu inicial",
     "Sin sprites", "Cargalos en la SD",
     "PS", "IV %u",
@@ -45,7 +45,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "%s: %s", "PARALISIS", "QUEMADURA", "VENENO", "DORMIDO", "CONGELADO", "CONFUSION",
     "Has ganado!", "Has perdido...",
     "%s saca a %s", "Adelante, %s!", "RESERVAS", "SELLOS %u/8", "GUARDA", "VELOCIDAD +%u", "toca: cambiar avatar", "%u en total", "NORMAL", "DIFICIL",
- "ELEGIDOS %u/%u", "LUCHAR", "BLOQUEADO", "EQUIPO", "%s derrotado!", "SELLO NUEVO!", "VOL %u", "CAJA %u/%u", "cambiar con %s: elige hueco", "CAJA", "TRAER", "solo con un huevo", "COMBATE LAN", "CREAR", "UNIRSE", "buscando...", "listo!", "version distinta", "crear o unirse", "rival: %u animales", "el rival se fue", "esperando al rival...", "OTRA VEZ", "HUIR", "de que region viene el huevo", "%s +%u", "ya no puede entrenar mas", "ELIGE TU REGION", "RETIRAR", "Retirarla ya?", "la siguiente evoluciona un dia mas tarde", "evoluciona un dia mas tarde",   "FALTA PACK", "SOLTAR", "se va para siempre", "AL EQUIPO", "no se unira a tu equipo", "VOLUMEN", "IDIOMA", "INFO", "BRILLO", "PRUEBA",
+ "ELEGIDOS %u/%u", "LUCHAR", "BLOQUEADO", "EQUIPO", "%s derrotado!", "SELLO NUEVO!", "VOL %u", "CAJA %u/%u", "cambiar con %s: elige hueco", "CAJA", "TRAER", "solo con un huevo", "COMBATE LAN", "CREAR", "UNIRSE", "buscando...", "listo!", "version distinta", "crear o unirse", "rival: %u animales", "el rival se fue", "esperando al rival...", "OTRA VEZ", "HUIR", "de que region viene el huevo", "%s +%u", "ya no puede entrenar mas", "ELIGE TU REGION", "RETIRAR", "Retirarla ya?", "la siguiente crece un dia mas tarde", "crece un dia mas tarde",   "FALTA PACK", "SOLTAR", "se va para siempre", "AL EQUIPO", "no se unira a tu equipo", "VOLUMEN", "IDIOMA", "INFO", "BRILLO", "PRUEBA",
     // care update
     "IZQ/DER", "MAS/MENOS", "QUIEN ES?", "BAYAS", "TOPOS", "COMBA", "BAILE", "ESCONDITE", "Hacia donde mira?", "Mayor o menor?", "MAYOR", "MENOR", "Quien es ese animal?", "Toca izq/der: mover", "Tocalos! No al escorpion", "Toca para saltar!", "Toca al ritmo!", "PERFECTO", "BIEN", "FALLO", "Donde se esconde?", "ALEGRIA +%u", "DEFENSA +%u", "BIEN!", "NO...", "Le duele la tripa!", "Esta resfriado!", "Esta grunon...", "Se aburre...", "Zzz... apaga la luz!", "Esta malito!", "Ya esta mejor!", "Otra dosis luego", "Espera 10 min", "Ahora un bano!", "Puaj! No esta malo", "MAS JUEGOS", "MINIJUEGOS",
     // care update
@@ -143,10 +143,10 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 44
     "Hierba alta", "SNACKS", "Snack", "Snack Fino", "Snack Top", "Aparece %s!", "Atrapaste a %s!", "Se fue a la caja.", "%s se escapo!", "Equipo y caja llenos", "Sin snacks: hay en la tienda", "Encontraste un snack!", "Algo se mueve en la hierba!", "Camina %u pasos mas", "Ahora esta durmiendo", "No hay nadie en la hierba", "Se usan en la hierba alta",
     // phase 45
-    "Excursion", "De excursion", "De vuelta!", "%s se fue de excursion!", "Ya no hay excursiones hoy", "Es tarde: manana sera", "Llamar", "Llamarlo? Sin historia", "%s fue al rio", "y encontro %u monedas!", "%s busco entre los arbustos", "y encontro un snack!", "%s conocio a %s", "y compartieron un bocadillo!", "%s paseo por el pueblo", "y le dieron una galleta!", "%s jugo en el jardin", "y encontro una semilla!", "%s salto en los charcos", "y trajo un jabon!", "%s vio algo moverse", "en la hierba alta!", "%s subio a una colina", "y encontro un snack fino!", },
+    "Excursion", "De excursion", "De vuelta!", "%s se fue de excursion!", "Ya no hay excursiones hoy", "Es tarde: manana sera", "Llamar", "Llamarlo? Sin historia", "%s fue al rio", "y encontro %u monedas!", "%s busco entre los arbustos", "y encontro un snack!", "%s conocio a %s", "y compartieron un bocadillo!", "%s paseo por el pueblo", "y le dieron una galleta!", "%s jugo en el jardin", "y encontro una semilla!", "%s salto en los charcos", "y trajo un jabon!", "%s vio algo moverse", "en la hierba alta!", "%s subio a una colina", "y encontro un snack fino!", "Cria", "Joven", "Adulto", },
   // ---------------- EN ----------------
   {
-    "Evolving!", "Yum yum!", "It likes it!", "It's hungry!", "Needs a bath!",
+    "Growing up!", "Yum yum!", "It likes it!", "It's hungry!", "Needs a bath!",
     "Worn out...", "Feeling sad...", "A bit chubby...", "It's SHINY!!", "It's happy",
     "THANKS! Farewell", "It ran away...", "Bye! Waving goodbye...",
     "EGG", "Legendary egg!?", "Rare egg!", "Tap the egg...", "It moves!", "Almost there!",
@@ -164,12 +164,12 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "NAME:", "tap to go back",
     "FOOD", "JOY", "ENE", "HYG",
     "BEST %u",
-    "PROGRESS", "Lv.%u", "%u min to Lv.%u", "EVOLUTION", "Final form",
-    "Ready to evolve!", "All needs >=40 to evolve",
-    "Evolves in %u lv.", "Slip-ups: %u",
+    "PROGRESS", "Lv.%u", "%u min to Lv.%u", "GROWTH", "Fully grown",
+    "Ready to grow up!", "All needs >=40 to grow",
+    "Grows up in %u lv.", "Slip-ups: %u",
     "ON", "OFF",
-    "EVOLVE!", "%s wants to tell you...", "%s feels abandoned...",
-    "Evolve?", "Keep form", "Say goodbye?", "Goodbye", "Stay together",
+    "GROW UP!", "%s wants to tell you...", "%s feels abandoned...",
+    "Grow up?", "Not yet", "Say goodbye?", "Goodbye", "Stay together",
     "Choose your starter",
     "No sprites", "Load them onto the SD",
     "HP", "IV %u",
@@ -182,7 +182,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "%s: %s", "PARALYSED", "BURNED", "POISONED", "ASLEEP", "FROZEN", "CONFUSED",
     "You win!", "You lost...",
     "%s sends out %s", "Go, %s!", "RESERVES", "STAMPS %u/8", "RANGER",
- "SPEED +%u", "tap: change avatar", "%u earned in all", "EASY", "HARD", "CHOSEN %u/%u", "FIGHT", "LOCKED", "TEAM", "%s defeated!", "NEW STAMP!", "VOL %u", "BOX %u/%u", "swap with %s: pick a slot", "BOX", "BRING BACK", "only while an egg waits", "LAN BATTLE", "HOST", "JOIN", "searching...", "ready!", "different version", "host or join", "rival: %u pets", "the rival left", "waiting for the rival...", "AGAIN", "RUN", "where this egg comes from", "%s +%u", "trained as far as it can go", "CHOOSE A REGION", "RETIRE", "Retire it early?", "the next one evolves a day later", "evolves a day later",
+ "SPEED +%u", "tap: change avatar", "%u earned in all", "EASY", "HARD", "CHOSEN %u/%u", "FIGHT", "LOCKED", "TEAM", "%s defeated!", "NEW STAMP!", "VOL %u", "BOX %u/%u", "swap with %s: pick a slot", "BOX", "BRING BACK", "only while an egg waits", "LAN BATTLE", "HOST", "JOIN", "searching...", "ready!", "different version", "host or join", "rival: %u pets", "the rival left", "waiting for the rival...", "AGAIN", "RUN", "where this egg comes from", "%s +%u", "trained as far as it can go", "CHOOSE A REGION", "RETIRE", "Retire it early?", "the next one grows up a day later", "grows up a day later",
    "NEEDS PACK", "RELEASE", "gone for good", "TO PARTY", "it will not join your party", "VOLUME", "LANGUAGE", "ABOUT", "BRIGHTNESS", "TEST",
     // care update
     "LEFT/RIGHT", "HIGH/LOW", "WHO IS IT?", "BERRY DROP", "MOLE POP", "JUMP ROPE", "DANCE", "HIDE+SEEK", "Which way will it look?", "Higher or lower?", "HIGHER", "LOWER", "Who's that animal?", "Tap left/right to move", "Tap them! Not the scorpion!", "Tap to jump!", "Tap on the beat!", "PERFECT", "GOOD", "MISS", "Where is it hiding?", "JOY +%u", "DEFENCE +%u", "YES!", "NOPE", "Tummy ache!", "Caught a cold!", "Grumpy...", "Bored...", "Zzz... lights on!", "Too sick to play!", "Feeling better!", "One more dose later", "Wait 10 minutes", "Now a bath!", "Yuck! Not sick", "MORE GAMES", "MINIGAMES",
@@ -281,10 +281,10 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 44
     "Tall Grass", "SNACKS", "Snack", "Fine Snack", "Top Snack", "%s appears!", "You caught %s!", "It went to the box.", "%s broke free!", "Team and box are full", "No snacks: buy some in the shop", "You found a snack!", "Something stirs in the grass!", "Walk %u more steps", "It's asleep right now", "Nobody is in the grass", "Use them in the Tall Grass",
     // phase 45
-    "Trip", "On a trip", "Back home!", "%s set off on a trip!", "No more trips today", "Too late: try tomorrow", "Call back", "Call it back? No story", "%s went to the river", "and found %u coins!", "%s looked under a bush", "and found a snack!", "%s met %s", "and they shared a snack!", "%s walked through town", "and was given a cookie!", "%s played in a garden", "and found a seed!", "%s splashed in puddles", "and brought home soap!", "%s saw something move", "in the tall grass!", "%s climbed a hill", "and found a fine snack!", },
+    "Trip", "On a trip", "Back home!", "%s set off on a trip!", "No more trips today", "Too late: try tomorrow", "Call back", "Call it back? No story", "%s went to the river", "and found %u coins!", "%s looked under a bush", "and found a snack!", "%s met %s", "and they shared a snack!", "%s walked through town", "and was given a cookie!", "%s played in a garden", "and found a seed!", "%s splashed in puddles", "and brought home soap!", "%s saw something move", "in the tall grass!", "%s climbed a hill", "and found a fine snack!", "Cub", "Juvenile", "Adult", },
   // ---------------- FR ----------------
   {
-    "Il evolue!", "Miam miam!", "Il aime ca!", "Il a faim!", "Besoin d'un bain!",
+    "Il grandit !", "Miam miam!", "Il aime ca!", "Il a faim!", "Besoin d'un bain!",
     "Epuise...", "Triste...", "Un peu rond...", "C'est SHINY!!", "Il est content",
     "MERCI! Adieu", "Il s'est enfui...", "Au revoir!",
     "OEUF", "Oeuf legendaire!?", "Oeuf rare!", "Touche l'oeuf...", "Il bouge!", "Presque la!",
@@ -302,12 +302,12 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "NOM:", "touche pour revenir",
     "NOUR", "JOIE", "ENE", "HYG",
     "REC %u",
-    "PROGRES", "Niv.%u", "%u min pour Niv.%u", "EVOLUTION", "Forme finale",
-    "Pret a evoluer!", "Tout a 40 pour evoluer",
-    "Evolue dans %u niv.", "Negligences: %u",
+    "PROGRES", "Niv.%u", "%u min pour Niv.%u", "CROISSANCE", "Adulte",
+    "Pret a grandir !", "Tout a 40 pour grandir",
+    "Grandit dans %u niv.", "Negligences: %u",
     "ON", "OFF",
-    "EVOLUER", "%s veut te parler...", "%s se sent abandonne...",
-    "Evoluer?", "Garder forme", "Dire adieu?", "Adieu", "Rester ensemble",
+    "GRANDIR", "%s veut te parler...", "%s se sent abandonne...",
+    "Grandir ?", "Pas encore", "Dire adieu?", "Adieu", "Rester ensemble",
     "Choisis ton starter",
     "Pas de sprites", "Charge-les sur la SD",
     "PV", "IV %u",
@@ -319,7 +319,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "%s a rate!", "Coup critique!", "%s est K.O.!", "Il se blesse!",
     "%s: %s", "PARALYSIE", "BRULURE", "POISON", "ENDORMI", "GELE", "CONFUSION",
     "Gagne!", "Perdu...",
-    "%s envoie %s", "Vas-y, %s!", "RESERVES", "TAMPONS %u/8", "GARDIEN", "VITESSE +%u", "touche: changer d'avatar", "%u au total", "NORMAL", "DIFFICILE", "CHOISIS %u/%u", "COMBATTRE", "VERROUILLE", "EQUIPE", "%s vaincu!", "NOUVEAU TAMPON!", "VOL %u", "BOITE %u/%u", "echanger avec %s: choisis", "BOITE", "RAMENER", "seulement avec un oeuf", "COMBAT LAN", "CREER", "REJOINDRE", "recherche...", "pret!", "version differente", "creer ou rejoindre", "rival: %u animaux", "le rival est parti", "en attente du rival...", "ENCORE", "FUIR", "d ou vient cet oeuf", "%s +%u", "ne peut plus progresser", "CHOISIS TA REGION", "RETIRER", "Retirer maintenant?", "le suivant evolue un jour plus tard", "evolue un jour plus tard",
+    "%s envoie %s", "Vas-y, %s!", "RESERVES", "TAMPONS %u/8", "GARDIEN", "VITESSE +%u", "touche: changer d'avatar", "%u au total", "NORMAL", "DIFFICILE", "CHOISIS %u/%u", "COMBATTRE", "VERROUILLE", "EQUIPE", "%s vaincu!", "NOUVEAU TAMPON!", "VOL %u", "BOITE %u/%u", "echanger avec %s: choisis", "BOITE", "RAMENER", "seulement avec un oeuf", "COMBAT LAN", "CREER", "REJOINDRE", "recherche...", "pret!", "version differente", "creer ou rejoindre", "rival: %u animaux", "le rival est parti", "en attente du rival...", "ENCORE", "FUIR", "d ou vient cet oeuf", "%s +%u", "ne peut plus progresser", "CHOISIS TA REGION", "RETIRER", "Retirer maintenant?", "le suivant grandit un jour plus tard", "grandit un jour plus tard",
    "PACK REQUIS", "RELACHER", "parti pour de bon", "A L EQUIPE", "ne rejoindra pas l equipe", "VOLUME", "LANGUE", "INFOS", "LUMINOSITE", "TEST",
     // care update
     "GAUCHE/DR", "PLUS/MOINS", "QUI EST-CE", "BAIES", "TAUPES", "CORDE", "DANSE", "CACHE", "Quel cote ?", "Plus ou moins ?", "PLUS", "MOINS", "Quel est cet animal ?", "Touche gauche/droite", "Touche-les! Pas le scorpion", "Touche pour sauter !", "Touche en rythme !", "PARFAIT", "BIEN", "RATE", "Ou se cache-t-il ?", "JOIE +%u", "DEFENSE +%u", "OUI !", "RATE", "Mal au ventre !", "Il est enrhume !", "Grognon...", "S'ennuie...", "Zzz... la lumiere !", "Trop malade !", "Ca va mieux !", "Encore une dose", "Attends 10 min", "Un bain maintenant !", "Beurk ! Pas malade", "PLUS DE JEUX", "MINI-JEUX",
@@ -418,10 +418,10 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 44
     "Hautes herbes", "SNACKS", "Snack", "Super Snack", "Top Snack", "%s apparait !", "%s est capture !", "Il va dans la boite.", "%s s'est libere !", "Equipe et boite pleines", "Plus de snacks: voir la boutique", "Tu trouves un snack !", "Ca bouge dans les herbes !", "Encore %u pas", "Il dort pour l'instant", "Personne dans les herbes", "A utiliser dans les herbes",
     // phase 45
-    "Balade", "En balade", "De retour !", "%s part en balade !", "Plus de balade aujourd'hui", "Trop tard: a demain", "Rappeler", "Rappeler ? Pas d'histoire", "%s est alle a la riviere", "et trouve %u pieces !", "%s a fouille un buisson", "et trouve un snack !", "%s a rencontre %s", "et ils ont goute ensemble !", "%s a traverse la ville", "et a recu un biscuit !", "%s a joue au jardin", "et trouve une graine !", "%s a saute dans les flaques", "et rapporte du savon !", "%s a vu bouger quelque chose", "dans les hautes herbes !", "%s a grimpe une colline", "et trouve un super snack !", },
+    "Balade", "En balade", "De retour !", "%s part en balade !", "Plus de balade aujourd'hui", "Trop tard: a demain", "Rappeler", "Rappeler ? Pas d'histoire", "%s est alle a la riviere", "et trouve %u pieces !", "%s a fouille un buisson", "et trouve un snack !", "%s a rencontre %s", "et ils ont goute ensemble !", "%s a traverse la ville", "et a recu un biscuit !", "%s a joue au jardin", "et trouve une graine !", "%s a saute dans les flaques", "et rapporte du savon !", "%s a vu bouger quelque chose", "dans les hautes herbes !", "%s a grimpe une colline", "et trouve un super snack !", "Petit", "Jeune", "Adulte", },
   // ---------------- DE ----------------
   {
-    "Entwickelt sich!", "Mampf mampf!", "Gefaellt ihm!", "Hat Hunger!", "Braucht ein Bad!",
+    "Es waechst!", "Mampf mampf!", "Gefaellt ihm!", "Hat Hunger!", "Braucht ein Bad!",
     "Erschoepft...", "Traurig...", "Etwas rundlich...", "Es ist SHINY!!", "Es ist froh",
     "DANKE! Lebwohl", "Es ist weg...", "Tschuess! Winkt",
     "EI", "Legendaeres Ei!?", "Seltenes Ei!", "Beruehre das Ei...", "Es bewegt sich!", "Fast soweit!",
@@ -439,12 +439,12 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "NAME:", "tippen zum zurueck",
     "ESS", "FRO", "ENE", "HYG",
     "REK %u",
-    "FORTSCHRITT", "Lv.%u", "%u min bis Lv.%u", "ENTWICKLUNG", "Endform",
-    "Bereit zur Entwicklung!", "Alles >=40 zur Entwicklung",
-    "Entwickelt in %u Lv.", "Patzer: %u",
+    "FORTSCHRITT", "Lv.%u", "%u min bis Lv.%u", "WACHSTUM", "Ausgewachsen",
+    "Bereit zum Wachsen!", "Alles >=40 zum Wachsen",
+    "Waechst in %u Lv.", "Patzer: %u",
     "AN", "AUS",
-    "ENTWICKELN", "%s will dir etwas sagen...", "%s fuehlt sich verlassen...",
-    "Entwickeln?", "Form behalten", "Abschied?", "Lebwohl", "Zusammen bleiben",
+    "WACHSEN", "%s will dir etwas sagen...", "%s fuehlt sich verlassen...",
+    "Wachsen?", "Noch nicht", "Abschied?", "Lebwohl", "Zusammen bleiben",
     "Waehle dein Starter",
     "Keine Sprites", "Auf die SD laden",
     "KP", "IV %u",
@@ -456,7 +456,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "%s hat verfehlt!", "Volltreffer!", "%s wurde besiegt!", "Es verletzt sich!",
     "%s: %s", "PARALYSE", "VERBRANNT", "VERGIFTET", "SCHLAEFT", "GEFROREN", "VERWIRRT",
     "Gewonnen!", "Verloren...",
-    "%s schickt %s", "Los, %s!", "RESERVATE", "STEMPEL %u/8", "RANGER", "TEMPO +%u", "tippen: Avatar wechseln", "%u insgesamt", "NORMAL", "SCHWER", "GEWAEHLT %u/%u", "KAEMPFEN", "GESPERRT", "TEAM", "%s besiegt!", "NEUER STEMPEL!", "LAUT %u", "BOX %u/%u", "mit %s tauschen: waehle", "BOX", "ZURUECK", "nur mit einem Ei", "LAN KAMPF", "HOSTEN", "BEITRETEN", "suche...", "bereit!", "andere Version", "hosten oder beitreten", "Gegner: %u", "der Gegner ist weg", "warte auf den Gegner...", "NOCHMAL", "FLUCHT", "woher dieses Ei kommt", "%s +%u", "kann nicht weiter trainieren", "WAEHLE DEINE REGION", "VERABSCHIEDEN", "Jetzt verabschieden?", "das naechste entwickelt sich einen Tag spaeter", "entwickelt sich einen Tag spaeter",
+    "%s schickt %s", "Los, %s!", "RESERVATE", "STEMPEL %u/8", "RANGER", "TEMPO +%u", "tippen: Avatar wechseln", "%u insgesamt", "NORMAL", "SCHWER", "GEWAEHLT %u/%u", "KAEMPFEN", "GESPERRT", "TEAM", "%s besiegt!", "NEUER STEMPEL!", "LAUT %u", "BOX %u/%u", "mit %s tauschen: waehle", "BOX", "ZURUECK", "nur mit einem Ei", "LAN KAMPF", "HOSTEN", "BEITRETEN", "suche...", "bereit!", "andere Version", "hosten oder beitreten", "Gegner: %u", "der Gegner ist weg", "warte auf den Gegner...", "NOCHMAL", "FLUCHT", "woher dieses Ei kommt", "%s +%u", "kann nicht weiter trainieren", "WAEHLE DEINE REGION", "VERABSCHIEDEN", "Jetzt verabschieden?", "das naechste waechst einen Tag spaeter", "waechst einen Tag spaeter",
    "PACK FEHLT", "FREILASSEN", "fuer immer weg", "INS TEAM", "kommt nicht ins team", "LAUTSTAERKE", "SPRACHE", "INFO", "HELLIGKEIT", "TEST",
     // care update
     "LINKS/RE", "HOCH/TIEF", "WER IST ES", "BEEREN", "MAULWURF", "SEILSPRUNG", "TANZ", "VERSTECK", "Wohin schaut es?", "Hoeher oder tiefer?", "HOEHER", "TIEFER", "Welches Tier ist das?", "Links/rechts tippen", "Tippen! Nicht Skorpion", "Tippen zum Springen!", "Im Takt tippen!", "PERFEKT", "GUT", "DANEBEN", "Wo versteckt es sich?", "FREUDE +%u", "VERTEID. +%u", "JA!", "NEIN", "Bauchweh!", "Erkaeltet!", "Grummelig...", "Langweilt sich...", "Zzz... Licht aus!", "Zu krank!", "Geht besser!", "Spaeter noch eine", "10 Min warten", "Jetzt baden!", "Igitt! Nicht krank", "MEHR SPIELE", "MINISPIELE",
@@ -555,10 +555,10 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 44
     "Hohes Gras", "SNACKS", "Snack", "Super Snack", "Top Snack", "%s taucht auf!", "%s gefangen!", "Es kommt in die Box.", "%s hat sich befreit!", "Team und Box sind voll", "Keine Baelle: im Laden kaufen", "Du findest einen Snack!", "Es raschelt im Gras!", "Noch %u Schritte", "Es schlaeft gerade", "Niemand ist im Gras", "Fuer das hohe Gras",
     // phase 45
-    "Ausflug", "Auf Ausflug", "Wieder da!", "%s macht einen Ausflug!", "Heute keine Ausfluege mehr", "Zu spaet: morgen wieder", "Zurueckrufen", "Zurueckrufen? Keine Story", "%s war am Fluss", "und fand %u Muenzen!", "%s suchte im Gebuesch", "und fand einen Snack!", "%s traf %s", "und sie teilten einen Snack!", "%s lief durch die Stadt", "und bekam einen Keks!", "%s spielte im Garten", "und fand einen Samen!", "%s sprang in Pfuetzen", "und brachte Seife mit!", "%s sah etwas sich bewegen", "im hohen Gras!", "%s stieg auf einen Huegel", "und fand einen Super Snack!", },
+    "Ausflug", "Auf Ausflug", "Wieder da!", "%s macht einen Ausflug!", "Heute keine Ausfluege mehr", "Zu spaet: morgen wieder", "Zurueckrufen", "Zurueckrufen? Keine Story", "%s war am Fluss", "und fand %u Muenzen!", "%s suchte im Gebuesch", "und fand einen Snack!", "%s traf %s", "und sie teilten einen Snack!", "%s lief durch die Stadt", "und bekam einen Keks!", "%s spielte im Garten", "und fand einen Samen!", "%s sprang in Pfuetzen", "und brachte Seife mit!", "%s sah etwas sich bewegen", "im hohen Gras!", "%s stieg auf einen Huegel", "und fand einen Super Snack!", "Junges", "Jungtier", "Erwachsen", },
   // ---------------- IT ----------------
   {
-    "Si evolve!", "Gnam gnam!", "Gli piace!", "Ha fame!", "Vuole un bagno!",
+    "Sta crescendo!", "Gnam gnam!", "Gli piace!", "Ha fame!", "Vuole un bagno!",
     "Esausto...", "Triste...", "Un po' cicciotto...", "E' SHINY!!", "E' felice",
     "GRAZIE! Addio", "E' scappato...", "Ciao! Saluta",
     "UOVO", "Uovo leggendario!?", "Uovo raro!", "Tocca l'uovo...", "Si muove!", "Ci siamo quasi!",
@@ -576,12 +576,12 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "NOME:", "tocca per tornare",
     "CIB", "GIO", "ENE", "IGI",
     "REC %u",
-    "PROGRESSI", "Lv.%u", "%u min per Lv.%u", "EVOLUZIONE", "Forma finale",
-    "Pronto a evolvere!", "Tutto a 40 per evolvere",
-    "Evolve tra %u liv.", "Disattenzioni: %u",
+    "PROGRESSI", "Lv.%u", "%u min per Lv.%u", "CRESCITA", "Adulto",
+    "Pronto a crescere!", "Tutto a 40 per crescere",
+    "Cresce tra %u liv.", "Disattenzioni: %u",
     "ON", "OFF",
-    "EVOLVI", "%s vuole dirti qualcosa...", "%s si sente abbandonato...",
-    "Evolvere?", "Mantieni forma", "Salutare?", "Addio", "Restare insieme",
+    "CRESCI", "%s vuole dirti qualcosa...", "%s si sente abbandonato...",
+    "Crescere?", "Non ancora", "Salutare?", "Addio", "Restare insieme",
     "Scegli l'iniziale",
     "Senza sprite", "Caricali sulla SD",
     "PS", "IV %u",
@@ -593,7 +593,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "%s ha mancato!", "Brutto colpo!", "%s e\' esausto!", "Si e ferito!",
     "%s: %s", "PARALISI", "SCOTTATURA", "VELENO", "ADDORMENTATO", "CONGELATO", "CONFUSIONE",
     "Hai vinto!", "Hai perso...",
-    "%s manda %s", "Vai, %s!", "RISERVE", "TIMBRI %u/8", "GUARDIA", "VELOCITA +%u", "tocca: cambia avatar", "%u in totale", "NORMALE", "DIFFICILE", "SCELTI %u/%u", "LOTTA", "BLOCCATO", "SQUADRA", "%s sconfitto!", "NUOVO TIMBRO!", "VOL %u", "BOX %u/%u", "scambia con %s: scegli", "BOX", "RIPORTA", "solo con un uovo", "LOTTA LAN", "CREA", "ENTRA", "ricerca...", "pronto!", "versione diversa", "crea o entra", "rivale: %u animali", "il rivale se n' e andato", "in attesa del rivale...", "ANCORA", "FUGGI", "da quale regione viene l uovo", "%s +%u", "non puo allenarsi oltre", "SCEGLI LA REGIONE", "RITIRARE", "Ritirarla adesso?", "il prossimo evolve un giorno dopo", "evolve un giorno dopo",
+    "%s manda %s", "Vai, %s!", "RISERVE", "TIMBRI %u/8", "GUARDIA", "VELOCITA +%u", "tocca: cambia avatar", "%u in totale", "NORMALE", "DIFFICILE", "SCELTI %u/%u", "LOTTA", "BLOCCATO", "SQUADRA", "%s sconfitto!", "NUOVO TIMBRO!", "VOL %u", "BOX %u/%u", "scambia con %s: scegli", "BOX", "RIPORTA", "solo con un uovo", "LOTTA LAN", "CREA", "ENTRA", "ricerca...", "pronto!", "versione diversa", "crea o entra", "rivale: %u animali", "il rivale se n' e andato", "in attesa del rivale...", "ANCORA", "FUGGI", "da quale regione viene l uovo", "%s +%u", "non puo allenarsi oltre", "SCEGLI LA REGIONE", "RITIRARE", "Ritirarla adesso?", "il prossimo cresce un giorno dopo", "cresce un giorno dopo",
    "MANCA PACK", "LIBERA", "via per sempre", "AL GRUPPO", "non entrera nel gruppo", "VOLUME", "LINGUA", "INFO", "LUMINOSITA", "PROVA",
     // care update
     "SIN/DES", "PIU/MENO", "CHI E?", "BACCHE", "TALPE", "CORDA", "BALLO", "NASCONDINO", "Dove guardera?", "Piu alto o basso?", "PIU", "MENO", "Chi e quell'animale?", "Tocca sin/des", "Toccali! Non lo scorpione", "Tocca per saltare!", "Tocca a ritmo!", "PERFETTO", "BENE", "MANCATO", "Dove si nasconde?", "GIOIA +%u", "DIFESA +%u", "SI!", "NO...", "Mal di pancia!", "Ha il raffreddore!", "Brontolone...", "Si annoia...", "Zzz... spegni luce!", "Troppo malato!", "Sta meglio!", "Ancora una dose", "Aspetta 10 min", "Ora un bagno!", "Bleah! Non malato", "ALTRI GIOCHI", "MINIGIOCHI",
@@ -692,10 +692,10 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 44
     "Erba alta", "SNACK", "Snack", "Super Snack", "Top Snack", "Ecco %s!", "Hai preso %s!", "Va nel box.", "%s si e liberato!", "Squadra e box pieni", "Niente snack: vai al negozio", "Hai trovato uno snack!", "Qualcosa si muove nell'erba!", "Ancora %u passi", "Ora sta dormendo", "Nessuno nell'erba", "Da usare nell'erba alta",
     // phase 45
-    "Gita", "In gita", "Di ritorno!", "%s parte per una gita!", "Niente piu gite oggi", "Troppo tardi: a domani", "Richiama", "Richiamarlo? Niente storia", "%s e andato al fiume", "e ha trovato %u monete!", "%s ha frugato un cespuglio", "e ha trovato uno snack!", "%s ha incontrato %s", "e hanno fatto merenda!", "%s ha girato in citta", "e ha avuto un biscotto!", "%s ha giocato in giardino", "e ha trovato un seme!", "%s ha saltato nelle pozzanghere", "e ha portato del sapone!", "%s ha visto muoversi qualcosa", "nell'erba alta!", "%s e salito su una collina", "e ha trovato un super snack!", },
+    "Gita", "In gita", "Di ritorno!", "%s parte per una gita!", "Niente piu gite oggi", "Troppo tardi: a domani", "Richiama", "Richiamarlo? Niente storia", "%s e andato al fiume", "e ha trovato %u monete!", "%s ha frugato un cespuglio", "e ha trovato uno snack!", "%s ha incontrato %s", "e hanno fatto merenda!", "%s ha girato in citta", "e ha avuto un biscotto!", "%s ha giocato in giardino", "e ha trovato un seme!", "%s ha saltato nelle pozzanghere", "e ha portato del sapone!", "%s ha visto muoversi qualcosa", "nell'erba alta!", "%s e salito su una collina", "e ha trovato un super snack!", "Cucciolo", "Giovane", "Adulto", },
   // ---------------- PT ----------------
   {
-    "Evoluindo!", "Nham nham!", "Ele gosta!", "Esta com fome!", "Precisa de banho!",
+    "Crescendo!", "Nham nham!", "Ele gosta!", "Esta com fome!", "Precisa de banho!",
     "Exausto...", "Triste...", "Um pouco gordinho...", "E SHINY!!", "Esta feliz",
     "OBRIGADO! Adeus", "Fugiu...", "Tchau! Acena",
     "OVO", "Ovo lendario!?", "Ovo raro!", "Toque no ovo...", "Mexe-se!", "Quase la!",
@@ -713,12 +713,12 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "NOME:", "toque para voltar",
     "COM", "ALE", "ENE", "HIG",
     "REC %u",
-    "PROGRESSO", "Niv.%u", "%u min para Niv.%u", "EVOLUCAO", "Forma final",
-    "Pronto a evoluir!", "Tudo a 40 para evoluir",
-    "Evolui em %u niv.", "Descuidos: %u",
+    "PROGRESSO", "Niv.%u", "%u min para Niv.%u", "CRESCIMENTO", "Adulto",
+    "Pronto para crescer!", "Tudo a 40 para crescer",
+    "Cresce em %u niv.", "Descuidos: %u",
     "ON", "OFF",
-    "EVOLUIR", "%s quer dizer-te algo...", "%s sente-se abandonado...",
-    "Evoluir?", "Manter forma", "Despedir?", "Adeus", "Ficar juntos",
+    "CRESCER", "%s quer dizer-te algo...", "%s sente-se abandonado...",
+    "Crescer?", "Ainda nao", "Despedir?", "Adeus", "Ficar juntos",
     "Escolhe o inicial",
     "Sem sprites", "Carrega-os no SD",
     "PS", "IV %u",
@@ -730,7 +730,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "%s falhou!", "Acerto critico!", "%s desmaiou!", "Feriu-se!",
     "%s: %s", "PARALISIA", "QUEIMADURA", "VENENO", "A DORMIR", "CONGELADO", "CONFUSAO",
     "Ganhaste!", "Perdeste...",
-    "%s envia %s", "Vai, %s!", "RESERVAS", "SELOS %u/8", "GUARDA", "VELOCIDADE +%u", "toca: mudar avatar", "%u no total", "NORMAL", "DIFICIL", "ESCOLHIDOS %u/%u", "LUTAR", "BLOQUEADO", "EQUIPE", "%s derrotado!", "NOVO SELO!", "VOL %u", "CAIXA %u/%u", "trocar com %s: escolhe", "CAIXA", "TRAZER", "so com um ovo", "COMBATE LAN", "CRIAR", "ENTRAR", "a procurar...", "pronto!", "versao diferente", "criar ou entrar", "rival: %u animais", "o rival saiu", "a esperar pelo rival...", "OUTRA VEZ", "FUGIR", "de que regiao vem o ovo", "%s +%u", "ja nao pode treinar mais", "ESCOLHE A REGIAO", "REFORMAR", "Reformar agora?", "o proximo evolui um dia depois", "evolui um dia depois",
+    "%s envia %s", "Vai, %s!", "RESERVAS", "SELOS %u/8", "GUARDA", "VELOCIDADE +%u", "toca: mudar avatar", "%u no total", "NORMAL", "DIFICIL", "ESCOLHIDOS %u/%u", "LUTAR", "BLOQUEADO", "EQUIPE", "%s derrotado!", "NOVO SELO!", "VOL %u", "CAIXA %u/%u", "trocar com %s: escolhe", "CAIXA", "TRAZER", "so com um ovo", "COMBATE LAN", "CRIAR", "ENTRAR", "a procurar...", "pronto!", "versao diferente", "criar ou entrar", "rival: %u animais", "o rival saiu", "a esperar pelo rival...", "OUTRA VEZ", "FUGIR", "de que regiao vem o ovo", "%s +%u", "ja nao pode treinar mais", "ESCOLHE A REGIAO", "REFORMAR", "Reformar agora?", "o proximo cresce um dia depois", "cresce um dia depois",
    "FALTA PACK", "SOLTAR", "vai para sempre", "A EQUIPA", "nao entrara na equipa", "VOLUME", "IDIOMA", "INFO", "BRILHO", "TESTE",
     // care update
     "ESQ/DIR", "MAIS/MENOS", "QUEM E?", "BAGAS", "TOUPEIRAS", "CORDA", "DANCA", "ESCONDE", "Para onde olha?", "Maior ou menor?", "MAIOR", "MENOR", "Quem e esse animal?", "Toque esq/dir", "Toque! Nao o escorpiao", "Toque para pular!", "Toque no ritmo!", "PERFEITO", "BOM", "ERROU", "Onde se escondeu?", "ALEGRIA +%u", "DEFESA +%u", "ISSO!", "NAO...", "Dor de barriga!", "Esta resfriado!", "Rabugento...", "Entediado...", "Zzz... apague a luz!", "Doente demais!", "Melhorou!", "Mais uma dose", "Espere 10 min", "Agora um banho!", "Eca! Nao esta doente", "MAIS JOGOS", "MINIJOGOS",
@@ -829,15 +829,15 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 44
     "Mato alto", "LANCHES", "Lanche", "Lanche Fino", "Lanche Top", "Surge %s!", "Pegou %s!", "Foi para a caixa.", "%s escapou!", "Equipe e caixa cheias", "Sem lanches: compre na loja", "Achou um lanche!", "Algo se mexe no mato!", "Ande mais %u passos", "Esta dormindo agora", "Ninguem no mato", "Use no mato alto",
     // phase 45
-    "Passeio", "Em passeio", "De volta!", "%s saiu em passeio!", "Sem passeios hoje", "Tarde: so amanha", "Chamar", "Chamar? Sem historia", "%s foi ao rio", "e achou %u moedas!", "%s olhou num arbusto", "e achou um lanche!", "%s conheceu %s", "e dividiram um lanche!", "%s andou pela cidade", "e ganhou um biscoito!", "%s brincou no jardim", "e achou uma semente!", "%s pulou em pocas", "e trouxe sabao!", "%s viu algo se mexer", "no mato alto!", "%s subiu um morro", "e achou um lanche fino!", },
+    "Passeio", "Em passeio", "De volta!", "%s saiu em passeio!", "Sem passeios hoje", "Tarde: so amanha", "Chamar", "Chamar? Sem historia", "%s foi ao rio", "e achou %u moedas!", "%s olhou num arbusto", "e achou um lanche!", "%s conheceu %s", "e dividiram um lanche!", "%s andou pela cidade", "e ganhou um biscoito!", "%s brincou no jardim", "e achou uma semente!", "%s pulou em pocas", "e trouxe sabao!", "%s viu algo se mexer", "no mato alto!", "%s subiu um morro", "e achou um lanche fino!", "Filhote", "Jovem", "Adulto", },
   // ---------------- ZH (simplified) ----------------
   // The only rows allowed non-ASCII: glyphs come from cjkfont.h (tools/gen_cjk.py).
   {
-    "进化中!", "好好吃!", "它很喜欢!", "它饿了!", "需要洗澡!",
+    "长大了!", "好好吃!", "它很喜欢!", "它饿了!", "需要洗澡!",
     "累坏了...", "好难过...", "有点胖...", "是闪光的!!", "很开心",
     "谢谢! 再见", "它跑掉了...", "再见! 挥手告别...",
     "蛋", "传说之蛋!?", "稀有蛋!", "点一点蛋...", "它在动!", "快好了!",
-    "图鉴 %u/%u",
+    "指南 %u/%u",
     "%s%s Lv.%u",
     "放生 %s?", "是", "否",
     "%u 次", "力量 +%u", "新纪录!", "最高: %u", "快打!",
@@ -851,12 +851,12 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "名字:", "点击返回",
     "饱食", "快乐", "精力", "清洁",
     "最高 %u",
-    "进度", "Lv.%u", "%u 分钟到 Lv.%u", "进化", "最终形态",
-    "可以进化了!", "所有需求>=40才能进化",
-    "%u 级后进化", "失误: %u",
+    "进度", "Lv.%u", "%u 分钟到 Lv.%u", "成长", "已经长大",
+    "可以长大了!", "所有需求>=40才能长大",
+    "%u 级后长大", "失误: %u",
     "开", "关",
-    "进化!", "%s 有话想说...", "%s 觉得被抛弃了...",
-    "进化吗?", "保持原样", "告别吗?", "告别", "留下来",
+    "长大!", "%s 有话想说...", "%s 觉得被抛弃了...",
+    "要长大吗?", "还不要", "告别吗?", "告别", "留下来",
     "选择你的伙伴",
     "没有图像", "请放入SD卡",
     "体力", "IV %u",
@@ -864,19 +864,19 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "能力", "训练", "力量", "速度", "防御", "开心时会自己成长",
     "招式", "- 空 -", "选择招式", "点击格子更换", "威力 %u", "变化",
     "%s 想学习", "不学习",
-    "%s 使用了 %s", "效果拔群!", "效果不太好...", "没有效果...",
+    "%s 使用了 %s", "重击!", "轻击...", "没有作用...",
     "%s 没打中!", "击中要害!", "%s 倒下了!", "它伤到了自己!",
     "%s: %s", "麻痹", "灼伤", "中毒", "睡眠", "冰冻", "混乱",
     "你赢了!", "你输了...",
-    "%s 派出了 %s", "上吧, %s!", "道馆", "徽章 %u/8", "训练家",
-    "速度 +%u", "点击: 换头像", "共获得 %u", "简单", "困难", "已选 %u/%u", "战斗", "未解锁", "宝可梦", "%s 被打败了!", "新徽章!", "音量 %u", "箱子 %u/%u", "与 %s 交换: 选择格子", "箱子", "带回来", "仅在有蛋时可用", "局域网对战", "主机", "加入", "搜索中...", "准备好了!", "版本不同", "主机或加入", "对手: %u 只", "对手离开了", "等待对手...", "再来", "逃跑", "这颗蛋的来源", "%s +%u", "已训练到极限", "选择地区", "退役", "要提前退役吗?", "下一只晚一天进化", "晚一天进化",
+    "%s 派出了 %s", "上吧, %s!", "保护区", "印章 %u/8", "护林员",
+    "速度 +%u", "点击: 换头像", "共获得 %u", "简单", "困难", "已选 %u/%u", "战斗", "未解锁", "队伍", "%s 被打败了!", "新印章!", "音量 %u", "箱子 %u/%u", "与 %s 交换: 选择格子", "箱子", "带回来", "仅在有蛋时可用", "局域网对战", "主机", "加入", "搜索中...", "准备好了!", "版本不同", "主机或加入", "对手: %u 只", "对手离开了", "等待对手...", "再来", "逃跑", "这颗蛋的来源", "%s +%u", "已训练到极限", "选择地区", "退役", "要提前退役吗?", "下一只晚一天长大", "晚一天长大",
     "需要图包", "放生", "永远离开", "入队", "它不会加入你的队伍", "音量", "语言", "关于", "亮度", "测试",
     // care update
-    "左还是右", "大还是小", "我是谁", "接树果", "打地鼠", "跳绳", "跳舞", "捉迷藏", "它会看哪边?", "更大还是更小?", "更大", "更小", "这是哪只宝可梦?", "点左右移动", "快点! 别碰霹雳电球", "点击跳跃!", "跟着节拍点击!", "完美", "不错", "失误", "它躲在哪里?", "快乐 +%u", "防御 +%u", "答对了!", "错了...", "肚子疼!", "感冒了!", "心情不好...", "好无聊...", "Zzz... 请关灯!", "生病了不能玩!", "好多了!", "稍后再吃一次", "等10分钟", "现在洗个澡!", "好苦! 它没生病", "更多游戏", "小游戏",
+    "左还是右", "大还是小", "我是谁", "接树果", "打地鼠", "跳绳", "跳舞", "捉迷藏", "它会看哪边?", "更大还是更小?", "更大", "更小", "这是哪只动物?", "点左右移动", "快点! 别碰蝎子", "点击跳跃!", "跟着节拍点击!", "完美", "不错", "失误", "它躲在哪里?", "快乐 +%u", "防御 +%u", "答对了!", "错了...", "肚子疼!", "感冒了!", "心情不好...", "好无聊...", "Zzz... 请关灯!", "生病了不能玩!", "好多了!", "稍后再吃一次", "等10分钟", "现在洗个澡!", "好苦! 它没生病", "更多游戏", "小游戏",
     // care update
     "沙袋", "反应测试", "顶球", "娱乐",
     // coins and daily missions
-    "金币", "今日任务", "喂食%u次", "喂它最爱的树果", "玩%u个小游戏", "走%u步", "给它洗澡", "抚摸%u次", "玩一个力量游戏", "玩一个速度游戏", "玩一个防御游戏", "得到%u分", "今日游戏: %u/%u", "全部完成: 额外+%u", "如何赚取", "玩耍和照顾", "每1000步 +%u", "每天第一次照顾 +%u", "每个任务 +%u", "新徽章 +%u", "关灯睡觉 +%u", "商店即将开放!",
+    "金币", "今日任务", "喂食%u次", "喂它最爱的树果", "玩%u个小游戏", "走%u步", "给它洗澡", "抚摸%u次", "玩一个力量游戏", "玩一个速度游戏", "玩一个防御游戏", "得到%u分", "今日游戏: %u/%u", "全部完成: 额外+%u", "如何赚取", "玩耍和照顾", "每1000步 +%u", "每天第一次照顾 +%u", "每个任务 +%u", "新印章 +%u", "关灯睡觉 +%u", "商店即将开放!",
     // shop, bag and hats
     "商店", "背包", "帽子", "鸭舌帽", "蝴蝶结", "花朵", "毛线帽", "派对帽", "草帽", "女巫帽", "圣诞帽", "礼帽", "皇冠", "购买", "不要", "已拥有", "金币不够", "买到了!", "戴着", "摘下帽子", "调整帽子", "还什么都没有", "完成",
     // toys and decorations
@@ -886,7 +886,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // bath and sleep menus
     "洗澡", "冲澡", "泡泡浴", "搓洗", "梳毛", "把脏东西搓掉!", "干干净净!", "需要肥皂", "先买梳子", "睡觉", "去睡觉", "午睡30分钟", "摇篮曲", "护理", "肥皂", "梳子",
     // places, garden, seasonal gifts
-    "出门", "公园", "宝可梦中心", "菜园", "散步", "进去", "回家", "治疗", "今天免费", "完全恢复了!", "找到了%u枚金币!", "找到了树果!", "%s 打招呼!", "散步真开心", "太累了", "种下", "收获", "去买种子", "生长中... %u%%", "种子", "收获了: %s", "万圣节礼物!", "圣诞礼物!", "新年快乐!", "情人节礼物!",
+    "出门", "公园", "兽医院", "菜园", "散步", "进去", "回家", "治疗", "今天免费", "完全恢复了!", "找到了%u枚金币!", "找到了树果!", "%s 打招呼!", "散步真开心", "太累了", "种下", "收获", "去买种子", "生长中... %u%%", "种子", "收获了: %s", "万圣节礼物!", "圣诞礼物!", "新年快乐!", "情人节礼物!",
     // capsules, scenery, trophies, teeth, school, quiz, parents, talk
     "场景", "草原", "海滩", "森林", "火山", "高山", "雪原", "墓地", "奖杯", "新奖杯! +10", "吃饭100次", "游戏50次", "洗澡30次", "散步25次", "收获5次", "1000枚金币", "5顶帽子", "6件装饰", "连续7天", "等级20", "学习10次", "刷牙14次", "测验满分", "扭蛋10次", "扭蛋", "今天还剩%u个", "抽到了: %s!", "2块肥皂!", "2颗种子!", "%u枚金币!", "明天再来", "刷牙", "牙齿亮晶晶!", "今天刷过两次了", "点击刷牙", "学校", "学习", "算术", "学多久?", "%u分钟", "学习中...", "做得好! +%u", "做得好!", "停止", "答对%u题!", "家长", "睡觉时间", "每天游戏", "关", "点击更改", "该睡觉了", "今天玩够了", "我饿了!", "我想洗澡", "我困了...", "我不舒服...", "一起玩吧!", "下雨了!", "下雪了!", "菜园可以收获了!", "我爱你!", "今天真开心!", "我们学习吧?",
     // adventures, lake, kitchen, chores, piggy bank, diary, alarm
@@ -898,13 +898,13 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 14
     "我想要%s!", "我想玩!", "去公园吧!", "我想洗澡!", "去钓鱼吧!", "摸摸我!", "愿望实现! +5", "有点寂寞", "今天超棒!", "我想你了...", "生日快乐! +20", "%u个月啦!", "复活节彩蛋! +5", "夏日祭: 免费冰淇淋!", "性格: %s", "爱玩", "懒洋洋", "贪吃", "害羞",
     // phase 15
-    "游戏", "头脑", "街机", "气球", "赛跑", "接住", "平衡", "属性测验", "滑块拼图", "泡泡", "画画", "戳气球, 别碰炸弹", "摇动或快速点击", "接住, 躲开霹雳电球", "倾斜或按住一边", "效果如何?", "按1到8排好", "点击同色泡泡", "完成",
+    "游戏", "头脑", "街机", "气球", "赛跑", "接住", "平衡", "属性测验", "滑块拼图", "泡泡", "画画", "戳气球, 别碰炸弹", "摇动或快速点击", "接住, 躲开蝎子", "倾斜或按住一边", "效果如何?", "按1到8排好", "点击同色泡泡", "完成",
     // phase 16
     "服装", "墨镜", "星星眼镜", "爱心眼镜", "单片眼镜", "围巾", "领结", "奖牌", "头巾", "斗篷", "背包", "天使翅膀", "蝙蝠翅膀", "真时髦!",
     // phase 17
-    "海滩", "图书馆", "音乐厅", "比赛", "游戏厅", "打工", "城堡", "贝壳! +1", "今天没有贝壳了", "沙堡!", "今天已经堆过了", "阅读", "今天读够了", "今天听够了", "战斗", "胜利", "摇篮曲", "参加", "下周再来", "这次没有缎带... +2", "铜缎带! +5", "银缎带! +10", "金缎带! +20", "服装, 亲密度和心情", "咖啡馆", "花店", "邮局", "3小时 +15", "在打工", "%u:%02u 回来", "下班回来了! +15", "明天再打工", "信件", "没有信", "大木博士: 做得好! 送你5枚金币。", "喵喵: 送你一块饼干, 喵!", "吉利蛋: 送你一颗种子。", "皮卡丘: 皮卡皮卡! (肥皂)", "奶奶: 8枚金币给你存起来。", "朋友: 想你了, 一起玩吧!",
+    "海滩", "图书馆", "音乐厅", "比赛", "游戏厅", "打工", "城堡", "贝壳! +1", "今天没有贝壳了", "沙堡!", "今天已经堆过了", "阅读", "今天读够了", "今天听够了", "战斗", "胜利", "摇篮曲", "参加", "下周再来", "这次没有缎带... +2", "铜缎带! +5", "银缎带! +10", "金缎带! +20", "服装, 亲密度和心情", "咖啡馆", "花店", "邮局", "3小时 +15", "在打工", "%u:%02u 回来", "下班回来了! +15", "明天再打工", "信件", "没有信", "安娜医生: 做得好! 送你5枚金币。", "薮猫: 送你一块饼干, 喵!", "鸵鸟: 送你一颗种子。", "狐獴: 叽叽! (肥皂)", "奶奶: 8枚金币给你存起来。", "朋友: 想你了, 一起玩吧!",
     // phase 19
-    "任务", "皮卡丘的帽子丢了", "喵喵的午饭", "吉利蛋丢失的蛋", "给胖丁的歌", "去公园找找", "去海滩找找", "去图书馆问问", "在湖边钓鱼", "做一道菜", "一起吃自制的菜", "打开一个冒险站点", "去宝可梦中心", "洗个澡", "放一首歌", "玩个游戏", "在学校学习", "下一步明天继续", "任务完成! 新帽子", "不给糖就捣蛋! 饼干", "免费热可可!", "在一起一年了! +50",
+    "任务", "狐獴的帽子丢了", "薮猫的午饭", "鸵鸟丢失的蛋", "给金丝雀的歌", "去公园找找", "去海滩找找", "去图书馆问问", "在湖边钓鱼", "做一道菜", "一起吃自制的菜", "打开一个冒险站点", "去兽医院", "洗个澡", "放一首歌", "玩个游戏", "在学校学习", "下一步明天继续", "任务完成! 新帽子", "不给糖就捣蛋! 饼干", "免费热可可!", "在一起一年了! +50",
     // the photo album
     "相册", "还没有照片", "照片已存入相册!", "拍照",
     // the Nursery
@@ -925,7 +925,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "我饿了!", "肚子咕咕叫!", "我们吃点东西吧?", "请给我一个果子!", "好香啊...", "我需要点心!",
     "我要洗澡!", "我们洗澡吧?", "我好脏啊...", "想要泡泡!", "我想香香的", "哈欠...好困。",
     "睡个午觉?", "眼睛快闭上了", "我有点累", "帮我盖被子?", "我不太舒服...", "我肚子疼",
-    "阿嚏!阿嚏!", "去宝可梦中心吧?", "请给我药", "我想你了!", "陪我玩好吗?", "我一个人好孤单...",
+    "阿嚏!阿嚏!", "去兽医院吧?", "请给我药", "我想你了!", "陪我玩好吗?", "我一个人好孤单...",
     "别走!", "抱抱我?", "好无聊...", "我们玩游戏吧!", "去公园吧!", "做点好玩的吧",
     "比赛跑步吧?", "多美好的一天!", "我好开心!", "很高兴你在这里", "看我会做什么!", "今天我要勇敢",
     "啦啦啦!", "我们是最棒的组合!", "我想学点新东西", "我喜欢我们的家", "今天做什么呢?", "给我讲个故事!",
@@ -934,7 +934,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "新的一天!", "刷牙时间到!", "下午好!", "你今天过得怎么样?", "点心时间!", "作业做完了吗?",
     "晚上好!", "快到睡觉时间了", "晚饭吃什么?", "看,星星出来了", "今天真不错", "做个好梦...",
     "已经很晚了!", "月亮真美", "阳光真好!", "晒太阳真舒服", "出去玩吧?", "蓝天!",
-    "好多云...", "那朵云像宝可梦", "今天多云", "下雨了!", "滴答滴答...", "去踩水坑吗?",
+    "好多云...", "那朵云像动物", "今天多云", "下雨了!", "滴答滴答...", "去踩水坑吗?",
     "别忘了带伞", "打雷了!待在我身边", "好大的暴风雨!", "我看到闪电了!", "什么都看不见!", "今天有雾",
     "好神秘...", "下雪了!", "堆雪人吧!", "雪花!", "打雪仗!", "纽约来的雪!",
     "纽约好冷!", "好热啊!", "请给我冰淇淋!", "我需要冰水", "好冷啊!", "我需要围巾",
@@ -943,10 +943,10 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "会孵出什么呢?", "来信了!", "我们看看信吧?", "继续冒险吧?", "今天再完成一步!", "我今天好努力工作!",
     "我赚了金币", "是我们的生日!", "有蛋糕吗?", "谢谢又陪我一个月", "不给糖就捣蛋!", "哇!吓到你了吗?",
     "我喜欢南瓜", "节日快乐!", "会有礼物吗?", "我喜欢彩灯", "去找彩蛋吧!", "彩色的蛋!",
-    "去海边吧!", "夏天万岁!", "我会一直陪着你", "我相信你", "在一起我们很强", "你是最棒的训练家",
+    "去海边吧!", "夏天万岁!", "我会一直陪着你", "我相信你", "在一起我们很强", "你是最棒的护林员",
     "我觉得我要变了...", "我身上发生了什么!",
     // phase 31
-    "泡泡浴", "刷牙", "午睡或摇篮曲", "吃一道家常菜", "赢得%u张奖券", "转一次扭蛋", "玩属性测验", "参加比赛", "去公园散步", "到达冒险站点", "钓鱼%u次", "去海滩玩", "去宝可梦中心", "做一道菜", "种植或收获", "做%u件家务", "读一本书", "学习一会儿", "放一首歌", "打开一封信", "存进存钱罐", "买食物", "买点东西", "装饰小屋", "帮忙做家务", "去商店买东西", "在街机赢奖券", "走3000步", "妙蛙种子的菜园", "可达鸭头疼了", "卡比兽的大午觉", "伊布的生日派对", "杰尼龟的海滩日", "鲤鱼王想飞", "皮皮的月亮之夜", "凯西去上学",
+    "泡泡浴", "刷牙", "午睡或摇篮曲", "吃一道家常菜", "赢得%u张奖券", "转一次扭蛋", "玩属性测验", "参加比赛", "去公园散步", "到达冒险站点", "钓鱼%u次", "去海滩玩", "去兽医院", "做一道菜", "种植或收获", "做%u件家务", "读一本书", "学习一会儿", "放一首歌", "打开一封信", "存进存钱罐", "买食物", "买点东西", "装饰小屋", "帮忙做家务", "去商店买东西", "在街机赢奖券", "走3000步", "乌龟的菜园", "火烈鸟头疼了", "树懒的大午觉", "耳廓狐的生日派对", "水獭的海滩日", "锦鲤想飞", "猫头鹰的月亮之夜", "鹦鹉去上学",
     // phase 32
     "扫掉便便", "没有要扫的", "也把便便扫掉吧!", "清洁+%u", "扫干净了!",
     // phase 32b
@@ -954,9 +954,9 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 33
     "删除这张照片?", "删除", "全部删除", "删除除收藏外的所有照片?", "照片已删除", "已经有%u张收藏了",
     // phase 34
-    "%s向你挑战!", "徽章 %u/8", "四天王 %u/4", "决赛: 冠军", "战斗!", "稍后",
+    "%s向你挑战!", "印章 %u/8", "四强 %u/4", "决赛: 首席护林员", "战斗!", "稍后",
     // phase 35
-    "步数", "今天", "最近7天", "到道馆的步数", "冒险路线", "总计: %u步", "准备好了! 开战!", "一二三四五六日", "所有道馆都赢了!",
+    "步数", "今天", "最近7天", "到保护区的步数", "冒险路线", "总计: %u步", "准备好了! 开战!", "一二三四五六日", "所有保护区都赢了!",
     // phase 36
     "步数够了! %u天后迎来挑战", "步数够了! 明天迎来挑战",
     // phase 36
@@ -966,16 +966,16 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 43
     "2500 步! 吃点心", "5000 步! 走得真棒", "10000 步! 变强了", "新手", "散步者", "步行者", "远足者", "徒步者", "领路人", "环球旅人", "步道高手", "传奇",
     // phase 44
-    "草丛", "精灵球", "精灵球", "超级球", "高级球", "野生的 %s!", "抓到了 %s!", "送进了箱子.", "%s 挣脱了!", "队伍和箱子都满了", "没有球了: 去商店买", "找到了精灵球!", "草丛里有动静!", "再走 %u 步", "它正在睡觉", "草丛里没有人", "在草丛里使用",
+    "草丛", "零食", "零食", "高级零食", "顶级零食", "%s 出现了!", "抓到了 %s!", "送进了箱子.", "%s 挣脱了!", "队伍和箱子都满了", "没有零食了: 去商店买", "找到了零食!", "草丛里有动静!", "再走 %u 步", "它正在睡觉", "草丛里没有人", "在草丛里使用",
     // phase 45
-    "旅行", "旅行中", "回来了!", "%s 出发旅行了!", "今天不能再旅行了", "太晚了: 明天吧", "叫回来", "叫回来? 没有故事", "%s 去了河边", "找到了 %u 枚金币!", "%s 在灌木下找东西", "找到了精灵球!", "%s 遇见了 %s", "一起吃了点心!", "%s 逛了小镇", "得到了一块饼干!", "%s 在花园里玩", "找到了一颗种子!", "%s 踩了水坑", "带回了肥皂!", "%s 看到有东西在动", "在草丛里!", "%s 爬上了小山", "找到了超级球!", },
+    "旅行", "旅行中", "回来了!", "%s 出发旅行了!", "今天不能再旅行了", "太晚了: 明天吧", "叫回来", "叫回来? 没有故事", "%s 去了河边", "找到了 %u 枚金币!", "%s 在灌木下找东西", "找到了零食!", "%s 遇见了 %s", "一起吃了点心!", "%s 逛了小镇", "得到了一块饼干!", "%s 在花园里玩", "找到了一颗种子!", "%s 踩了水坑", "带回了肥皂!", "%s 看到有东西在动", "在草丛里!", "%s 爬上了小山", "找到了高级零食!", "幼崽", "少年", "成年", },
   // ---------------- KO ----------------
   {
-    "진화 중!", "냠냠!", "좋아해요!", "배고파요!", "목욕이 필요해요!",
+    "자라는 중!", "냠냠!", "좋아해요!", "배고파요!", "목욕이 필요해요!",
     "지쳤어요...", "슬퍼요...", "조금 통통해요...", "이로치예요!!", "행복해요",
     "고마워요! 안녕", "도망갔어요...", "안녕! 손을 흔들어요...",
     "알", "전설의 알!?", "희귀한 알!", "알을 눌러요...", "움직여요!", "거의 다 됐어요!",
-    "도감 %u/%u",
+    "가이드 %u/%u",
     "%s%s Lv.%u",
     "%s 놓아줄까요?", "예", "아니오",
     "%u 회", "힘 +%u", "신기록!", "최고: %u", "빨리 쳐요!",
@@ -989,12 +989,12 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "이름:", "눌러서 뒤로",
     "식사", "기쁨", "기력", "청결",
     "최고 %u",
-    "진행", "Lv.%u", "%u 분 후 Lv.%u", "진화", "최종 형태",
-    "진화 준비 완료!", "모든 욕구 >=40 필요",
-    "%u 레벨 후 진화", "실수: %u",
+    "진행", "Lv.%u", "%u 분 후 Lv.%u", "성장", "다 자랐어요",
+    "자랄 준비 완료!", "모든 욕구 >=40 필요",
+    "%u 레벨 후 성장", "실수: %u",
     "켬", "끔",
-    "진화!", "%s: 할 말이 있어요...", "%s: 버려진 기분이에요...",
-    "진화할까요?", "그대로", "작별할까요?", "작별", "함께 있기",
+    "성장!", "%s: 할 말이 있어요...", "%s: 버려진 기분이에요...",
+    "성장할까요?", "아직은", "작별할까요?", "작별", "함께 있기",
     "첫 파트너를 골라요",
     "스프라이트 없음", "SD에 넣어 주세요",
     "체력", "IV %u",
@@ -1002,19 +1002,19 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "능력치", "훈련", "힘", "속도", "방어", "행복하면 저절로 늘어요",
     "기술", "- 비어 있음 -", "기술 선택", "칸을 눌러 변경", "위력 %u", "변화",
     "%s: 배우고 싶어요", "배우지 않기",
-    "%s 의 %s!", "효과가 굉장했다!", "효과가 별로인 듯하다...", "효과가 없었다...",
+    "%s 의 %s!", "강한 공격!", "약한 공격...", "소용없었다...",
     "%s 빗나갔다!", "급소에 맞았다!", "%s 쓰러졌다!", "스스로를 다치게 했다!",
     "%s: %s", "마비", "화상", "독", "잠듦", "얼음", "혼란",
     "승리!", "패배...",
-    "%s 의 %s 등장!", "가라, %s!", "체육관", "배지 %u/8", "트레이너",
-    "속도 +%u", "누르기: 아바타 변경", "총 %u 획득", "쉬움", "어려움", "선택 %u/%u", "싸우기", "잠김", "포켓몬", "%s 쓰러뜨림!", "새 배지!", "볼륨 %u", "박스 %u/%u", "%s 와 교체: 칸 선택", "박스", "데려오기", "알이 있을 때만", "LAN 배틀", "호스트", "참가", "검색 중...", "준비 완료!", "버전 다름", "호스트 또는 참가", "상대: %u 마리", "상대가 나갔어요", "상대를 기다리는 중...", "다시", "도망", "이 알의 출신지", "%s +%u", "더 이상 훈련할 수 없어요", "지역 선택", "은퇴", "일찍 은퇴할까요?", "다음 아이는 하루 늦게 진화", "하루 늦게 진화",
+    "%s 의 %s 등장!", "가라, %s!", "보호구역", "도장 %u/8", "레인저",
+    "속도 +%u", "누르기: 아바타 변경", "총 %u 획득", "쉬움", "어려움", "선택 %u/%u", "싸우기", "잠김", "팀", "%s 쓰러뜨림!", "새 도장!", "볼륨 %u", "박스 %u/%u", "%s 와 교체: 칸 선택", "박스", "데려오기", "알이 있을 때만", "LAN 배틀", "호스트", "참가", "검색 중...", "준비 완료!", "버전 다름", "호스트 또는 참가", "상대: %u 마리", "상대가 나갔어요", "상대를 기다리는 중...", "다시", "도망", "이 알의 출신지", "%s +%u", "더 이상 훈련할 수 없어요", "지역 선택", "은퇴", "일찍 은퇴할까요?", "다음 아이는 하루 늦게 성장", "하루 늦게 성장",
     "팩 필요", "놓아주기", "영영 이별", "파티로", "파티에 들어가지 않아요", "볼륨", "언어", "정보", "밝기", "테스트",
     // care update
-    "왼쪽/오른쪽", "높게/낮게", "누구일까?", "열매 받기", "두더지", "줄넘기", "댄스", "숨바꼭질", "어느 쪽을 볼까?", "더 클까 작을까?", "크다", "작다", "이 포켓몬은 누구?", "좌우를 눌러 이동", "눌러! 찌리리공은 안돼", "눌러서 점프!", "박자에 맞춰 눌러!", "완벽", "좋아", "실패", "어디에 숨었을까?", "기쁨 +%u", "방어 +%u", "정답!", "아쉽다...", "배가 아파!", "감기에 걸렸어!", "기분이 나빠...", "심심해...", "Zzz... 불 꺼줘!", "아파서 못 놀아!", "다 나았어!", "나중에 한 번 더", "10분 기다려", "이제 목욕!", "으웩! 안 아파", "더 많은 게임", "미니게임",
+    "왼쪽/오른쪽", "높게/낮게", "누구일까?", "열매 받기", "두더지", "줄넘기", "댄스", "숨바꼭질", "어느 쪽을 볼까?", "더 클까 작을까?", "크다", "작다", "이 동물은 누구?", "좌우를 눌러 이동", "눌러! 전갈은 안돼", "눌러서 점프!", "박자에 맞춰 눌러!", "완벽", "좋아", "실패", "어디에 숨었을까?", "기쁨 +%u", "방어 +%u", "정답!", "아쉽다...", "배가 아파!", "감기에 걸렸어!", "기분이 나빠...", "심심해...", "Zzz... 불 꺼줘!", "아파서 못 놀아!", "다 나았어!", "나중에 한 번 더", "10분 기다려", "이제 목욕!", "으웩! 안 아파", "더 많은 게임", "미니게임",
     // care update
     "샌드백", "반응 속도", "공놀이", "놀이",
     // coins and daily missions
-    "코인", "오늘의 미션", "먹이 %u번 주기", "좋아하는 열매 주기", "미니게임 %u번", "%u걸음 걷기", "목욕시키기", "%u번 쓰다듬기", "힘 게임 하기", "속도 게임 하기", "방어 게임 하기", "%u점 얻기", "오늘 놀이: %u/%u", "모두 완료: +%u 추가", "모으는 방법", "놀아주고 돌보기", "1000걸음마다 +%u", "하루 첫 돌봄 +%u", "미션마다 +%u", "새 배지 +%u", "불 끄고 재우기 +%u", "상점이 곧 열려요!",
+    "코인", "오늘의 미션", "먹이 %u번 주기", "좋아하는 열매 주기", "미니게임 %u번", "%u걸음 걷기", "목욕시키기", "%u번 쓰다듬기", "힘 게임 하기", "속도 게임 하기", "방어 게임 하기", "%u점 얻기", "오늘 놀이: %u/%u", "모두 완료: +%u 추가", "모으는 방법", "놀아주고 돌보기", "1000걸음마다 +%u", "하루 첫 돌봄 +%u", "미션마다 +%u", "새 도장 +%u", "불 끄고 재우기 +%u", "상점이 곧 열려요!",
     // shop, bag and hats
     "상점", "가방", "모자", "야구모자", "리본", "꽃", "비니", "파티 모자", "밀짚모자", "마녀 모자", "산타 모자", "실크해트", "왕관", "구매", "아니요", "보유", "코인이 부족해요", "구매 완료!", "착용 중", "모자 벗기", "모자 옮기기", "아직 아무것도 없어요", "완료",
     // toys and decorations
@@ -1024,7 +1024,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // bath and sleep menus
     "목욕", "샤워", "거품 목욕", "문지르기", "빗질", "얼룩을 문질러!", "반짝반짝!", "비누가 필요해요", "빗을 사세요", "잠자기", "재우기", "낮잠 30분", "자장가", "관리", "비누", "빗",
     // places, garden, seasonal gifts
-    "외출", "공원", "포켓몬센터", "텃밭", "산책", "들어가기", "돌아가기", "치료", "오늘 무료", "완전히 회복했어요!", "코인 %u개를 찾았어요!", "열매를 찾았어요!", "%s 인사해요!", "즐거운 산책", "너무 피곤해요", "심기", "수확", "씨앗을 사세요", "자라는 중... %u%%", "씨앗", "수확: %s", "할로윈 선물!", "크리스마스 선물!", "새해 복 많이!", "발렌타인 선물!",
+    "외출", "공원", "동물병원", "텃밭", "산책", "들어가기", "돌아가기", "치료", "오늘 무료", "완전히 회복했어요!", "코인 %u개를 찾았어요!", "열매를 찾았어요!", "%s 인사해요!", "즐거운 산책", "너무 피곤해요", "심기", "수확", "씨앗을 사세요", "자라는 중... %u%%", "씨앗", "수확: %s", "할로윈 선물!", "크리스마스 선물!", "새해 복 많이!", "발렌타인 선물!",
     // capsules, scenery, trophies, teeth, school, quiz, parents, talk
     "배경", "초원", "해변", "숲", "화산", "산", "설원", "묘지", "트로피", "새 트로피! +10", "식사 100번", "게임 50번", "목욕 30번", "산책 25번", "수확 5번", "코인 1000개", "모자 5개", "장식 6개", "7일 연속", "레벨 20", "공부 10번", "양치 14번", "퀴즈 만점", "캡슐 10개", "캡슐", "오늘 %u개 남음", "나왔다: %s!", "비누 2개!", "씨앗 2개!", "코인 %u개!", "내일 다시 와요", "양치하기", "이가 반짝반짝!", "오늘 이미 2번 했어요", "눌러서 양치", "학교", "공부", "수학", "얼마나 할까요?", "%u분", "공부 중...", "잘했어요! +%u", "잘했어요!", "그만", "10개 중 %u개!", "부모님", "잠잘 시간", "하루 게임", "끔", "눌러서 변경", "잘 시간이에요", "오늘은 충분히 놀았어요", "배고파요!", "목욕하고 싶어요", "졸려요...", "몸이 안 좋아요...", "놀자!", "비가 와요!", "눈이 와요!", "텃밭이 다 자랐어요!", "사랑해요!", "정말 좋은 날!", "공부할까요?",
     // adventures, lake, kitchen, chores, piggy bank, diary, alarm
@@ -1036,13 +1036,13 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 14
     "%s 먹고 싶어요!", "놀고 싶어요!", "공원 가요!", "목욕하고 싶어요!", "낚시 가요!", "쓰다듬어 줘요!", "소원 성취! +5", "외로워해요", "최고의 하루!", "보고 싶었어요...", "생일 축하해요! +20", "%u개월!", "부활절 달걀! +5", "여름 축제: 아이스크림 공짜!", "성격: %s", "장난꾸러기", "게으름뱅이", "먹보", "수줍음",
     // phase 15
-    "게임", "두뇌", "아케이드", "풍선 터뜨리기", "흔들기 경주", "받기", "균형", "타입 퀴즈", "슬라이드 퍼즐", "버블", "그림 그리기", "폭탄은 피해요", "흔들거나 빠르게 눌러요", "받고, 찌리리공은 피해요", "기울이거나 한쪽을 눌러요", "효과는 얼마나?", "1부터 8까지 정렬", "같은 색 묶음을 눌러요", "완성",
+    "게임", "두뇌", "아케이드", "풍선 터뜨리기", "흔들기 경주", "받기", "균형", "타입 퀴즈", "슬라이드 퍼즐", "버블", "그림 그리기", "폭탄은 피해요", "흔들거나 빠르게 눌러요", "받고, 전갈은 피해요", "기울이거나 한쪽을 눌러요", "효과는 얼마나?", "1부터 8까지 정렬", "같은 색 묶음을 눌러요", "완성",
     // phase 16
     "옷", "선글라스", "별 안경", "하트 안경", "외알 안경", "목도리", "나비넥타이", "메달", "반다나", "망토", "배낭", "천사 날개", "박쥐 날개", "멋쟁이!",
     // phase 17
-    "해변", "도서관", "음악당", "콘테스트", "오락실", "아르바이트", "모래성", "조개! +1", "오늘은 조개가 없어요", "모래성 완성!", "오늘 이미 만들었어요", "읽기", "오늘은 충분히 읽었어요", "오늘은 음악 그만", "배틀", "승리", "자장가", "참가", "다음 주에 와요", "이번엔 리본 없음... +2", "동 리본! +5", "은 리본! +10", "금 리본! +20", "옷, 친밀도, 기쁨이 중요해요", "카페", "꽃집", "우체국", "3시간 +15", "일하는 중", "%u:%02u 돌아와요", "퇴근했어요! +15", "내일 또 해요", "우편", "편지가 없어요", "오박사: 잘했어! 코인 5개 줄게.", "나옹: 쿠키 선물이다옹!", "럭키: 텃밭에 심을 씨앗이야.", "피카츄: 피카피카! (비누)", "할머니: 저금하렴, 코인 8개.", "친구: 보고 싶어, 같이 놀자!",
+    "해변", "도서관", "음악당", "콘테스트", "오락실", "아르바이트", "모래성", "조개! +1", "오늘은 조개가 없어요", "모래성 완성!", "오늘 이미 만들었어요", "읽기", "오늘은 충분히 읽었어요", "오늘은 음악 그만", "배틀", "승리", "자장가", "참가", "다음 주에 와요", "이번엔 리본 없음... +2", "동 리본! +5", "은 리본! +10", "금 리본! +20", "옷, 친밀도, 기쁨이 중요해요", "카페", "꽃집", "우체국", "3시간 +15", "일하는 중", "%u:%02u 돌아와요", "퇴근했어요! +15", "내일 또 해요", "우편", "편지가 없어요", "안나 박사: 잘했어! 코인 5개 줄게.", "서벌: 쿠키 선물이다옹!", "타조: 텃밭에 심을 씨앗이야.", "미어캣: 찍찍! (비누)", "할머니: 저금하렴, 코인 8개.", "친구: 보고 싶어, 같이 놀자!",
     // phase 19
-    "퀘스트", "피카츄가 모자를 잃어버렸어요", "나옹의 점심", "럭키의 잃어버린 알", "푸린을 위한 노래", "공원을 찾아봐요", "해변을 찾아봐요", "도서관에 물어봐요", "호수에서 낚시해요", "요리를 해요", "직접 만든 음식을 먹어요", "모험 정류장을 열어요", "포켓몬센터에 가요", "목욕해요", "노래를 틀어요", "게임을 해요", "학교에서 공부해요", "다음 단계는 내일", "퀘스트 완료! 새 모자", "트릭 오어 트릿! 쿠키", "핫초코 공짜!", "함께한 지 1년! +50",
+    "퀘스트", "미어캣이 모자를 잃어버렸어요", "서벌의 점심", "타조의 잃어버린 알", "카나리아를 위한 노래", "공원을 찾아봐요", "해변을 찾아봐요", "도서관에 물어봐요", "호수에서 낚시해요", "요리를 해요", "직접 만든 음식을 먹어요", "모험 정류장을 열어요", "동물병원에 가요", "목욕해요", "노래를 틀어요", "게임을 해요", "학교에서 공부해요", "다음 단계는 내일", "퀘스트 완료! 새 모자", "트릭 오어 트릿! 쿠키", "핫초코 공짜!", "함께한 지 1년! +50",
     // the photo album
     "앨범", "아직 사진이 없어요", "앨범에 사진 저장!", "사진",
     // the Nursery
@@ -1072,7 +1072,7 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "새로운 하루!", "양치하자!", "좋은 오후!", "오늘 하루 어땠어?", "간식 시간!", "숙제 했어?",
     "좋은 저녁!", "곧 잘 시간이야", "저녁 뭐 먹어?", "봐, 별이 떴어", "좋은 하루였어", "좋은 꿈 꿔...",
     "벌써 늦었어!", "달이 예뻐", "햇살 좋은 날!", "햇볕이 따뜻해", "밖에서 놀까?", "파란 하늘!",
-    "구름이 많아...", "저 구름 포켓몬 같아", "오늘은 흐려", "비가 와!", "똑똑똑...", "물웅덩이 뛰기?",
+    "구름이 많아...", "저 구름 동물 같아", "오늘은 흐려", "비가 와!", "똑똑똑...", "물웅덩이 뛰기?",
     "우산 챙겨", "천둥이야! 곁에 있어줘", "폭풍우가 대단해!", "번개를 봤어!", "아무것도 안 보여!", "오늘 안개가 꼈어",
     "신비로워...", "눈이 와!", "눈사람 만들자!", "눈송이!", "눈싸움!", "뉴욕에서 온 눈!",
     "뉴욕은 추워!", "너무 더워!", "아이스크림 줘!", "시원한 물이 필요해", "으으, 추워!", "목도리가 필요해",
@@ -1081,10 +1081,10 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     "뭐가 태어날까?", "편지가 왔어!", "편지 읽을까?", "모험 계속할까?", "오늘 한 단계 더!", "오늘 열심히 일했어!",
     "코인 벌었어", "우리 생일이야!", "케이크 있어?", "함께한 한 달 고마워", "과자 안 주면 장난칠 거야!", "왁! 놀랐지?",
     "호박이 좋아", "즐거운 연휴!", "선물 있을까?", "불빛이 좋아", "달걀 찾으러 가자!", "알록달록 달걀!",
-    "해변 가자!", "여름 최고!", "항상 곁에 있을게", "널 믿어", "함께라면 강해", "넌 최고의 트레이너야",
+    "해변 가자!", "여름 최고!", "항상 곁에 있을게", "널 믿어", "함께라면 강해", "넌 최고의 레인저야",
     "곧 변할 것 같아...", "뭔가 일어나고 있어!",
     // phase 31
-    "거품 목욕", "양치하기", "낮잠이나 자장가", "집밥 먹기", "티켓 %u장 얻기", "캡슐 뽑기", "타입 퀴즈 하기", "콘테스트 참가", "공원 산책", "모험 지점 도착", "낚시 %u번", "해변에서 놀기", "포켓몬센터 방문", "요리하기", "심기 또는 수확", "집안일 %u개", "책 읽기", "공부하기", "노래 틀기", "편지 열기", "저금통에 저금", "음식 사기", "무언가 사기", "집 꾸미기", "집안일 돕기", "상점에서 사기", "오락실 티켓 얻기", "3000걸음 걷기", "이상해씨의 텃밭", "고라파덕의 두통", "잠만보의 긴 낮잠", "이브이의 생일 파티", "꼬부기의 해변 나들이", "잉어킹은 날고 싶어", "삐삐의 달밤", "캐이시의 첫 등교",
+    "거품 목욕", "양치하기", "낮잠이나 자장가", "집밥 먹기", "티켓 %u장 얻기", "캡슐 뽑기", "타입 퀴즈 하기", "콘테스트 참가", "공원 산책", "모험 지점 도착", "낚시 %u번", "해변에서 놀기", "동물병원 방문", "요리하기", "심기 또는 수확", "집안일 %u개", "책 읽기", "공부하기", "노래 틀기", "편지 열기", "저금통에 저금", "음식 사기", "무언가 사기", "집 꾸미기", "집안일 돕기", "상점에서 사기", "오락실 티켓 얻기", "3000걸음 걷기", "거북이의 텃밭", "플라밍고의 두통", "나무늘보의 긴 낮잠", "사막여우의 생일 파티", "수달의 해변 나들이", "비단잉어는 날고 싶어", "부엉이의 달밤", "앵무새의 첫 등교",
     // phase 32
     "응가 쓸기", "쓸 게 없어요", "응가도 쓸어 주세요!", "청결 +%u", "깨끗하게 쓸었어요!",
     // phase 32b
@@ -1092,9 +1092,9 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 33
     "이 사진을 지울까요?", "지우기", "모두 지우기", "즐겨찾기 빼고 모두 지울까요?", "사진을 지웠어요", "이미 즐겨찾기가 %u개예요",
     // phase 34
-    "%s의 도전!", "배지 %u/8", "사천왕 %u/4", "결승: 챔피언", "싸우자!", "나중에",
+    "%s의 도전!", "도장 %u/8", "4대 레인저 %u/4", "결승: 수석 레인저", "싸우자!", "나중에",
     // phase 35
-    "걸음", "오늘", "지난 7일", "체육관까지 걸음", "모험 루트", "총 %u걸음", "준비 완료! 싸우자!", "월화수목금토일", "모든 체육관 승리!",
+    "걸음", "오늘", "지난 7일", "보호구역까지 걸음", "모험 루트", "총 %u걸음", "준비 완료! 싸우자!", "월화수목금토일", "모든 보호구역 승리!",
     // phase 36
     "걸음 완료! %u일 후 도전이 와요", "걸음 완료! 내일 도전이 와요",
     // phase 36
@@ -1104,9 +1104,9 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 43
     "2500 걸음! 간식 시간", "5000 걸음! 멋진 산책", "10000 걸음! 더 강해졌어", "초보", "산책가", "걷기꾼", "등산가", "트레커", "길잡이", "세계 여행자", "길의 고수", "전설",
     // phase 44
-    "풀숲", "볼", "몬스터볼", "수퍼볼", "하이퍼볼", "야생의 %s!", "%s 잡았다!", "상자로 보냈어.", "%s 빠져나왔어!", "팀과 상자가 꽉 찼어", "볼이 없어: 상점에서 사자", "몬스터볼을 찾았어!", "풀숲에서 뭔가 움직여!", "%u 걸음 더 걷자", "지금 자고 있어", "풀숲에 아무도 없어", "풀숲에서 쓰자",
+    "풀숲", "간식", "간식", "고급 간식", "최고급 간식", "%s 나타났다!", "%s 잡았다!", "상자로 보냈어.", "%s 빠져나왔어!", "팀과 상자가 꽉 찼어", "간식이 없어: 상점에서 사자", "간식을 찾았어!", "풀숲에서 뭔가 움직여!", "%u 걸음 더 걷자", "지금 자고 있어", "풀숲에 아무도 없어", "풀숲에서 쓰자",
     // phase 45
-    "여행", "여행 중", "돌아왔어!", "%s 여행을 떠났어!", "오늘은 여행 끝", "늦었어: 내일 가자", "부르기", "부를까? 이야기 없어", "%s 강에 갔어", "코인 %u개를 찾았어!", "%s 덤불을 뒤졌어", "몬스터볼을 찾았어!", "%s, %s 만났어", "간식을 나눠 먹었어!", "%s 마을을 걸었어", "쿠키를 받았어!", "%s 정원에서 놀았어", "씨앗을 찾았어!", "%s 물웅덩이에서 놀았어", "비누를 가져왔어!", "%s 뭔가 움직이는 걸 봤어", "풀숲에서!", "%s 언덕에 올랐어", "수퍼볼을 찾았어!", },
+    "여행", "여행 중", "돌아왔어!", "%s 여행을 떠났어!", "오늘은 여행 끝", "늦었어: 내일 가자", "부르기", "부를까? 이야기 없어", "%s 강에 갔어", "코인 %u개를 찾았어!", "%s 덤불을 뒤졌어", "간식을 찾았어!", "%s, %s 만났어", "간식을 나눠 먹었어!", "%s 마을을 걸었어", "쿠키를 받았어!", "%s 정원에서 놀았어", "씨앗을 찾았어!", "%s 물웅덩이에서 놀았어", "비누를 가져왔어!", "%s 뭔가 움직이는 걸 봤어", "풀숲에서!", "%s 언덕에 올랐어", "고급 간식을 찾았어!", "새끼", "청소년", "성체", },
 };
 
 // Medal names in their three lengths [language][medal].

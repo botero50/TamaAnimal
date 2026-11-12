@@ -27,9 +27,18 @@ def digest(term):
     return hashlib.sha256(SALT + term.lower().encode()).hexdigest()[:16]
 
 
+CJK_RUN = re.compile(r'[぀-ヿ㐀-鿿가-힯]+')
+
+
 def hits_in(text, bad):
     words = WORD.findall(text)
     found = set()
+    # Chinese, Japanese and Korean have no spaces, so check every 2-5 character stretch
+    for run in CJK_RUN.findall(text):
+        for n in range(2, 6):
+            for i in range(len(run) - n + 1):
+                if digest(run[i:i + n]) in bad:
+                    found.add(run[i:i + n])
     for i, w in enumerate(words):
         if digest(w) in bad:
             found.add(w)
@@ -39,6 +48,8 @@ def hits_in(text, bad):
 
 
 def main():
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')   # the names it reports may be CJK
     bad = set(open(TERMS).read().split())
     files = subprocess.check_output(['git', 'ls-files', '-co', '--exclude-standard'], cwd=ROOT, text=True).splitlines()
     problems = 0

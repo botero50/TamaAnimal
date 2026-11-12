@@ -137,18 +137,19 @@
     <p>Put a microSD into the board (it formats itself). Press <b>Connect board</b>,
        then a region. Any one of them works on its own, and the others can be added later
        without redoing this one. Africa is simply the usual place to start.</p>
-    <p class="note">⏱️ <b>This part takes a few minutes, and that is normal.</b> The sprites go
+    <p class="note">⏱️ <b>This part is slow, and that is normal: about 5 to 10 minutes for Africa.</b> Each animal comes as a cub, a juvenile and an adult. The sprites go
        over the USB serial link. Leave the tab open and the card in. The progress bar moves
        the whole time.</p>
+    <p class="note">🐣 <b>Updating from 1.0?</b> Send your regions again to get the cub and juvenile art. Until you do, every stage shows the adult.</p>
     <p class="note">🗂️ Used this card with another game before? That is fine. Tamanimals keeps its animals in its
        own <code>animals</code> folder and ignores everything else on the card, so send your regions here.</p>
     <p class="note">Close the step-1 install tab first (only one program can use
        the port at a time).</p>
     <div class="row">
       <button id="connect">🔌 Connect board</button>
-      <button id="auto" data-region="africa" disabled>⬇️ Africa (145 animals, ~7 MB)</button>
-      <button id="autoa" data-region="asia" disabled>⬇️ Asia (55 animals, ~3 MB)</button>
-      <button id="autom" data-region="americas" disabled>⬇️ Americas (125 animals, ~6 MB)</button>
+      <button id="auto" data-region="africa" disabled>⬇️ Africa (145 animals, ~20 MB)</button>
+      <button id="autoa" data-region="asia" disabled>⬇️ Asia (55 animals, ~8 MB)</button>
+      <button id="autom" data-region="americas" disabled>⬇️ Americas (125 animals, ~17 MB)</button>
     </div>
     <p class="note">Have your own <code>.bin</code> files? <label style="cursor:pointer;text-decoration:underline">pick them manually<input id="files" type="file" accept=".bin" multiple disabled hidden></label></p>
     <p class="note">🎨 Every sprite is drawn by code. See <a href="https://github.com/botero50/TamaAnimal#regenerating-the-content" target="_blank">how to change or regenerate them</a>.</p>

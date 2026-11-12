@@ -45,7 +45,7 @@
 
 // Version del firmware. Subir este numero en cada release (y manifest.json para
 // el instalador web). Se muestra en la pantalla de ajustes y por serie al arrancar.
-#define FW_VERSION "1.0.2"
+#define FW_VERSION "1.1.0"
 #define PET_CRY_GAP_MS 6000  // minimum time between cries from petting
 
 Arduino_DataBus *bus = new Arduino_ESP32QSPI(
@@ -84,6 +84,7 @@ SprtMon sprt;         // multi-action SPRT sprite (main screen)
 SprtMon evoSprt;      // previous form, only during the evolution blink
 int16_t monFor = -2;
 bool monShinyFor = false;
+uint8_t monGrowthFor = 255;
 
 // on-screen behaviour of the creature
 struct {
@@ -952,17 +953,18 @@ void setup() {
 
 // loads/unloads the SD sprite when the species changes
 void ensureMon() {
-  if (pet.speciesId == monFor && monShinyFor == pet.shiny && !sdDirty) return;
+  if (pet.speciesId == monFor && monShinyFor == pet.shiny && monGrowthFor == pet.growth && !sdDirty) return;
   sdDirty = false;
   monFor = pet.speciesId;
   monShinyFor = pet.shiny;
+  monGrowthFor = pet.growth;
   mon.unload();
   sprt.unload();
   beh.x = beh.targetX = 233;
   beh.mode = 0;
   beh.until = 0;
   if (pet.speciesId >= 1 && pet.speciesId <= DEX_COUNT) {
-    sprt.load(pet.speciesId, pet.shiny);          // primary: SPRT
+    sprt.load(pet.speciesId, pet.shiny, pet.growth);   // primary: SPRT, at its growth stage
     if (!sprt.loaded) mon.load(pet.speciesId, pet.shiny);  // fallback: B/W
   }
 }
@@ -2423,7 +2425,8 @@ void onTap(int16_t x, int16_t y) {
     bool b2 = inX && y >= c2t && y <= c2b;   // keep / stay together
     if (choiceKind == 1) {                 // evolution
       if (b1) {
-        int16_t old = pet.speciesId; pet.evolve(); evoSprt.load(old, pet.shiny);
+        int16_t old = pet.speciesId; uint8_t oldGrowth = pet.growth;
+        pet.evolve(); evoSprt.load(old, pet.shiny, oldGrowth);
         audioCry(pet.speciesId);
       }
       else if (b2) pet.declineEvolve();
@@ -5791,13 +5794,13 @@ static void drawBattleBack() {
 // a creature steps in, never per frame. That is also when it cries, so the cry
 // follows the sprite swap: a switch to the SAME species stays silent.
 static void btlSyncSprite(uint8_t who, const Combatant &c) {
-  int16_t key = c.dex * (c.shiny ? -1 : 1);
+  int16_t key = (int16_t)(c.dex * 4 + c.growth) * (c.shiny ? -1 : 1);   // a cub and its adult are different sprites
   if (btlSprtDex[who] == key && btlSprt[who].loaded) return;
   btlSprt[who].unload();
   btlSprtDex[who] = 0;
   if (c.dex < 1 || c.dex > DEX_COUNT) return;
   audioCry(c.dex);   // a creature just came out: it calls (needs no sprite, so before the load)
-  if (btlSprt[who].load(c.dex, c.shiny)) btlSprtDex[who] = key;   // NOT (uint8_t): the Americas runs past 255
+  if (btlSprt[who].load(c.dex, c.shiny, c.growth)) btlSprtDex[who] = key;   // NOT (uint8_t): the Americas runs past 255
 }
 
 static void btlFreeSprites() {
@@ -7692,17 +7695,22 @@ void renderCardProgress() {
   uiTextFit(UIF_SMALL, CX, by + 46, nx, UI_INK, 1, 300);
 
   // evolution status
-  uiTextFit(UIF_SMALL, CX, 244, T(S_EVO_LABEL), UI_TRACK_TEXT, 1, 300);
+  {
+    static const StrId STAGE_NAME[3] = { S_STAGE_CUB, S_STAGE_JUV, S_STAGE_ADULT };
+    char lbl[40];
+    snprintf(lbl, sizeof(lbl), "%s: %s", T(S_EVO_LABEL), T(STAGE_NAME[pet.growth < 3 ? pet.growth : 2]));
+    uiTextFit(UIF_SMALL, CX, 244, lbl, UI_TRACK_TEXT, 1, 300);
+  }
   char evoBuf[28];
   const char *evo;
   uint16_t evoCol = UI_INK;
-  if (d.evolvesTo == 0) {
+  if (d.evolvesTo == 0 && pet.growth >= GROW_ADULT) {
     evo = T(S_FINAL_FORM);
   } else {
     // The SAME sum canEvolveNow() uses -- including the day owed for retiring
     // the previous creature early. A card that left evoPenalty() out would
-    // promise an evolution that then does not happen.
-    int needed = d.evolveLevel + pet.careMistakes + pet.evoPenalty();
+    // promise a growth that then does not happen.
+    int needed = d.evolvesTo == 0 ? pet.nextGrowLevel() : d.evolveLevel + pet.careMistakes + pet.evoPenalty();
     if (pet.level() >= needed) {
       if (pet.lowestStat() >= 40) { evo = T(S_EVO_READY); evoCol = UI_BAR_OK; }
       else { evo = T(S_EVO_BLOCKED); evoCol = UI_BAR_BAD; }
