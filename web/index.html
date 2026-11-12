@@ -26,7 +26,7 @@
   .row { display:flex; gap:.75rem; align-items:center; flex-wrap:wrap; }
   #log { font-family: ui-monospace, monospace; font-size:.85rem; background:#1b1b25; color:#d8dcf0;
          border-radius:10px; padding:.75rem 1rem; margin-top:1rem; max-height:220px; overflow:auto; white-space:pre-wrap; display:none; }
-  #savelog, #wifilog, #installlog { font-family: ui-monospace, monospace; font-size:.85rem; background:#1b1b25; color:#d8dcf0;
+  #savelog, #wifilog { font-family: ui-monospace, monospace; font-size:.85rem; background:#1b1b25; color:#d8dcf0;
          border-radius:10px; padding:.75rem 1rem; margin-top:1rem; max-height:160px; overflow:auto; white-space:pre-wrap; display:none; }
   .bar { height:10px; background:var(--track); border-radius:5px; overflow:hidden; margin-top:.75rem; display:none; }
   .bar > div { height:100%; width:0; background:var(--ok); transition: width .15s; }
@@ -61,8 +61,7 @@
 
   <h2><span class="num">💾</span>Save or restore your pet</h2>
   <div class="step" style="border-left:4px solid var(--ok)">
-    <p>Step 1 below takes a backup for you before it installs. Use <b>Save my pet</b>
-       to take one any other time: it downloads a small file of your animal, field guide,
+    <p>Use <b>Save my pet</b> before an update: it downloads a small file of your animal, field guide,
        coins and items, after checking that the file is complete. If anything goes wrong,
        <b>Restore my pet</b> puts it all back. New board? Skip this.</p>
     <div class="row">
@@ -103,22 +102,18 @@
 
   <h2><span class="num">1</span>Flash the firmware</h2>
   <div class="step">
-    <p>Plug the board in via USB and press <b>Back up, then install</b>. Pick the port
-       when asked. It saves your pet to a file and checks the file is complete, and only
-       then shows <b>Install now</b>. Press that and pick the port again, because the
-       browser asks once for each. The install takes about a minute, with no drivers
-       on any OS.</p>
-    <div class="row"><button id="backupinstall">💾 Back up, then install</button></div>
-    <div id="installgate" hidden>
-      <p><b>Ready to install.</b></p>
-      <esp-web-install-button manifest="manifest.json">
-        <button slot="activate">⚡ Install now</button>
-        <span slot="unsupported">Browser not supported (use Chrome/Edge).</span>
-        <span slot="not-allowed">Needs HTTPS.</span>
-      </esp-web-install-button>
-    </div>
-    <pre id="installlog"></pre>
-    <p class="note">New board with nothing to save? <a href="#" id="skipbackup">Install without a backup</a>.</p>
+    <p>Plug the board in via USB and press <b>Install now</b>. Pick the port when
+       asked. The install takes about a minute, with no drivers on any OS. Updating a
+       board that has a pet? Press <b>Save my pet</b> in the section above first. A
+       new board, or one running something else, has nothing to save. If you have not
+       saved on this page, tick the box below first.</p>
+    <p><label><input id="nopetsave" type="checkbox"> I saved my pet above, or this board has no pet to save</label></p>
+    <p class="note" id="installhint" style="display:none;color:#e8503a"><b>Tick the box above first.</b> Updating does not erase the pet; this is only a safety net.</p>
+    <esp-web-install-button id="installer" manifest="manifest.json">
+      <button slot="activate">⚡ Install now</button>
+      <span slot="unsupported">Browser not supported (use Chrome/Edge).</span>
+      <span slot="not-allowed">Needs HTTPS.</span>
+    </esp-web-install-button>
     <p class="note" style="border-left:4px solid #e8503a;padding-left:10px">
        🔄 <b>Updating? Leave "Erase device" unchecked.</b> The installer asks
        once, with the box already unchecked — click <b>Next</b> without ticking
@@ -126,8 +121,8 @@
        firmware is written around the save rather than over it. Tick that box
        and everything is gone, with no undo. The sprites on the microSD are
        untouched either way.<br><br>
-       A backup is still the only real safety net, which is why this step takes one
-       first (the same as typing <code>EXPORT</code> on the serial console).<br><br>
+       A backup is still the only real safety net, which is why <b>Save my pet</b> is
+       there (the same as typing <code>EXPORT</code> on the serial console).<br><br>
        A fresh board with nothing on it can be erased safely, and on a board
        that has never run Tamanimals it makes no difference either way.</p>
   </div>
@@ -293,6 +288,7 @@ document.getElementById('sendover').onclick = (ev) => {
 const slog = (m) => { const el = document.getElementById('savelog'); el.style.display = 'block';
   el.textContent += m + '\n'; el.scrollTop = el.scrollHeight; };
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+let backupDone = false;     // a checked backup was taken on this page, so Install now needs no question
 
 async function withPort(job) {
   if (port && port.readable) { slog('Close the board connection in step 2 first (reload the page).'); return; }
@@ -368,36 +364,21 @@ document.getElementById('petsave').onclick = () => withPort(async (send, line) =
   const got = await takeBackup(send, line, slog);
   if (got === 'none') slog('No save came back. Is Tamanimals running on the board? Try again.');
   if (got === 'bad') slog('The backup never came through complete, so nothing was saved. Check the cable and try again.');
+  if (got === 'saved') backupDone = true;
 });
 
-// ---------- step 1: back up, then install ----------
-// The install button appears only once there is a good backup or the player has said
-// there is nothing to save. It takes its own click because a browser only shows the
-// port picker straight after one, and reading the save takes longer than that allows.
-const ilog = (m) => { const el = document.getElementById('installlog'); el.style.display = 'block';
-  el.textContent += m + '\n'; el.scrollTop = el.scrollHeight; };
-function showInstall() {
-  const gate = document.getElementById('installgate');
-  gate.hidden = false;
-  gate.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-document.getElementById('backupinstall').onclick = async () => {
-  let got = null;
-  await withPort(async (send, line) => { got = await takeBackup(send, line, ilog); });
-  if (got === 'saved') {          // the port is closed again by now, so the installer can have it
-    ilog('Now press Install now, and leave "Erase device" unticked.');
-    showInstall();
-  } else if (got === 'bad') {
-    ilog('The backup never came through complete, so nothing will be installed. Check the cable and try again.');
-  } else if (got === 'none') {
-    ilog('Nothing answered, so there was nothing to back up.');
-    if (confirm('No pet answered on this board. That is normal for a new board.\n\nIf this board has a pet on it, press Cancel and check the cable. Install without a backup?')) showInstall();
-  }
-};
-document.getElementById('skipbackup').onclick = (ev) => {
+// ---------- step 1: install ----------
+// Backing up is the Save my pet button above, a separate step. Installing with no backup
+// taken on this page asks first, so a board that does have a pet is not overwritten by accident.
+// In the capture phase, so it runs before the install button's own handler and can stop it.
+// No confirm() box here: a dialog uses up the click, and the browser then refuses to show the
+// port picker ("Must be handling a user gesture"). A tick box keeps the click intact.
+document.getElementById('installer').addEventListener('click', (ev) => {
+  if (backupDone || document.getElementById('nopetsave').checked) return;
+  ev.stopPropagation();
   ev.preventDefault();
-  if (confirm('Install without a backup? If this board has a pet on it, take a backup first.')) showInstall();
-};
+  document.getElementById('installhint').style.display = 'block';
+}, true);
 
 document.getElementById('petload').onclick = () => document.getElementById('petfile').click();
 document.getElementById('petfile').onchange = async (ev) => {
