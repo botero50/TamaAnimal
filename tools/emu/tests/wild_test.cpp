@@ -35,6 +35,10 @@ extern uint32_t fpToastUntil, lastInteract;
 bool startWildBattle();
 void btlThrowWith(uint8_t kind, uint8_t roll);
 void battleTap(int16_t x, int16_t y);
+uint8_t audioMusicNow();
+void onTap(int16_t x, int16_t y);
+extern bool galleryOpen, galleryPick, galleryDirty;
+extern uint8_t galleryRegion;
 void startTrainerBattle(uint8_t idx, bool hard);
 int mapGridHit(int16_t x, int16_t y);
 
@@ -258,6 +262,10 @@ static void flowTests() {
   ck(btlOver && btlWon, "a catch ends the fight");
   ck(party.count() == team + 1 && party.boxCount() == boxN, "it joins the team");
   ck(pet.isRegistered(dex), "and the field guide");
+  ck(audioMusicNow() == MUS_VICTORY, "the win tune plays");
+  battleTap(233, 330);
+  while (btlMsgCount && battleOpen) battleTap(233, 330);
+  ck(!battleOpen && audioMusicNow() == MUS_NONE, "tapping out of a won fight stops the music");
   closeBattle();
 
   // team full: to the box, and shiny in the field guide
@@ -338,6 +346,21 @@ static void flowTests() {
   }
 }
 
+static void galleryTests() {
+  galleryOpen = true; galleryPick = true; galleryDirty = true;
+  pumpMs(150);
+  onTap(233, 22);
+  ck(!galleryOpen, "the field guide region list closes with the X");
+  galleryOpen = true; galleryPick = false; galleryRegion = 0; galleryDirty = true;
+  pumpMs(150);
+  onTap(233, 22);
+  ck(!galleryOpen, "a region page closes with the X");
+  galleryOpen = true; galleryPick = false; galleryDirty = true;
+  onTap(233, 60);
+  ck(!galleryOpen, "and still with a tap on the title");
+  galleryOpen = false; galleryPick = false;
+}
+
 int main() {
   ruleTests();
   encounterTests();
@@ -349,6 +372,7 @@ int main() {
   if (pet.awaitingStarter()) { printf("FAIL: no starter\n"); return 1; }
   pumpMs(120);
   flowTests();
+  galleryTests();
   if (bad) { printf("FAILURES: %d\n", bad); return 1; }
   printf("wild test passed\n");
   return 0;

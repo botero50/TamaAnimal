@@ -45,7 +45,7 @@
 
 // Version del firmware. Subir este numero en cada release (y manifest.json para
 // el instalador web). Se muestra en la pantalla de ajustes y por serie al arrancar.
-#define FW_VERSION "1.0.1"
+#define FW_VERSION "1.0.2"
 #define PET_CRY_GAP_MS 6000  // minimum time between cries from petting
 
 Arduino_DataBus *bus = new Arduino_ESP32QSPI(
@@ -1176,9 +1176,15 @@ void loop() {
   // large sprites drawing takes longer, so a cushion is left)
   static uint32_t lastTimerSweep = 0;
   if (now - lastTimerSweep >= 60000) { lastTimerSweep = now; sweepOldTimers(now); }
-  if (!screenOff && now - lastRender >= (uint32_t)((gameOpen || sackOpen || spdOpen || fpOpen || scrubOpen || placeScene) ? 85 : 100)) {
+  uint32_t renderGap = (gameOpen || sackOpen || spdOpen || fpOpen || scrubOpen || placeScene) ? 85 : 100;
+  if (!screenOff && now - lastRender >= renderGap) {
     lastRender = now;
     render();
+    // The gap counts from the START of a frame, so a slow frame (the big sprite while
+    // scrubbing) left almost none before the next one began painting over the buffer
+    // the previous flush was still sending: the screen flickered. Keep 55 ms clear.
+    uint32_t end = millis();
+    if (end - now > renderGap - 55) lastRender = end - (renderGap - 55);
   }
   delay(1);   // the other tasks get a turn on every pass
 }
@@ -2356,6 +2362,7 @@ void onTap(int16_t x, int16_t y) {
   }
   if (galleryOpen) {
     if (galleryPick) {
+      if (exitHit(x, y)) { galleryOpen = false; sfxPlay(SFX_TAP); return; }
       int r = regionPickTap(x, y, RPICK_FOR_DEX);
       if (r >= 0) {
         galleryRegion = (uint8_t)r;
@@ -6739,6 +6746,7 @@ void battleTap(int16_t x, int16_t y) {
     btlMsgCount = 0;
     if (btlOver) {
       btlFreeSprites();
+      audioMusic(MUS_NONE);   // the win tune used to play on over the main screen, with no way to stop it
       battleOpen = false;
       // Back to the LAN screen rather than all the way out: that is where a
       // rematch is offered, and re-pairing for every fight would be tedious.
@@ -7536,6 +7544,7 @@ static void renderRegionPick(uint8_t mode) {
   else if (forGyms) snprintf(ttl, sizeof(ttl), "%s", T(S_GYMS));
   else snprintf(ttl, sizeof(ttl), T(S_GUIDE_FMT), pet.registeredCount(), DEX_COUNT);
   uiTextFit(UIF_MID, CX, 70, ttl, UI_INK, 1, 280);
+  if (mode == RPICK_FOR_DEX) drawExitBtn();     // the field guide: the same marked X as the games
 
   // The subtitle a row shows. At first boot there is none: naming the starter here
   // would give away the next screen, and the counts the other two modes show would
@@ -8112,6 +8121,7 @@ void renderGallery() {
   char pg[12];
   snprintf(pg, sizeof(pg), "%d/%d", galleryPage + 1, (int)GAL_PAGES);
   uiText(UIF_SMALL, CX, 442, pg, UI_TRACK_TEXT, 1);
+  drawExitBtn();                                // the way out was a tap on the title, with nothing to show it
   gfx->flush();
 }
 
@@ -8122,7 +8132,7 @@ void galleryTap(int16_t x, int16_t y) {
     galleryDirty = true;
     return;
   }
-  if (y < 72) {  // tap the header = quit
+  if (y < 72 || exitHit(x, y)) {  // the X, or the header = quit
     galleryOpen = false;
     gallerySprt.unload();
     return;
