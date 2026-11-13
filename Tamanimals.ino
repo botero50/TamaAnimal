@@ -45,13 +45,14 @@
 
 // Version del firmware. Subir este numero en cada release (y manifest.json para
 // el instalador web). Se muestra en la pantalla de ajustes y por serie al arrancar.
-#define FW_VERSION "1.1.2"
+#define FW_VERSION "1.1.3"
 #define PET_CRY_GAP_MS 6000  // minimum time between cries from petting
 
 Arduino_DataBus *bus = new Arduino_ESP32QSPI(
   LCD_CS, LCD_SCLK, LCD_SDIO0, LCD_SDIO1, LCD_SDIO2, LCD_SDIO3);
-Arduino_CO5300 *panel = new Arduino_CO5300(
-  bus, LCD_RESET, 0 /*rotation*/, LCD_WIDTH, LCD_HEIGHT, 6, 0, 0, 0);
+// Created at the start of setup(), not here: the display's reset pin depends on the board, and
+// the board is only known once the flash can be read (see boardIs175C()).
+Arduino_CO5300 *panel = nullptr;
 // Framebuffer completo en PSRAM: dibujamos todo y hacemos flush() (sin parpadeo)
 // Canvas that also draws UTF-8 text (zh/ko): ASCII still goes through the stock
 // 5x7 font, everything else from the generated 12x12 table in cjkfont.h.
@@ -73,7 +74,13 @@ private:
   CjkState cjk;
 };
 #endif
-TpCanvas *gfx = new TpCanvas(LCD_WIDTH, LCD_HEIGHT, panel);
+TpCanvas *gfx = nullptr;
+
+static void makeDisplay() {
+  const bool c = boardIs175C();
+  panel = new Arduino_CO5300(bus, c ? LCD_RESET_175C : LCD_RESET, 0 /*rotation*/, LCD_WIDTH, LCD_HEIGHT, 6, 0, 0, 0);
+  gfx = new TpCanvas(LCD_WIDTH, LCD_HEIGHT, panel);
+}
 
 TouchDrvCST92xx touch;
 Pet pet;
@@ -664,8 +671,8 @@ static inline bool btlCellHit(int i, int16_t x, int16_t y) {
 
 // the 9 species with their own sprite in flash (fallback without SD): dex -> index
 int flashIdxForDex(int16_t dex) {
-  static const int8_t IDX[10] = { -1, 3, 4, 5, 0, 1, 2, 6, 7, 8 };
-  return (dex >= 1 && dex <= 9) ? IDX[dex] : -1;
+  // the built-in drawings in species.h are animals 1-9 in field-guide order (LION .. FLAMINGO)
+  return (dex >= 1 && dex <= NUM_SPECIES) ? dex - 1 : -1;
 }
 
 #define CX 233  // centre of the round screen
@@ -866,6 +873,9 @@ void setup() {
   // and nobody drains it) -> with timeout 0 the messages are dropped
   Serial.setTxTimeoutMs(0);
   Serial.printf("Tamanimals fw v%s\n", FW_VERSION);
+  makeDisplay();   // first: everything that draws needs gfx, and its reset pin depends on the board
+  Serial.printf("board: %s\n", boardIs175C() ? "ESP32-S3-Touch-AMOLED-1.75C (no microSD, display reset on GPIO 1)"
+                                             : "ESP32-S3-Touch-AMOLED-1.75");
   bootReport();   // why the last run ended, and what it was doing
   loadLang();  // saved language (ES by default)
   Wire.begin(IIC_SDA, IIC_SCL);
@@ -899,7 +909,7 @@ void setup() {
   const uint32_t splashAt = millis();
   if (!crashed) drawSplash();
 
-  touch.setPins(TP_RESET, TP_INT);
+  touch.setPins(boardIs175C() ? TP_RESET_175C : TP_RESET, TP_INT);
   bool touchOk = false;
   for (int i = 0; i < 3 && !touchOk; i++) {  // sometimes fails on the first attempt
     touchOk = touch.begin(Wire, 0x5A, IIC_SDA, IIC_SCL);

@@ -1,5 +1,6 @@
 #include <Preferences.h>
 #include "sdmon.h"
+#include "rtcbat.h"   // boardIs175C
 #include "noart.h"
 #include "pin_config.h"
 #include "pet.h"   // gRegionArt, REGIONS -- the mask this narrows
@@ -179,6 +180,13 @@ void sdScanRegionArt(bool verbose) {
 }
 
 bool sdBegin() {
+  // The 1.75C has no slot, and its display and touch resets are on these very pins: starting
+  // the card there reset the panel a moment after the splash and left the screen black.
+  if (boardIs175C()) {
+    sdReady = false;
+    Serial.println("1.75C board: no microSD slot (the game uses the flash sprites)");
+    return false;
+  }
   SD_MMC.setPins(SDMMC_CLK, SDMMC_CMD, SDMMC_DATA);
   sdReady = SD_MMC.begin("/sdcard", true /* modo 1-bit */, true /* formatea si no monta */);
   if (sdReady) {

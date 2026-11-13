@@ -10,6 +10,8 @@
 #include "battle.h"
 #include "wild.h"
 #include "save.h"
+#include "species.h"
+#include <cstring>
 #include <chrono>
 #include <thread>
 
@@ -385,6 +387,18 @@ static void songTests() {
   ck(audioMusicNow() == MUS_NONE, "walking out of the hall stops it at once");
 }
 
+int flashIdxForDex(int16_t dex);
+// with no microSD sprites the pet falls back to the drawings built into species.h
+static void fallbackArtTests() {
+  bool same = true;
+  for (int16_t d = 1; d <= NUM_SPECIES; d++) {
+    int fi = flashIdxForDex(d);
+    if (fi < 0 || strcmp(SPECIES[fi].name, DEX_TBL[d].name) != 0) same = false;
+  }
+  ck(same, "each built-in drawing is the animal it is shown for");
+  ck(flashIdxForDex(NUM_SPECIES + 1) < 0 && flashIdxForDex(0) < 0, "and the others have none");
+}
+
 static void galleryTests() {
   galleryOpen = true; galleryPick = true; galleryDirty = true;
   pumpMs(150);
@@ -412,6 +426,7 @@ int main() {
   pumpMs(120);
   flowTests();
   galleryTests();
+  fallbackArtTests();
   tuneTests();
   songTests();
   if (bad) { printf("FAILURES: %d\n", bad); return 1; }

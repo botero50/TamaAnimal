@@ -32,7 +32,13 @@
 #define I2S_DO_IO 8
 #define PA 46
 
-// TF slot (not used yet)
+// The 1.75C variant (aluminium case, 32 MB flash, no microSD slot, no RTC) moves two resets onto
+// GPIO 1 and 2 -- the pins the plain 1.75 uses for its microSD. Source:
+// github.com/waveshareteam/ESP32-S3-Touch-AMOLED-1.75C (examples/arduino/libraries/board_config/pin_config.h)
+#define LCD_RESET_175C 1
+#define TP_RESET_175C 2
+
+// TF slot (plain 1.75 only: on the 1.75C these pins are the display and touch resets)
 #define SDMMC_CLK 2
 #define SDMMC_CMD 1
 #define SDMMC_DATA 3

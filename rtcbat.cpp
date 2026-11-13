@@ -3,6 +3,7 @@
 #include "pin_config.h"  // define XPOWERS_CHIP_AXP2101
 #include <Wire.h>
 #include <time.h>
+#include "esp_flash.h"
 #include <SensorPCF85063.hpp>
 #include <XPowersLib.h>
 
@@ -55,6 +56,15 @@ bool batBegin() {
 // hangs off the AXP2101's BLDO1 rail at 3.3V. The firmware assumed it was
 // on; if the PMU resets (total drain), BLDO1 stays OFF and the screen
 // looks black even though the rest works. It must be called BEFORE gfx->begin().
+bool boardIs175C() {
+  static int8_t known = -1;
+  if (known < 0) {
+    uint32_t size = 0;
+    known = (esp_flash_get_physical_size(NULL, &size) == ESP_OK && size >= 32UL * 1024 * 1024) ? 1 : 0;
+  }
+  return known == 1;
+}
+
 void pmuEnablePanel() {
   if (!pmu.begin(Wire, AXP2101_SLAVE_ADDRESS, IIC_SDA, IIC_SCL)) {
     Serial.println("AXP2101 not detected (pmuEnablePanel)");
