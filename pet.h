@@ -1116,6 +1116,8 @@ public:
   // test: force what the egg holds and hatch it now (serial command EGG).
   // The legendary/shiny IV guarantees only fire inside hatch(), so without
   // this there is no way to exercise them from outside the class.
+  // an unhatched egg holding this species, for tests of the egg rule
+  void dbgSetEgg(int16_t dex, bool starter) { speciesId = -1; eggTarget = dex; starterPick = starter; eggBred = false; }
   void dbgHatchAs(int16_t dex, bool wantShiny) {
     if (dex < 1 || dex > DEX_COUNT) return;
     eggTarget = dex;
@@ -1150,6 +1152,10 @@ public:
   // to see which creature a switch landed on.
   int16_t eggPeek() const { return eggTarget; }
   int16_t rollInRegion(uint8_t r, uint8_t tier);
+  // THE rule for what an egg may hold: a species the field guide does not have yet, then (only when
+  // none is left in the tier) one whose line still has a missing evolution, then anything.
+  int16_t eggRoll(uint8_t use, uint8_t tier) const;
+  void recheckEgg();               // just before it cracks: a species that has become a repeat is rolled again
   uint8_t lowestStat() const { return min(min(fullness, joy), min(energy, hygiene)); }
   PetMood mood() const;
   // progress of the farewell/runaway ceremony, 0..1 (to animate it)
