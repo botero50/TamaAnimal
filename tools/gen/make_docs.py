@@ -181,17 +181,20 @@ def tour(shots, names, path, size=300, delay=170):
 
 # ---------------------------------------------------------------- sprite GIFs
 def sprite_gif(path, cells, cols, scale=3, steps=12, ms=14):
-    """cells: (name, arch, stage). Every cell walks in place through its own animation."""
+    """cells: (name, arch, stage[, action]). Every cell walks in place, or plays its own action."""
     walk = [p for act, poses, _ in sl.ACTIONS if act == 2 for p in poses]
     idle = [p for act, poses, _ in sl.ACTIONS if act == 0 for p in poses]
-    seq = walk + walk + idle + idle
+    walking = walk + walk + idle + idle
+    own = {act: poses for act, poses, _ in sl.ACTIONS}
     cw = 40 * scale + 8
     rows = (len(cells) + cols - 1) // cols
     w, h = cols * cw, rows * cw
     frames = []
     for k in range(steps):
         img = [BG] * (w * h)
-        for i, (name, arch, stage) in enumerate(cells):
+        for i, cell in enumerate(cells):
+            name, arch, stage = cell[:3]
+            seq = own[cell[3]] if len(cell) > 3 else walking
             g = sl.draw(name, arch, seq[k % len(seq)], stage=stage)
             ox, oy = (i % cols) * cw + 4, (i // cols) * cw + 4
             for y, row in enumerate(g):
@@ -220,10 +223,14 @@ def main():
     parade = pick('LION', 'ZEBRA', 'TIGER', 'SCARLET MACAW', 'RHINOCEROS', 'KING COBRA', 'JAGUAR', 'TOCO TOUCAN',
                   'HIPPOPOTAMUS', 'RED PANDA', 'OSTRICH', 'DART FROG')
     sprite_gif(os.path.join(DOCS, 'animals.gif'), [(n, a, 2) for n, a in parade], cols=6, scale=2)
+    # the moods: sad, sick, tired, hungry, dirty, happy (actions 12-17), for a cub and two adults
+    moods = [(n, a, s, act) for (n, a), s in zip(pick('LION', 'GIANT PANDA', 'TOCO TOUCAN'), (0, 2, 2)) for act in range(12, 18)]
+    sprite_gif(os.path.join(DOCS, 'moods.gif'), moods, cols=6, scale=2, steps=6, ms=45)
 
     shots = screens(capture())
     tour(shots, ['main_cub', 'card_growth', 'grow_dialog', 'main_juvenile', 'main_adult', 'card_growth'], os.path.join(DOCS, 'tour-growth.gif'))
     tour(shots, ['main_adult', 'guide_africa', 'ranger_ladder', 'battle_ranger', 'battle_wild', 'map', 'shop', 'game_whois'], os.path.join(DOCS, 'tour-play.gif'))
+    tour(shots, ['mood_happy', 'mood_hungry', 'mood_dirty', 'mood_tired', 'mood_sad', 'mood_sick'], os.path.join(DOCS, 'tour-moods.gif'), delay=120)
 
 
 if __name__ == '__main__':

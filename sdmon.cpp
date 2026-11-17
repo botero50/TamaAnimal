@@ -67,10 +67,11 @@ bool SprtMon::load(int16_t dexNum, bool shiny, uint8_t growth) {
   for (uint8_t i = 0; i < nActs && p + 4 <= end; i++) {
     uint8_t id = p[0], w = p[1], h = p[2], nf = p[3];
     p += 4;
-    if (id >= SPRT_NACTS || nf > 24) { unload(); return false; }
+    if (nf > 24) { unload(); return false; }
     // checks that ms[] and the frame data fit in the blob (truncated file)
     uint32_t bytes = (uint32_t)nf * 2 + (uint32_t)w * h * nf;
     if (w == 0 || h == 0 || nf == 0 || p + bytes > end) { unload(); return false; }
+    if (id >= SPRT_NACTS) { p += bytes; continue; }   // an action from a newer card: skip it
     SprtAct &a = acts[id];
     a.w = w;
     a.h = h;

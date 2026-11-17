@@ -3,7 +3,8 @@
 
 Nothing is traced or derived from any existing sprite. Standard library only.
 A pose is a dict: leg (0-3 walk phase), dy (bob), head (head offset), eye
-('open', 'shut', 'hurt'), mouth (bool), low (lying down), lunge (x shift).
+('open', 'shut', 'hurt', 'sad', 'happy', 'tired', 'sick'), mouth (bool), low (lying down), lunge (x shift),
+and the extras: tear / sweat / drool (drop offset), cheek (pale), dirt (mud on the lower body).
 """
 import zlib
 
@@ -80,15 +81,69 @@ class Canvas:
 
 
 def eye(c, x, y, pose, big=False):
+    if not hasattr(c, 'eyes'):
+        c.eyes = []
+    c.eyes.append((x, y))
     kind = pose.get('eye', 'open')
     if kind == 'shut':
         c.rect(x - 1, y, x + 2, y + 1, 'k')
     elif kind == 'hurt':
         for a, b in ((-1, -1), (1, 1), (-1, 1), (1, -1), (0, 0)):
             c.dot(x + a, y + b, 'k')
+    elif kind == 'sad':        # looking down, the brow raised towards the snout
+        c.rect(x - 1, y, x + 1, y + 2, 'w')
+        c.rect(x, y + 1, x + 1, y + 2, 'k')
+        c.dot(x - 1, y - 1, 'k')
+        c.dot(x, y - 2, 'k')
+        c.dot(x + 1, y - 2, 'k')
+    elif kind == 'happy':      # a smiling arc
+        c.dot(x - 1, y + 1, 'k')
+        c.dot(x, y, 'k')
+        c.dot(x + 1, y + 1, 'k')
+    elif kind == 'tired':      # a heavy lid over half the eye
+        c.rect(x - 1, y, x + 1, y + 2, 'w')
+        c.rect(x, y + 1, x + 1, y + 2, 'k')
+        c.rect(x - 1, y, x + 2, y + 1, 'k')
+    elif kind == 'sick':       # a woozy squiggle
+        for a, b in ((-1, 1), (0, 0), (1, 1), (2, 0)):
+            c.dot(x + a, y + b, 'k')
     else:
         c.rect(x - 1, y - 1, x + 2 if big else x + 1, y + 2, 'w')
         c.rect(x, y - 1, x + 2 if big else x + 1, y + 2, 'k')
+
+
+def extras(c, pose, seed):
+    """Tears, sweat, drool, a pale cheek and mud: placed from where the eyes were drawn."""
+    eyes = getattr(c, 'eyes', [])
+    if eyes:
+        x, y = eyes[-1]
+        if 'tear' in pose:
+            t = pose['tear']
+            c.dot(x, y + 2 + t, 'b')
+            c.dot(x, y + 3 + t, 'B')
+        if 'sweat' in pose:
+            t = pose['sweat']
+            c.dot(x + 3, y - 4 + t, 'b')
+            c.dot(x + 3, y - 3 + t, 'b')
+        if pose.get('cheek'):
+            c.dot(x - 1, y + 2, 't')
+            c.dot(x, y + 2, 't')
+        if 'drool' in pose:
+            t = pose['drool']
+            c.dot(x + 3, y + 5 + t, 'b')
+    if pose.get('dirt'):
+        pts = [(gx, gy) for gy, row in enumerate(c.g) for gx, v in enumerate(row) if v is not None]
+        if pts:
+            top = min(p[1] for p in pts)
+            bot = max(p[1] for p in pts)
+            low = [p for p in pts if p[1] >= top + (bot - top) * .45]
+            r = seed
+            for _ in range(max(5, len(low) // 30)):
+                r = (r * 1103515245 + 12345) & 0x7fffffff
+                gx, gy = low[r % len(low)]
+                for a, b in ((0, 0), (1, 0), (0, 1)):
+                    if 0 <= gy + b < c.n and 0 <= gx + a < c.n and c.g[gy + b][gx + a] is not None:
+                        c.g[gy + b][gx + a] = 'C'
 
 
 def legs(c, xs, top, foot, w, col, dark, pose):
@@ -587,10 +642,12 @@ def draw(name, arch, pose, size=40, stage=STAGE_ADULT):
     plan, a, zoom = stage_look(look(name, arch), arch, stage)
     c = Canvas(size, zoom)
     plan(c, a, pose)
+    extras(c, pose, zlib.crc32(name.encode()))
     return c.finish()
 
 
-# 12 actions, ids as sdmon.h: IDLE WALKL WALKR SLEEP EAT HURT ATTACK POSE HOP NOD BREATH SIT
+# 18 actions, ids as sdmon.h: IDLE WALKL WALKR SLEEP EAT HURT ATTACK POSE HOP NOD BREATH SIT,
+# then the moods: SAD SICK TIRED HUNGRY DIRTY HAPPY
 ACTIONS = [
     (0, [dict(), dict(dy=1, head=1)], 420),
     (1, [dict(leg=i, dy=(i % 2) * -1) for i in range(4)], 150),
@@ -604,6 +661,12 @@ ACTIONS = [
     (9, [dict(head=2), dict(head=-1)], 260),
     (10, [dict(), dict(dy=1)], 600),
     (11, [dict(low=True)], 900),
+    (12, [dict(eye='sad', head=2, dy=1, tear=0), dict(eye='sad', head=2, dy=1, tear=2)], 520),
+    (13, [dict(eye='sick', head=2, cheek=True, sweat=0, lunge=-1), dict(eye='sick', head=2, cheek=True, sweat=1)], 260),
+    (14, [dict(eye='tired', head=2, dy=1), dict(eye='tired', head=3, dy=1), dict(eye='shut', head=4, dy=1)], 700),
+    (15, [dict(eye='sad', head=-1, mouth=True, drool=0), dict(eye='sad', mouth=True, drool=1)], 380),
+    (16, [dict(eye='tired', dirt=True), dict(eye='tired', dirt=True, dy=1)], 520),
+    (17, [dict(eye='happy', mouth=True), dict(eye='happy', mouth=True, head=-2), dict(eye='happy', head=-1)], 200),
 ]
 ACTION_WALK_LEFT = 1
 

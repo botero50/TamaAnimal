@@ -23,6 +23,8 @@ struct SdMon {
 enum : uint8_t {
   SPRT_IDLE = 0, SPRT_WALKL, SPRT_WALKR, SPRT_SLEEP, SPRT_EAT, SPRT_HURT,
   SPRT_ATTACK, SPRT_POSE, SPRT_HOP, SPRT_NOD, SPRT_BREATH, SPRT_SIT,
+  // the moods (sprites made before 1.2.0 lack them: has() falls back)
+  SPRT_SAD, SPRT_SICK, SPRT_TIRED, SPRT_HUNGRY, SPRT_DIRTY, SPRT_HAPPY,
   SPRT_NACTS
 };
 

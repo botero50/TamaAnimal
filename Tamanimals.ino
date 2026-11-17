@@ -15,6 +15,7 @@
 #include "TouchDrvCSTXXX.hpp"
 #include "pin_config.h"
 #include "species.h"
+#include "faces.h"
 #include "dex.h"
 #include "types.h"
 #include "moves.h"
@@ -45,7 +46,7 @@
 
 // Version del firmware. Subir este numero en cada release (y manifest.json para
 // el instalador web). Se muestra en la pantalla de ajustes y por serie al arrancar.
-#define FW_VERSION "1.1.5"
+#define FW_VERSION "1.2.0"
 #define PET_CRY_GAP_MS 6000  // minimum time between cries from petting
 
 Arduino_DataBus *bus = new Arduino_ESP32QSPI(
@@ -595,6 +596,8 @@ uint16_t btlHpShown[2] = { 0, 0 };      // bars ease toward the real value
 // party member rather than the live pet.
 SprtMon btlSprt[2];
 bool gSprFlip = false;   // mirror the next sprite drawn
+uint16_t gSprTint = 0;   // colour the next sprite drawn leans towards (a battle ailment)
+uint8_t gSprTintAmt = 0; // how far, in eighths: 0 none
 int16_t btlSprtDex[2] = { 0, 0 };
 // A faint used to swap the next creature in instantly, inside the same call
 // that resolved the turn -- which is why it felt like a jump cut. The swap is
@@ -4566,6 +4569,7 @@ void render() {
   }
 
   drawSickGerm();
+  drawMoodFX();
   if (pet.sleeping) drawSnore();
   drawDream();
   drawTalk();
@@ -6427,6 +6431,79 @@ static void btlHpBar(int x, int y, int w, const Combatant &c, uint16_t shown) {
   gfx->drawRoundRect(x, y, w, 14, 4, UI_INK);
 }
 
+// A fighter's ailment shows on the fighter, not just in its plate: a tint over
+// the sprite, then a small effect around it.
+static void btlAilTint(uint8_t ail, uint32_t now) {
+  gSprTintAmt = 0;
+  switch (ail) {
+    case AIL_BURN:   gSprTint = 0xF9A0; gSprTintAmt = 2 + (now / 220) % 2; break;   // reddish, flickering
+    case AIL_POISON: gSprTint = 0x8017; gSprTintAmt = 3; break;                     // purple
+    case AIL_FREEZE: gSprTint = 0x9E7F; gSprTintAmt = 5; break;                     // icy blue
+    case AIL_PARA:   if ((now / 140) % 5 == 0) { gSprTint = 0xFFE0; gSprTintAmt = 4; } break;   // a yellow jolt now and then
+    default: break;
+  }
+}
+
+// cx: the fighter's middle, gy: the ground under it, top: its head
+static void btlAilFX(uint8_t ail, int cx, int gy, int top, uint32_t now, uint8_t who) {
+  switch (ail) {
+    case AIL_BURN:                                  // embers rising off it
+      for (int i = 0; i < 5; i++) {
+        uint32_t ph = (now / 12 + i * 41) % 100;
+        int x = cx - 50 + i * 25 + (int)(sinf((ph + i * 30) * 0.12f) * 5);
+        int y = gy - 10 - (int)ph * (gy - top) / 100;
+        gfx->fillCircle(x, y, ph < 60 ? 4 : 2, ph < 40 ? 0xFE60 : 0xF9A0);
+      }
+      break;
+    case AIL_POISON:                                // bubbles that rise and pop
+      for (int i = 0; i < 4; i++) {
+        uint32_t ph = (now / 18 + i * 29) % 100;
+        int x = cx - 40 + i * 27, y = top + 20 - (int)ph * 50 / 100;
+        if (ph < 90) gfx->drawCircle(x, y, 3 + (int)ph / 25, 0xA01F);
+        else gfx->drawCircle(x, y, 7, lerp565(0xA01F, UI_WHITE, 1, 2));
+      }
+      break;
+    case AIL_FREEZE:                                // ice crystals around it, glinting
+      for (int i = 0; i < 4; i++) {
+        int x = cx + (i % 2 ? 58 : -58) + (i / 2) * (i % 2 ? -14 : 14);
+        int y = top + 14 + (i / 2) * 50;
+        int r = 7 + ((now / 300 + i) % 3 == 0 ? 2 : 0);
+        gfx->drawFastHLine(x - r, y, r * 2 + 1, 0xBF7F);
+        gfx->drawFastVLine(x, y - r, r * 2 + 1, 0xBF7F);
+        gfx->drawLine(x - r * 2 / 3, y - r * 2 / 3, x + r * 2 / 3, y + r * 2 / 3, UI_WHITE);
+        gfx->drawLine(x - r * 2 / 3, y + r * 2 / 3, x + r * 2 / 3, y - r * 2 / 3, UI_WHITE);
+      }
+      break;
+    case AIL_SLEEP: {                               // Zs drifting up
+      uint32_t ph = now % 1800;
+      for (int k = 0; k < 3; k++) {
+        if (ph < (uint32_t)k * 500) break;
+        int x = cx + (who ? -40 : 40) + (who ? -k * 14 : k * 14), y = top - k * 14;
+        uiText(k == 2 ? UIF_SMALL : UIF_TINY, x, y, "z", UI_INK, 1);
+      }
+      break;
+    }
+    case AIL_CONFUSE:                               // little stars circling its head
+      for (int i = 0; i < 3; i++) {
+        float a = now * 0.005f + i * 2.094f;
+        int x = cx + (int)(cosf(a) * 36), y = top + 4 + (int)(sinf(a) * 9);
+        gfx->fillCircle(x, y, 6, UI_INK);
+        gfx->fillCircle(x, y, 5, UI_BAR_WARN);
+        gfx->fillCircle(x - 1, y - 1, 2, UI_WHITE);
+      }
+      break;
+    case AIL_PARA:                                  // a spark beside it now and then
+      if ((now / 140) % 5 == 0) {
+        int x = cx + (who ? -54 : 54), y = top + 24;
+        gfx->drawLine(x, y, x + 8, y + 10, 0xFFE0);
+        gfx->drawLine(x + 8, y + 10, x - 2, y + 16, 0xFFE0);
+        gfx->drawLine(x - 2, y + 16, x + 6, y + 28, 0xFFE0);
+      }
+      break;
+    default: break;
+  }
+}
+
 static void btlSide(int tx, int ty, int sx, int sy, const Combatant &c, uint8_t who) {
   // the scenes are busy, so the name and bar sit on their own plate rather
   // than fighting the artwork for contrast
@@ -6486,16 +6563,25 @@ static void btlSide(int tx, int ty, int sx, int sy, const Combatant &c, uint8_t 
       act = SPRT_HURT; loop = false; t = now - (btlHitUntil[who] - BTL_HIT_MS);
     } else if (timeOn(now, btlLungeUntil[who]) && btlSprt[who].has(SPRT_ATTACK)) {
       act = SPRT_ATTACK; loop = false; t = now - (btlLungeUntil[who] - BTL_LUNGE_MS);
+    } else if (c.ailment == AIL_SLEEP && btlSprt[who].has(SPRT_SLEEP)) {
+      act = SPRT_SLEEP;                    // asleep: it lies down
+    } else if (c.ailment == AIL_FREEZE) {
+      t = 0; loop = false;                 // frozen stiff: not a twitch
     }
+    if (c.ailment == AIL_CONFUSE && !c.fainted()) ox += (int)(sinf(now * 0.006f) * 6);   // it sways
+    btlAilTint(c.ailment, now);
     gSprFlip = who == 1;                   // the sprites face right; the foe faces you
     drawSprtActM(btlSprt[who], act, sx + 24 + ox, sy + 78 + oy, t, loop, false, 4);
     gSprFlip = false;
+    gSprTintAmt = 0;
+    if (!c.fainted()) btlAilFX(c.ailment, sx + 24 + ox, sy + 78 + oy, gSprTop.ok ? gSprTop.y : sy - 40 + oy, now, who);
     return;
   }
   const uint8_t *th = thumbs.get(c.dex);
   if (!th) return;
   if (timeOn(now, btlHitUntil[who])) flash = ((btlHitUntil[who] - now) / 60) % 2 == 0;
   drawThumb(th, sx + ox, sy + oy, 3, flash);
+  if (!c.fainted()) btlAilFX(c.ailment, sx + ox + 60, sy + oy + 120, sy + oy + 10, now, who);
 }
 
 // Bars drain rather than snap: a hit that removes half your health should be
@@ -8656,18 +8742,21 @@ void drawPet() {
   }
 
   PetMood m = pet.mood();
-  if (m == MOOD_HAPPY && (millis() / 500) % 2) y -= 6;  // little hop
+  PetLook lk = (m == MOOD_SLEEPING || m == MOOD_EATING) ? LOOK_CONTENT : pet.look();
+  if (m == MOOD_HAPPY && lk != LOOK_SAD && (millis() / 500) % 2) y -= 6;  // little hop
 
   drawMap(sp.sprite, SPRITE_H, x, y, s, false);
 
-  // overlaid expressions using the species' anchors
+  // the face, painted over the drawing (faces.h, made from the same drawings as the card sprites)
+  static const uint8_t LOOK_FACE[] = { 0xFF, FACE_SICK, FACE_HUNGRY, FACE_DIRTY, FACE_TIRED, FACE_SAD, FACE_HAPPY };
   bool blink = (millis() % 3500 < 300);
-  if (m == MOOD_SLEEPING || blink) {
-    overlayEye(sp, x, y, s, sp.eyeColL);
-    overlayEye(sp, x, y, s, sp.eyeColR);
-  }
-  if (m == MOOD_EATING) overlayMouth(sp, x, y, s, true);
-  else if (m == MOOD_SAD) overlayMouth(sp, x, y, s, false);
+  uint8_t face = 0xFF;
+  if (m == MOOD_SLEEPING) face = FACE_SHUT;
+  else if (m == MOOD_EATING) face = FACE_EAT;
+  else if (lk == LOOK_TIRED && millis() % 4000 > 3000) face = FACE_SHUT;   // nodding off
+  else if (LOOK_FACE[lk] != 0xFF) face = LOOK_FACE[lk];
+  else if (blink) face = FACE_SHUT;
+  if (face != 0xFF) paintFace(SPECIES_FACES[fi][face], x, y, s);
 
   if (pet.showHeart()) drawHeartFloat(x + 16 * s, y);
 }
@@ -8877,7 +8966,9 @@ void drawSprtActZ(SprtMon &m, uint8_t actId, int cx, int groundY, uint32_t t, bo
       rowCnt[r]++; rowSum[r] += c;
       int pc = gSprFlip ? a.w - 1 - c : c;
       int xa = x0 + (int)(pc * sc / 100), xb = x0 + (int)((pc + 1) * sc / 100);
-      gfx->fillRect(xa, ya, xb - xa, yb - ya, sil ? INK_K : m.pal[idx]);
+      uint16_t col = sil ? INK_K : m.pal[idx];
+      if (gSprTintAmt && !sil) col = lerp565(col, gSprTint, gSprTintAmt, 8);
+      gfx->fillRect(xa, ya, xb - xa, yb - ya, col);
     }
   }
   // The head is the first row nearly as solid as the widest one: ear tips and
@@ -8908,6 +8999,14 @@ void behNext() {
   beh.t0 = now;
   if (behToy(now)) return;
   int r = random(100);
+  // a happy creature bounces with joy more often than it wanders
+  bool joyful = pet.look() == LOOK_HAPPY && sprt.has(SPRT_HAPPY);
+  if (joyful && r < 40) {
+    beh.mode = 2;
+    beh.act = SPRT_HAPPY;
+    beh.until = now + sprtActTotalMs(sprt.acts[SPRT_HAPPY]) * 2;
+    return;
+  }
   if (r < 35 && (sprt.has(SPRT_WALKL) || sprt.has(SPRT_WALKR))) {
     beh.mode = 1;  // walk
     beh.targetX = 180 + random(106);   // narrower: the creature is wider now
@@ -8915,8 +9014,8 @@ void behNext() {
   } else if (r < 60) {
     // random gesture among the available ones
     // (Hop excluded: jumps too high; Sit excluded: looks backwards)
-    static const uint8_t flair[] = { SPRT_POSE, SPRT_NOD, SPRT_BREATH };
-    uint8_t pick[3], n = 0;
+    static const uint8_t flair[] = { SPRT_POSE, SPRT_NOD, SPRT_BREATH, SPRT_HAPPY };
+    uint8_t pick[4], n = 0;
     for (uint8_t f : flair)
       if (sprt.has(f)) pick[n++] = f;
     if (n) {
@@ -8931,6 +9030,16 @@ void behNext() {
     beh.mode = 0;  // look straight ahead
     beh.until = now + 2000 + random(3000);
   }
+}
+
+// The face for a need: its own expression when the card has it, the old
+// pained look on a card sent before 1.2.0, or 0xFF to let it roam as usual.
+uint8_t moodAct(PetMood m) {
+  static const uint8_t LOOK_ACT[] = { 0xFF, SPRT_SICK, SPRT_HUNGRY, SPRT_DIRTY, SPRT_TIRED, SPRT_SAD, 0xFF };
+  uint8_t a = LOOK_ACT[pet.look()];
+  if (a != 0xFF && sprt.has(a)) return a;
+  if (m == MOOD_SAD && sprt.has(SPRT_HURT)) return SPRT_HURT;
+  return 0xFF;
 }
 
 void drawPetSPRT() {
@@ -8952,8 +9061,9 @@ void drawPetSPRT() {
   } else if (m == MOOD_EATING && sprt.has(SPRT_EAT)) {
     act = SPRT_EAT;
     beh.t0 = 0;
-  } else if (m == MOOD_SAD && sprt.has(SPRT_HURT)) {
-    act = SPRT_HURT;
+  } else if (moodAct(m) != 0xFF) {
+    act = moodAct(m);
+    beh.mode = 0;
   } else {
     // content: the planner decides (idle / walk / gesture)
     if (hatAdjust) { beh.mode = 0; beh.until = now + 1000; }   // hold still for the hat
@@ -9017,22 +9127,11 @@ void drawPetSD() {
   if (pet.showHeart()) drawHeartFloat(x + w / 2, y);
 }
 
-// closed eye: erases the 3x4 eye and draws the eyelid
-void overlayEye(const Species &sp, int x, int y, int s, int col) {
-  gfx->fillRect(x + col * s, y + sp.eyeRow * s, 3 * s, 4 * s, sp.bodyColor);
-  gfx->fillRect(x + col * s, y + (sp.eyeRow + 2) * s, 3 * s, s, INK_K);
-}
-
-// erases the base smile and paints an open mouth (eating) or a frown (sad)
-void overlayMouth(const Species &sp, int x, int y, int s, bool open) {
-  int mc = sp.mouthCol, mr = sp.mouthRow;
-  gfx->fillRect(x + (mc - 3) * s, y + mr * s, 7 * s, 2 * s, sp.bodyColor);
-  if (open) {
-    gfx->fillRect(x + (mc - 2) * s, y + mr * s, 5 * s, 2 * s, INK_K);
-  } else {
-    gfx->fillRect(x + (mc - 2) * s, y + mr * s, 5 * s, s, INK_K);
-    gfx->fillRect(x + (mc - 3) * s, y + (mr + 1) * s, s, s, INK_K);
-    gfx->fillRect(x + (mc + 3) * s, y + (mr + 1) * s, s, s, INK_K);
+// paints a face from faces.h: count, then x, y, colour letter per pixel
+void paintFace(const uint8_t *f, int x, int y, int s) {
+  for (uint8_t i = 0; i < f[0]; i++) {
+    const uint8_t *q = f + 1 + i * 3;
+    gfx->fillRect(x + q[0] * s, y + q[1] * s, s, s, spriteColor((char)q[2]));
   }
 }
 
@@ -9526,6 +9625,58 @@ void drawSickGerm() {
   if (!pet.isSick() || pet.isEgg()) return;
   int bob = (int)(sinf(millis() * 0.004f) * 5);
   drawMap(SPR_ICON_GERM, 16, CX + 62, 112 + bob, 2, false);
+}
+
+// Little signs beside the creature that say what it feels, drawn by the firmware so
+// they show with any sprites: flies and a whiff over a dirty one, a sigh over a
+// tired one, sparkles around a happy one. (Sick has its germ, sleep its Zs.)
+void drawMoodFX() {
+  if (pet.isEgg() || pet.sleeping || pet.atWork() || pet.evolving() || pet.eating() || bathUntil) return;
+  uint32_t t = millis();
+  int px = (int)beh.x, top = PET_GROUND - 150;
+  switch (pet.look()) {
+    case LOOK_DIRTY: {
+      for (int i = 0; i < 3; i++) {                     // wavy whiffs drifting up
+        int bx = px - 44 + i * 44;
+        uint32_t ph = (t / 30 + i * 37) % 60;
+        for (int k = 0; k < 6; k++) {
+          int y = top + 40 - (int)ph - k * 5;
+          int x = bx + (int)(sinf((y + i * 9) * 0.25f) * 4);
+          gfx->fillCircle(x, y, 2, lerp565(UI_BAR_OK, UI_INK, 2, 5));
+        }
+      }
+      for (int i = 0; i < 2; i++) {                     // two flies circling it
+        float a = t * (i ? 0.007f : 0.0055f) + i * 2.6f;
+        int fx = px + (int)(cosf(a) * 70), fy = top + 10 + (int)(sinf(a * 1.7f) * 22);
+        bool up = (t / 60 + i) % 2;
+        gfx->fillCircle(fx - 3, fy - (up ? 4 : 2), 3, UI_WHITE);
+        gfx->fillCircle(fx + 3, fy - (up ? 4 : 2), 3, UI_WHITE);
+        gfx->fillCircle(fx, fy, 3, UI_INK);
+      }
+      break;
+    }
+    case LOOK_TIRED: {                                  // a slow sigh: dots that fade upward
+      uint32_t ph = t % 2400;
+      for (int k = 0; k < 3; k++) {
+        if (ph < (uint32_t)k * 500) break;
+        gfx->fillCircle(px + 52 + k * 12, top + 20 - k * 12, 3 + k, lerp565(UI_INK, UI_WHITE, 3, 5));
+      }
+      break;
+    }
+    case LOOK_HAPPY: {                                  // sparkles that wink in and out
+      for (int i = 0; i < 3; i++) {
+        uint32_t ph = (t + i * 400) % 1200;
+        if (ph > 700) continue;
+        int r = 2 + (int)(ph < 350 ? ph : 700 - ph) / 70;
+        int x = px + (i == 0 ? -64 : i == 1 ? 60 : 30), y = top + (i == 0 ? 30 : i == 1 ? 20 : -6);
+        gfx->drawFastHLine(x - r * 2, y, r * 4 + 1, UI_BAR_WARN);
+        gfx->drawFastVLine(x, y - r * 2, r * 4 + 1, UI_BAR_WARN);
+        gfx->fillCircle(x, y, r / 2 + 1, UI_WHITE);
+      }
+      break;
+    }
+    default: break;
+  }
 }
 
 // ---------- shared game pieces ----------

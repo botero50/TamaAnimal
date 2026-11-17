@@ -406,6 +406,10 @@ enum MissionId : uint8_t {
 
 enum PetMood : uint8_t { MOOD_HAPPY, MOOD_SAD, MOOD_EATING, MOOD_SLEEPING };
 
+// The face it wears while awake and not eating: the most urgent need first,
+// in the same order as the line under it on the main screen.
+enum PetLook : uint8_t { LOOK_CONTENT, LOOK_SICK, LOOK_HUNGRY, LOOK_DIRTY, LOOK_TIRED, LOOK_SAD, LOOK_HAPPY };
+
 // the individual's medals (bitmask)
 enum : uint16_t {
   MED_LV10 = 1 << 0, MED_LV25 = 1 << 1, MED_LV50 = 1 << 2,
@@ -1158,6 +1162,7 @@ public:
   void recheckEgg();               // just before it cracks: a species that has become a repeat is rolled again
   uint8_t lowestStat() const { return min(min(fullness, joy), min(energy, hygiene)); }
   PetMood mood() const;
+  PetLook look() const;
   // progress of the farewell/runaway ceremony, 0..1 (to animate it)
   float ceremonyT() const {
     if (ceremony == CER_NONE) return 0.0f;

@@ -3264,6 +3264,16 @@ PetMood Pet::mood() const {
   return MOOD_HAPPY;
 }
 
+PetLook Pet::look() const {
+  if (isSick()) return LOOK_SICK;
+  if (fullness < 25) return LOOK_HUNGRY;
+  if (hygiene < 25) return LOOK_DIRTY;
+  if (energy < 25) return LOOK_TIRED;
+  if (joy < 25 || isLonely() || grumpy) return LOOK_SAD;
+  if (isExcited() || (joy >= 85 && lowestStat() >= 60)) return LOOK_HAPPY;
+  return LOOK_CONTENT;
+}
+
 void Pet::save() {
   // A Pet nobody opened is a scratch object -- the battle's opponent, a test
   // fixture, anything built to be read and thrown away. It shares the single

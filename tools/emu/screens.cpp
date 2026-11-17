@@ -9,8 +9,10 @@
 #include "save.h"
 #include "i18n.h"
 #include "pin_config.h"
+#include "battle.h"
 #include <cstdio>
 #include <cstring>
+#include <string>
 
 uint32_t g_seed = 0x7A3A;
 FakeSerial Serial;
@@ -29,6 +31,9 @@ extern bool battleOpen, mapOpen, galleryOpen, galleryPick, gymOpen, gymPick, par
 extern uint8_t rpickPage, cardPage, choiceKind, galleryRegion;
 extern uint32_t choiceUntil;
 extern bool galleryDirty;
+extern Combatant btlYou, btlFoe;
+extern int16_t monFor;
+void emuSetSpriteDir(const char *);
 
 static const char *gOut = ".";
 static void shot(const char *name) {
@@ -83,6 +88,25 @@ int main(int argc, char **argv) {
   cardPage = 2; pump(2); shot("card_moves");
   closeAll();
 
+  // the moods: one need low at a time, and the face it wears
+  struct { const char *name; uint8_t *need; } MOOD[] = {
+    { "mood_hungry", &pet.fullness }, { "mood_dirty", &pet.hygiene }, { "mood_tired", &pet.energy }, { "mood_sad", &pet.joy },
+  };
+  for (auto &m : MOOD) { careFor(36); *m.need = 10; pump(6); shot(m.name); }
+  careFor(36); pet.sickness = SICK_COLD; pump(6); shot("mood_sick");
+  pet.sickness = SICK_NONE;
+  careFor(36); pet.joy = 95; pet.fullness = pet.energy = pet.hygiene = 90; pump(6); shot("mood_happy");
+  careFor(36);
+
+  // the same moods on a board without a card (the art built into the firmware)
+  emuSetSpriteDir("no_card_here"); monFor = -2;
+  for (auto &m : MOOD) { careFor(36); *m.need = 10; pump(6); shot((std::string("nocard_") + (m.name + 5)).c_str()); }
+  careFor(36); pet.sickness = SICK_COLD; pump(6); shot("nocard_sick");
+  pet.sickness = SICK_NONE;
+  careFor(36); pet.joy = 95; pet.fullness = pet.energy = pet.hygiene = 90; pump(6); shot("nocard_happy");
+  emuSetSpriteDir(SPRITE_DIR); monFor = -2;
+  careFor(36);
+
   memset(pet.dexReg, 0x6D, sizeof(pet.dexReg));   // a well-filled field guide
   galleryOpen = true; galleryPick = true; rpickPage = 0; pump(2); shot("guide_regions");
   galleryPick = false; galleryRegion = 0; galleryDirty = true; pump(4); shot("guide_africa");
@@ -93,6 +117,11 @@ int main(int argc, char **argv) {
   startTrainerBattle(0, false); pump(5); shot("battle_ranger");
   closeAll();
   startBattle(146, 30); pump(5); shot("battle_wild");
+  // ailments show on the fighters
+  btlYou.ailment = AIL_BURN; btlFoe.ailment = AIL_POISON; pump(3); shot("battle_burn_poison");
+  btlYou.ailment = AIL_FREEZE; btlFoe.ailment = AIL_CONFUSE; pump(3); shot("battle_freeze_confuse");
+  btlYou.ailment = AIL_SLEEP; btlFoe.ailment = AIL_PARA; pump(3); shot("battle_sleep_para");
+  btlYou.ailment = btlFoe.ailment = AIL_NONE;
   closeAll();
   mapOpen = true; pump(2); shot("map");
   closeAll();

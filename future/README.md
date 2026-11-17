@@ -5,7 +5,12 @@ include them. They are kept here so the work is not lost.
 
 Covers: daily rewards, expanded achievements, educational animal facts, token and respect-based
 catching, guilds, leaderboards, weekly challenges, a battle pass, cosmetics, habitat unlocks, session
-safeguards, emotional sprite states, HD sprite loading and NVS persistence.
+safeguards, HD sprite loading and NVS persistence.
+
+`sprite_animation_states.h` (emotional sprite states) is now in the game in its own form, since 1.2.0:
+the sad, sick, tired, hungry, dirty and happy faces are sprite actions drawn for every animal
+(`tools/gen/spritelib.py`), chosen by `Pet::look()`, and battle ailments show as tints and effects on
+the fighters. Its scared and angry states were not taken up. The header stays for reference only.
 
 ## Before adding one to the build
 

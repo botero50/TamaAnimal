@@ -2,7 +2,7 @@
 
 [![Install in browser](https://img.shields.io/badge/install-in%20browser-FF6B00?logo=googlechrome&logoColor=white)](https://botero50.github.io/TamaAnimal/web/)
 ![Board](https://img.shields.io/badge/board-ESP32--S3%20round%20AMOLED-E7352C?logo=espressif&logoColor=white)
-![Firmware](https://img.shields.io/badge/firmware-v1.1.5-8A2BE2)
+![Firmware](https://img.shields.io/badge/firmware-v1.2.0-8A2BE2)
 ![Animals](https://img.shields.io/badge/animals-325-58B868)
 ![Languages](https://img.shields.io/badge/languages-8-FFCB05)
 ![Code](https://img.shields.io/badge/code-MIT-blue)
@@ -48,6 +48,9 @@ Every picture on this page is captured from the real firmware by
 
 Updating later? Leave **Erase device** unchecked and your animal, field guide and stamps are kept.
 
+Coming from a version before 1.2.0? Send the sprites again once (step 2) to get the mood faces.
+Until you do, the game still runs with the old sprites, just without the new faces.
+
 ## The animals
 
 <p align="center"><img src="docs/animals.gif" alt="Twelve of the 325 animals walking"></p>
@@ -70,6 +73,30 @@ previous pet early, make it grow up later. You can always say "Not yet".
 | A cub at level 10 | A juvenile at level 16 | An adult at level 36 |
 | <img src="docs/screens/card_growth.png" width="240"> | <img src="docs/screens/grow_button.png" width="240"> | <img src="docs/screens/grow_dialog.png" width="240"> |
 | The card says when it grows up | Ready to grow up | Grow up, or not yet |
+
+## Moods
+
+<p align="center"><img src="docs/moods.gif" alt="A lion cub, a panda and a toucan looking sad, sick, tired, hungry, dirty and happy"></p>
+
+Every animal has its own face for each need: tears when it is sad, a woozy look and a sweat drop
+when it is sick, heavy eyes when it is tired, drool when it is hungry, mud when it needs a bath and
+a happy little bounce when everything is fine. The most urgent need shows first.
+
+| | | |
+|:---:|:---:|:---:|
+| <img src="docs/screens/mood_happy.png" width="240"> | <img src="docs/screens/mood_hungry.png" width="240"> | <img src="docs/screens/mood_dirty.png" width="240"> |
+| Happy: sparkles | Hungry | Dirty: flies and a whiff |
+| <img src="docs/screens/mood_tired.png" width="240"> | <img src="docs/screens/mood_sad.png" width="240"> | <img src="docs/screens/mood_sick.png" width="240"> |
+| Tired | Sad | Sick |
+
+In battle, a status shows on the fighter itself: burned animals glow and give off embers, poisoned
+ones turn purple and bubble, frozen ones go icy and stop moving, sleeping ones lie down, and confused
+ones sway under circling stars.
+
+| | | |
+|:---:|:---:|:---:|
+| <img src="docs/screens/battle_burn_poison.png" width="240"> | <img src="docs/screens/battle_freeze_confuse.png" width="240"> | <img src="docs/screens/battle_sleep_para.png" width="240"> |
+| Burned and poisoned | Frozen and confused | Asleep |
 
 ## Collect and battle
 

@@ -91,6 +91,9 @@
     <p>Put a microSD into the board (it formats itself). Press <b>Connect board</b>,
        then a region. Any one of them works on its own, and the others can be added later
        without redoing this one. Africa is simply the usual place to start.</p>
+    <p class="note">🎭 <b>Updating from before 1.2.0?</b> Send your regions again once: the new
+       sprites carry every animal's mood faces (sad, sick, tired, hungry, dirty and happy).
+       The old ones still work, just without them.</p>
     <p class="note">⏱️ <b>This part is slow, and that is normal: about 5 to 10 minutes for Africa.</b> Each animal comes as a cub, a juvenile and an adult. The sprites go
        over the USB serial link. Leave the tab open and the card in. The progress bar moves
        the whole time.</p>
@@ -107,9 +110,9 @@
        Then <b>refresh this page</b> and try again.</p>
     <div class="row">
       <button id="connect">🔌 Connect board</button>
-      <button id="auto" data-region="africa" disabled>⬇️ Africa (145 animals, ~20 MB)</button>
-      <button id="autoa" data-region="asia" disabled>⬇️ Asia (55 animals, ~8 MB)</button>
-      <button id="autom" data-region="americas" disabled>⬇️ Americas (125 animals, ~17 MB)</button>
+      <button id="auto" data-region="africa" disabled>⬇️ Africa (145 animals, ~29 MB)</button>
+      <button id="autoa" data-region="asia" disabled>⬇️ Asia (55 animals, ~11 MB)</button>
+      <button id="autom" data-region="americas" disabled>⬇️ Americas (125 animals, ~25 MB)</button>
     </div>
     <p class="note">Have your own <code>.bin</code> files? <label style="cursor:pointer;text-decoration:underline">pick them manually<input id="files" type="file" accept=".bin" multiple disabled hidden></label></p>
     <p class="note">🎨 Every sprite is drawn by code. See <a href="https://github.com/botero50/TamaAnimal#regenerating-the-content" target="_blank">how to change or regenerate them</a>.</p>

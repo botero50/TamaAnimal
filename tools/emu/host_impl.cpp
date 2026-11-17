@@ -74,9 +74,10 @@ bool SprtMon::load(int16_t dexNum, bool shiny, uint8_t growth) {
   for (uint8_t i = 0; i < nActs && q + 4 <= end; i++) {
     uint8_t id = q[0], w = q[1], h = q[2], nf = q[3];
     q += 4;
-    if (id >= SPRT_NACTS || nf > 24) { unload(); return false; }
+    if (nf > 24) { unload(); return false; }
     uint32_t bytes = (uint32_t)nf * 2 + (uint32_t)w * h * nf;
     if (w == 0 || h == 0 || nf == 0 || q + bytes > end) { unload(); return false; }
+    if (id >= SPRT_NACTS) { q += bytes; continue; }   // an action from a newer card: skip it (as sdmon.cpp)
     SprtAct &a = acts[id];
     a.w = w; a.h = h; a.frames = nf;
     for (uint8_t k = 0; k < nf; k++) { a.ms[k] = sprtFrameMs(q[0] | (q[1] << 8)); q += 2; }
