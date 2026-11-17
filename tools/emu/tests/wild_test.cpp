@@ -399,6 +399,45 @@ static void fallbackArtTests() {
   ck(flashIdxForDex(NUM_SPECIES + 1) < 0 && flashIdxForDex(0) < 0, "and the others have none");
 }
 
+extern bool clockOpen; extern uint8_t settingsPage;
+void clockTap(int16_t x, int16_t y);
+static void clock24Tests() {
+  readyPet();
+  extern uint8_t gClock24;
+  clockOpen = true; settingsPage = 0;   // the time page
+  gClock24 = 0;
+  pumpMs(150);
+  clockTap(233, 300);
+  ck(gClock24 == 1, "the 12 h / 24 h pill switches to 24 h");
+  { Preferences pr; pr.begin("tamanimals", true); ck(pr.getUChar("h24", 0) == 1, "and it is saved"); pr.end(); }
+  pumpMs(150);
+  clockTap(233, 300);
+  ck(gClock24 == 0, "and back to 12 h");
+  { Preferences pr; pr.begin("tamanimals", true); ck(pr.getUChar("h24", 1) == 0, "and that is saved too"); pr.end(); }
+  clockOpen = false;
+}
+
+static void tapWakeTests() {
+  readyPet();
+  extern uint8_t gTapWake; extern bool screenOff;
+  clockOpen = true; settingsPage = 2;   // the brightness page
+  gTapWake = 1;
+  pumpMs(150);
+  clockTap(233, 300);
+  ck(gTapWake == 0, "the tap-wake pill switches it off");
+  { Preferences pr; pr.begin("tamanimals", true); ck(pr.getUChar("twk", 1) == 0, "and it is saved"); pr.end(); }
+  clockOpen = false;
+  screenOff = true; pumpMs(200);
+  g_touchX = 233; g_touchY = 233; g_touchDown = true; emuFireInterrupt(); pumpMs(120); g_touchDown = false; emuFireInterrupt(); pumpMs(120);
+  ck(screenOff, "with tap wake off, a touch does not wake the screen");
+  g_touchX = 233; g_touchY = 233; g_touchDown = true; emuFireInterrupt(); pumpMs(120); g_touchDown = false; emuFireInterrupt(); pumpMs(120);
+  ck(screenOff, "not even a second one");
+  gTapWake = 1;
+  g_touchX = 233; g_touchY = 233; g_touchDown = true; emuFireInterrupt(); pumpMs(120); g_touchDown = false; emuFireInterrupt(); pumpMs(120);
+  ck(!screenOff, "with tap wake on, a touch wakes it as before");
+  screenOff = false;
+}
+
 static void galleryTests() {
   galleryOpen = true; galleryPick = true; galleryDirty = true;
   pumpMs(150);
@@ -426,6 +465,8 @@ int main() {
   pumpMs(120);
   flowTests();
   galleryTests();
+  clock24Tests();
+  tapWakeTests();
   fallbackArtTests();
   tuneTests();
   songTests();

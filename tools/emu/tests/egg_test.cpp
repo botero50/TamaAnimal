@@ -81,6 +81,25 @@ int main() {
     for (int i = 0; i < 300; i++) if (p.rollInRegion(r2, R_RARO) != newInR2) ok = false;
     ck(ok, "a region switch rolls the animal the field guide lacks, not a repeat");
   }
+  // eggs come from every region on the card, whatever region was picked at the start
+  {
+    Pet p; fresh(p);
+    p.region = 0;                                      // the first region was the starter's
+    const int here = pickIn(0, R_COMUN, 1)[0];
+    const int far = pickIn(2, R_COMUN, 1)[0];          // the first common animal of the last region
+    unreg(p, here); unreg(p, far);
+    int a = 0, b = 0, other = 0;
+    for (int i = 0; i < 600; i++) {
+      int16_t e = p.pickEggSpecies();
+      if (e == here) a++; else if (e == far) b++; else other++;
+    }
+    ck(a > 100 && b > 100, "a player who started in one region also gets eggs from another");
+    ck(other == 0, "and nothing that the field guide already has");
+    reg(p, here);
+    bool onlyFar = true;
+    for (int i = 0; i < 300; i++) if (p.pickEggSpecies() != far) onlyFar = false;
+    ck(onlyFar, "with the home region finished, the egg is the one new animal from another region");
+  }
   // just before it cracks, an egg that has become a repeat is rolled again
   {
     Pet p; fresh(p); p.setRegion(0);

@@ -45,7 +45,7 @@
 
 // Version del firmware. Subir este numero en cada release (y manifest.json para
 // el instalador web). Se muestra en la pantalla de ajustes y por serie al arrancar.
-#define FW_VERSION "1.1.4"
+#define FW_VERSION "1.1.5"
 #define PET_CRY_GAP_MS 6000  // minimum time between cries from petting
 
 Arduino_DataBus *bus = new Arduino_ESP32QSPI(
@@ -193,6 +193,8 @@ int clockH = 12, clockM = 0;  // hora en edicion
 // settings pages, swiped left/right
 enum { SET_TIME, SET_VOLUME, SET_BRIGHT, SET_LANG, SET_ALARM, SET_PARENT, SET_ABOUT, SET_PAGES };
 uint8_t gBright = 7;           // screen brightness 1..10, saved under "bri"
+uint8_t gTapWake = 1;          // 0 = with the screen off, only the PWR button wakes it (saved under "twk")
+uint8_t gClock24 = 0;          // 1 = show the time as 13:05, not 1:05 PM (saved under "h24")
 uint8_t settingsPage = 0;
 
 // bath scene: foam over the creature, cleaned up when it bursts
@@ -897,6 +899,8 @@ void setup() {
     Preferences bp;
     bp.begin("tamanimals", true);
     gBright = bp.getUChar("bri", 7);
+    gClock24 = bp.getUChar("h24", 0) ? 1 : 0;
+    gTapWake = bp.getUChar("twk", 1) ? 1 : 0;
     bp.end();
     if (gBright < 1 || gBright > 10) gBright = 7;
   }
@@ -1647,6 +1651,9 @@ void handleTouch() {
   i2cLock();                                   // shared with the IMU task
   bool pressed = touch.getPoint(&x, &y, 1) > 0;
   i2cUnlock();
+
+  // screen off and tap-to-wake switched off: a touch (a pocket) does nothing, only PWR wakes it
+  if (screenOff && !gTapWake) { wasPressed = false; return; }
 
   // punching bag: every touch counts instantly (rapid mashing)
   if (sackOpen) {
@@ -5100,8 +5107,11 @@ void renderClock() {
     char t[8];
     // 12-hour display; clockH stays 0..23 underneath so the +/- buttons and
     // the stored epoch are unchanged
-    snprintf(t, sizeof(t), "%02d:%02d", clockH % 12 == 0 ? 12 : clockH % 12, clockM);
-    {
+    if (gClock24) {                       // 24-hour: 13:05, no AM/PM
+      snprintf(t, sizeof(t), "%02d:%02d", clockH, clockM);
+      uiText(UIF_HUGE, CX, 160, t, UI_INK, 1);
+    } else {
+      snprintf(t, sizeof(t), "%02d:%02d", clockH % 12 == 0 ? 12 : clockH % 12, clockM);
       // time block (digits + AM/PM) centred as a whole
       const char *ap = clockH < 12 ? "AM" : "PM";
       int tw = uiTextWidth(UIF_HUGE, t), aw = uiTextWidth(UIF_BIG, ap);
@@ -5116,6 +5126,10 @@ void renderClock() {
     drawClockBtn(318, 190, "+");  // min +
     uiTextFit(UIF_SMALL, 166, 270, T(S_HOUR), UI_TRACK_TEXT, 1, 120);
     uiTextFit(UIF_SMALL, 314, 270, T(S_MIN), UI_TRACK_TEXT, 1, 120);
+    // 12 h / 24 h: one pill that switches the clock between the two
+    gfx->fillRoundRect(CX - 70, 284, 140, 32, 16, gClock24 ? UI_BAR_OK : UI_WHITE);
+    gfx->drawRoundRect(CX - 70, 284, 140, 32, 16, UI_INK);
+    uiText(UIF_SMALL, CX, uiMidY(UIF_SMALL, 284, 32), gClock24 ? "24 h" : "12 h", gClock24 ? UI_BG_DAY : UI_INK, 1);
   } else if (settingsPage == SET_VOLUME) {
     settingsTitle(T(S_SET_VOLUME));
     // the switch is the master; the level below is how loud it is when on,
@@ -5156,6 +5170,10 @@ void renderClock() {
     snprintf(bl, sizeof(bl), "%u/10", gBright);
     uiText(UIF_BIG, CX, 158, bl, UI_INK, 1);
     drawSlider(gBright, 1, 10);
+    // tap to wake: ON = a touch wakes the screen, OFF = only the PWR button does
+    gfx->fillRoundRect(CX - 95, 286, 190, 30, 15, gTapWake ? UI_BAR_OK : UI_WHITE);
+    gfx->drawRoundRect(CX - 95, 286, 190, 30, 15, UI_INK);
+    uiText(UIF_SMALL, CX, uiMidY(UIF_SMALL, 286, 30), gTapWake ? "Tap wake: ON" : "Tap wake: OFF", gTapWake ? UI_BG_DAY : UI_INK, 1);
   } else if (settingsPage == SET_LANG) {
     settingsTitle(T(S_SET_LANG));
     const char *ln[LANG_COUNT]; int lwid[LANG_COUNT];
@@ -5230,6 +5248,20 @@ void saveBright() {
   bp.end();
 }
 
+void saveTapWake() {
+  Preferences bp;
+  bp.begin("tamanimals", false);
+  bp.putUChar("twk", gTapWake);
+  bp.end();
+}
+
+void saveClock24() {
+  Preferences bp;
+  bp.begin("tamanimals", false);
+  bp.putUChar("h24", gClock24);
+  bp.end();
+}
+
 void clockSliderSet(int16_t x) {
   if (settingsPage == SET_BRIGHT) gBright = (uint8_t)sliderValue(x, 1, 10);   // applied live
   else audioSetVolume((uint8_t)sliderValue(x, 0, 100));
@@ -5254,6 +5286,11 @@ void clockTap(int16_t x, int16_t y) {
       else if (x >= 252 && x < 310) clockM = (clockM + 59) % 60;
       else if (x >= 318 && x < 376) clockM = (clockM + 1) % 60;
     }
+    if (y >= 278 && y <= 322 && x >= CX - 80 && x <= CX + 80) {   // the 12 h / 24 h pill
+      gClock24 = gClock24 ? 0 : 1;
+      saveClock24();
+      sfxPlay(SFX_TAP);
+    }
   } else if (settingsPage == SET_VOLUME) {
     if (y >= SND_SW_Y && y < SND_SW_Y + SND_SW_H && x >= SND_SW_X && x < SND_SW_X + SND_SW_W) {
       audioSetEnabled(!audioEnabled());
@@ -5272,6 +5309,11 @@ void clockTap(int16_t x, int16_t y) {
       sfxPlay(SFX_TAP);                        // so the new level is audible
     }
   } else if (settingsPage == SET_BRIGHT) {
+    if (y >= 280 && y <= 322 && x >= CX - 100 && x <= CX + 100) {   // the tap-to-wake pill
+      gTapWake = gTapWake ? 0 : 1;
+      saveTapWake();
+      sfxPlay(SFX_TAP);
+    }
     if (y >= BRI_ROW_Y && y < BRI_ROW_Y + VOL_BTN_H) {
       int nb = gBright;
       if (x >= VOLS_MINUS_X && x < VOLS_MINUS_X + VOL_BTN_W) nb--;
@@ -6047,8 +6089,7 @@ bool startWildBattle() {
     fpToastNum = (int16_t)pet.wildStepsLeft();
     return false;
   }
-  uint16_t lo = 1, hi = DEX_COUNT;
-  if (pet.region < REGION_COUNT && pet.region != REGION_ALL) { lo = REGIONS[pet.region].lo; hi = REGIONS[pet.region].hi; }
+  uint16_t lo = 1, hi = DEX_COUNT;   // every region with its sprite pack on the card (wildSpeciesOk filters)
   uint8_t tier = wildTierForRoll((uint8_t)random(100));
   int16_t dex = wildPickSpecies(lo, hi, tier, (uint32_t)random(100000), wildSpeciesOk);
   if (!dex) dex = wildPickSpecies(lo, hi, R_COMUN, (uint32_t)random(100000), wildSpeciesOk);
@@ -7437,6 +7478,7 @@ void renderGyms() {
 #define EGGREG_GUARD 14
 
 static void drawEggRegion() {
+  return;   // no region pill any more: eggs come from every pack on the card
   char l[24];
   snprintf(l, sizeof(l), "%s >", pet.regionName());
   gfx->fillRoundRect(EGGREG_X, EGGREG_Y, EGGREG_W, EGGREG_H, 10, UI_WHITE);
@@ -7460,6 +7502,7 @@ void uiEggPillRect(int *x, int *y, int *w, int *h, bool hitArea) {
 // 1 = cycled the region, -1 = a near miss that must NOT reach the egg, 0 = not
 // ours at all.
 static int eggRegionTap(int16_t x, int16_t y) {
+  return 0;   // no region pill any more
   if (!pet.isEgg()) return 0;
   if (pet.eggBred) return 0;   // no chooser: the parents decided
   int inset = EGGREG_PAD, guard = EGGREG_PAD + EGGREG_GUARD;
@@ -8175,7 +8218,8 @@ static const char *headerTimeText(char *t, size_t n) {
   if (!cachedAt || ms - cachedAt >= 250) { cachedE = rtcEpoch(); cachedAt = ms ? ms : 1; }
   if (!cachedE) return nullptr;   // RTC not valid: show nothing rather than a wrong time
   int h = (cachedE / 3600) % 24;
-  snprintf(t, n, "%d:%02d %s", h % 12 == 0 ? 12 : h % 12,
+  if (gClock24) snprintf(t, n, "%02d:%02d", h, (int)((cachedE / 60) % 60));
+  else snprintf(t, n, "%d:%02d %s", h % 12 == 0 ? 12 : h % 12,
            (int)((cachedE / 60) % 60), h < 12 ? "AM" : "PM");
   return t;
 }

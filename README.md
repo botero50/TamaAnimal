@@ -2,7 +2,7 @@
 
 [![Install in browser](https://img.shields.io/badge/install-in%20browser-FF6B00?logo=googlechrome&logoColor=white)](https://botero50.github.io/TamaAnimal/web/)
 ![Board](https://img.shields.io/badge/board-ESP32--S3%20round%20AMOLED-E7352C?logo=espressif&logoColor=white)
-![Firmware](https://img.shields.io/badge/firmware-v1.1.2-8A2BE2)
+![Firmware](https://img.shields.io/badge/firmware-v1.1.5-8A2BE2)
 ![Animals](https://img.shields.io/badge/animals-325-58B868)
 ![Languages](https://img.shields.io/badge/languages-8-FFCB05)
 ![Code](https://img.shields.io/badge/code-MIT-blue)
@@ -43,7 +43,8 @@ Every picture on this page is captured from the real firmware by
    pet? Press **Save my pet** first.
 2. Press **Install now** and pick the board's port. A brand-new board needs download mode first:
    hold BOOT, tap RESET, let go of BOOT.
-3. Put in a microSD card, press **Connect board**, and send one or more regions.
+3. Put in a microSD card, press **Connect board**, and send one or more regions. Eggs and wild animals
+   come from every region you have sent, mixed.
 
 Updating later? Leave **Erase device** unchecked and your animal, field guide and stamps are kept.
 
@@ -88,7 +89,8 @@ previous pet early, make it grow up later. You can always say "Not yet".
 | <img src="docs/screens/game_whois.png" width="240"> | <img src="docs/screens/game_highlow.png" width="240"> | <img src="docs/screens/game_berrydrop.png" width="240"> |
 | Who is it? | High or low | Berry drop |
 
-Also: feeding, sleep, baths, chores, furniture, hats, missions, a step counter and the weather.
+Also: feeding, sleep, baths, chores, furniture, hats, missions, a step counter, the weather, a
+12 h or 24 h clock, and a "tap to wake" switch so a pocket cannot wake the screen.
 
 ## Eight languages
 
