@@ -118,3 +118,46 @@ def to_rgb(cell):
         return None
     L, tone = cell
     return RAMP[L][tone]
+
+
+# The fixed HD palette: every letter in all four tones, in a stable order.
+HD_KEYS = [(L, t) for L in sl.LETTERS for t in range(4)]
+HD_INDEX = {k: i for i, k in enumerate(HD_KEYS)}
+assert len(HD_KEYS) <= 255
+
+
+def rgb565t(c):
+    r, g, b = c
+    return ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3)
+
+
+def tpk2_hd(name, arch, stage=sl.STAGE_ADULT, extra=None):
+    """The sprite file in the firmware's TPK2 format, drawn in HD."""
+    import struct
+    out = bytearray(b'TPK2')
+    out.append(len(sl.ACTIONS))
+    out += struct.pack('<H', len(HD_KEYS))
+    for k in HD_KEYS:
+        out += struct.pack('<H', rgb565t(RAMP[k[0]][k[1]]))
+    for act, poses, ms in sl.ACTIONS:
+        out += bytes((act, HD_SIZE, HD_SIZE, len(poses)))
+        for _ in poses:
+            out += struct.pack('<H', ms)
+        for p in poses:
+            g = draw_hd(name, arch, p, stage=stage, extra=extra)
+            if act == sl.ACTION_WALK_LEFT:
+                g = [list(reversed(r)) for r in g]
+            out += bytes(0xFF if v is None else HD_INDEX[v] for row in g for v in row)
+    return bytes(out)
+
+
+def thumb_hd(name, arch, extra=None, size=40):
+    """A field guide thumbnail (TPTH entry): w, h, its own palette, then the pixels."""
+    import struct
+    g = draw_hd(name, arch, {}, extra=extra, size=size)
+    used = sorted({v for row in g for v in row if v is not None})
+    idx = {v: i for i, v in enumerate(used)}
+    blob = struct.pack('<3B', size, size, len(used))
+    blob += struct.pack(f'<{len(used)}H', *[rgb565t(RAMP[v[0]][v[1]]) for v in used])
+    blob += bytes(0xFF if v is None else idx[v] for row in g for v in row)
+    return blob

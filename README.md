@@ -2,7 +2,7 @@
 
 [![Install in browser](https://img.shields.io/badge/install-in%20browser-FF6B00?logo=googlechrome&logoColor=white)](https://botero50.github.io/TamaAnimal/web/)
 ![Board](https://img.shields.io/badge/board-ESP32--S3%20round%20AMOLED-E7352C?logo=espressif&logoColor=white)
-![Firmware](https://img.shields.io/badge/firmware-v1.4.2-8A2BE2)
+![Firmware](https://img.shields.io/badge/firmware-v1.5.0-8A2BE2)
 ![Animals](https://img.shields.io/badge/animals-325%20%2B%2060%20legends%20%2B%2023%20memes-58B868)
 ![Languages](https://img.shields.io/badge/languages-8-FFCB05)
 ![Code](https://img.shields.io/badge/code-MIT-blue)
@@ -27,7 +27,9 @@ a computer, no Arduino or drivers needed.
 </table>
 
 Every picture on this page is captured from the real firmware by
-[`tools/gen/make_docs.py`](tools/gen/make_docs.py), and every animal is drawn by code.
+[`tools/gen/make_docs.py`](tools/gen/make_docs.py), and every animal is drawn by code: shapes from
+[`spritelib.py`](tools/gen/spritelib.py), painted in HD with light, shadow and coloured outlines by
+[`hdlib.py`](tools/gen/hdlib.py).
 
 ## What you need
 
@@ -48,8 +50,8 @@ Every picture on this page is captured from the real firmware by
 
 Updating later? Leave **Erase device** unchecked and your animal, field guide and stamps are kept.
 
-Coming from a version before 1.2.0? Send the sprites again once (step 2) to get the mood faces.
-Until you do, the game still runs with the old sprites, just without the new faces.
+Coming from a version before 1.5.0? Send the sprites again once (step 2) to get the HD art: twice
+the pixels, shading, and the mood faces. Until you do, the game still runs with the old sprites.
 
 ## The animals
 

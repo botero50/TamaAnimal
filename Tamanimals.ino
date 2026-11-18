@@ -46,7 +46,7 @@
 
 // Version del firmware. Subir este numero en cada release (y manifest.json para
 // el instalador web). Se muestra en la pantalla de ajustes y por serie al arrancar.
-#define FW_VERSION "1.4.2"
+#define FW_VERSION "1.5.0"
 #define PET_CRY_GAP_MS 6000  // minimum time between cries from petting
 
 Arduino_DataBus *bus = new Arduino_ESP32QSPI(
@@ -8964,17 +8964,28 @@ uint8_t sprtFrameAt(const SprtAct &a, uint32_t t, bool loop) {
 // Pixel edges are floored from the fractional position, so a fractional zoom
 // leaves no gaps between neighbouring pixels. maxPx caps the drawn height when
 // zoomed, so a tall action cannot run up into the header.
+// How big a sprite is drawn, x100. The sizes were tuned for 40 px art: a creature about
+// 170 px tall, maxS the largest whole scale a scene allows. HD art (56 px) is drawn to the
+// SAME size on screen: maxS is a size limit in units of 40 px art, and the scale is kept to
+// whole pixels whenever it is 2x or more, so every art pixel stays square and crisp.
+uint32_t sprtScale100(const SprtMon &m, const SprtAct &a, uint8_t maxS, uint16_t zoom100, uint16_t maxPx) {
+  uint32_t hI = m.acts[SPRT_IDLE].h ? m.acts[SPRT_IDLE].h : 34;
+  uint32_t s100 = 17000 / hI;
+  uint32_t lo = 8000 / hI, cap = (uint32_t)maxS * 4000 / hI;   // 2x and maxS, as 40 px art
+  if (s100 < lo) s100 = lo;
+  if (s100 > cap) s100 = cap;
+  if (s100 >= 200) s100 -= s100 % 100;                         // whole pixels
+  while (s100 > 200 && a.h * s100 > 25000) s100 -= 100;        // actions with a large frame (attack)
+  uint32_t sc = s100 * zoom100 / 100;
+  if (zoom100 > 100 && a.h * sc > (uint32_t)maxPx * 100) sc = (uint32_t)maxPx * 100 / a.h;
+  return sc;
+}
+
 void drawSprtActZ(SprtMon &m, uint8_t actId, int cx, int groundY, uint32_t t, bool loop, bool sil,
                  uint8_t maxS, uint16_t zoom100, uint16_t maxPx) {
   const SprtAct &a = m.acts[actId];
   if (!a.frames) return;
-  uint8_t sBase = m.acts[SPRT_IDLE].h ? 170 / m.acts[SPRT_IDLE].h : 5;
-  if (sBase < 2) sBase = 2;
-  if (sBase > maxS) sBase = maxS;
-  uint8_t s = sBase;
-  while (s > 2 && a.h * s > 250) s--;  // actions with a large frame (attack)
-  uint32_t sc = (uint32_t)s * zoom100;                 // scale x100
-  if (zoom100 > 100 && a.h * sc > (uint32_t)maxPx * 100) sc = (uint32_t)maxPx * 100 / a.h;
+  uint32_t sc = sprtScale100(m, a, maxS, zoom100, maxPx);      // scale x100
   uint8_t fi = sprtFrameAt(a, t, loop);
   const uint8_t *fr = a.data + (uint32_t)fi * a.w * a.h;
   // anchor by the feet (a.base), not by canvas height: that way actions
@@ -9307,12 +9318,7 @@ const char *eggMsg() {
 void petHeadAnchor(uint8_t actId, int &hx, int &hy) {
   if (!sprt.loaded) { hx = CX + 30; hy = PET_CY - 40; return; }
   const SprtAct &a = sprt.has(actId) ? sprt.acts[actId] : sprt.acts[SPRT_IDLE];
-  uint8_t s = sprt.acts[SPRT_IDLE].h ? 170 / sprt.acts[SPRT_IDLE].h : 5;
-  if (s < 2) s = 2;
-  if (s > 5) s = 5;
-  while (s > 2 && a.h * s > 250) s--;
-  uint32_t sc = (uint32_t)s * PET_ZOOM;
-  if (a.h * sc > (uint32_t)PET_MAX_PX * 100) sc = (uint32_t)PET_MAX_PX * 100 / (a.h ? a.h : 1);
+  uint32_t sc = sprtScale100(sprt, a, 5, PET_ZOOM, PET_MAX_PX);   // exactly as drawPetSPRT draws it
   hx = (int)beh.x;
   hy = PET_GROUND - (int)((a.base ? a.base : a.h) * sc / 100) + 6;
 }

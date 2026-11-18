@@ -21,6 +21,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, '..', '..')
 sys.path.insert(0, HERE)
 import spritelib as sl
+import hdlib   # the packs are drawn in HD: 56 px, shaded, with coloured outlines
 
 ANIMALS = json.load(open(os.path.join(HERE, 'animals.json')))
 # the legends (Colombia at the heart, then the Americas and the world's best-known myths) carry their own look
@@ -32,6 +33,10 @@ WEB = os.path.join(ROOT, 'web')
 
 
 def thumb(a):
+    return hdlib.thumb_hd(a['name'], a['arch'], a.get('look'))
+
+
+def thumb_flat(a):
     g = sl.draw(a['name'], a['arch'], {}, extra=a.get('look'))
     used = sorted({c for row in g for c in row if c})
     idx = {c: i for i, c in enumerate(used)}
@@ -48,7 +53,7 @@ def main():
     # three files per animal: c = cub, j = juvenile, p = adult (the firmware falls back to p)
     for a in ANIMALS:
         for stage, prefix in sl.STAGE_PREFIX.items():
-            data = sl.tpk2(a['name'], a['arch'], stage, a.get('look'))
+            data = hdlib.tpk2_hd(a['name'], a['arch'], stage, a.get('look'))
             name = f'{prefix}{a["id"]:03d}.bin'
             with open(os.path.join(MONS, name), 'wb') as f:
                 f.write(data)
