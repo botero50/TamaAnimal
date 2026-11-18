@@ -3300,6 +3300,7 @@ void Pet::save() {
   prefs.putUChar("mvlv", lastLearnLevel);
   prefs.putUChar("avtr", avatar);
   prefs.putUChar("reg", region);
+  prefs.putUChar("rlay", REGION_ALL);          // where WORLD sits in this build (see load)
   prefs.putBytes("badgX", badgesX, sizeof(badgesX));
   prefs.putBytes("badhX", badgesHardX, sizeof(badgesHardX));
   prefs.putBytes("eggR", eggByRegion, sizeof(eggByRegion));
@@ -3591,10 +3592,21 @@ void Pet::load() {
   loadBlob(prefs, "badgX", badgesX, sizeof(badgesX));
   loadBlob(prefs, "badhX", badgesHardX, sizeof(badgesHardX));
   region = prefs.getUChar("reg", REGION_ALL);
-  if (region >= REGION_COUNT) region = REGION_ALL;
   // A save from the Africa-only build has neither key; getBytes leaves the
   // array at its zeroed initialiser, which is exactly "nothing remembered".
   loadBlob(prefs, "eggR", eggByRegion, sizeof(eggByRegion));
+  // WORLD, the mixed pool, is always the LAST index, so adding a region moves it: in a save
+  // from before the Legends region (no "rlay" key) WORLD was 3, which is now LEGENDS. "rlay"
+  // records where WORLD sat when the save was written; move it, and its remembered egg.
+  {
+    uint8_t lay = prefs.getUChar("rlay", 3);
+    if (lay != REGION_ALL && lay < REGION_COUNT) {
+      if (region == lay) region = REGION_ALL;
+      eggByRegion[REGION_ALL] = eggByRegion[lay];
+      eggByRegion[lay] = 0;
+    }
+  }
+  if (region >= REGION_COUNT) region = REGION_ALL;
   prefs.getString("tnam", trainerName, sizeof(trainerName));
   prefs.getString("onam", ownerName, sizeof(ownerName));
   if (avatar >= AVATAR_COUNT) avatar = 0;   // a save from when there were four

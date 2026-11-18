@@ -291,13 +291,66 @@ static const CryNote CRY_13_N[1] = {  // bubble
   { 3, 2, 3, -1, 1, 12 },
 };
 
+static const CryNote CRY_14_P[11] = {  // wail
+  { 1544, 2, 11, -1, 4, 6 },
+  { 1624, 2, 11, -1, 4, 6 },
+  { 1692, 2, 11, -1, 4, 6 },
+  { 1748, 2, 11, -1, 4, 6 },
+  { 1796, 2, 11, -1, 4, 6 },
+  { 1796, 2, 11, -1, 5, 7 },
+  { 1767, 2, 11, -1, 5, 7 },
+  { 1734, 2, 11, -1, 5, 7 },
+  { 1697, 2, 11, -1, 5, 7 },
+  { 1657, 2, 11, -1, 5, 7 },
+  { 1611, 2, 11, -1, 5, 7 },
+};
+
+static const CryNote CRY_14_Q[11] = {  // wail
+  { 1548, 0, 6, -1, 4, 6 },
+  { 1627, 0, 6, -1, 4, 6 },
+  { 1694, 0, 6, -1, 4, 6 },
+  { 1750, 0, 6, -1, 4, 6 },
+  { 1797, 0, 6, -1, 4, 6 },
+  { 1797, 0, 6, -1, 5, 7 },
+  { 1768, 0, 6, -1, 5, 7 },
+  { 1736, 0, 6, -1, 5, 7 },
+  { 1700, 0, 6, -1, 5, 7 },
+  { 1659, 0, 6, -1, 5, 7 },
+  { 1614, 0, 6, -1, 5, 7 },
+};
+
+static const CryNote CRY_14_N[1] = {  // wail
+  { 9, 3, 3, -1, 6, 30 },
+};
+
+static const CryNote CRY_15_P[8] = {  // screech
+  { 1993, 1, 12, -1, 1, 2 },
+  { 2002, 1, 12, -1, 1, 2 },
+  { 2009, 1, 12, -1, 1, 2 },
+  { 0, 1, 0, 0, 0, 2 },
+  { 2007, 1, 11, -1, 1, 2 },
+  { 2000, 1, 11, -1, 1, 2 },
+  { 1992, 1, 11, -1, 1, 2 },
+  { 1982, 1, 11, -1, 1, 2 },
+};
+
+static const CryNote CRY_15_Q[3] = {  // screech
+  { 1975, 3, 6, -1, 1, 2 },
+  { 1985, 3, 6, -1, 1, 2 },
+  { 1993, 3, 6, -1, 1, 2 },
+};
+
+static const CryNote CRY_15_N[1] = {  // screech
+  { 1, 3, 6, -1, 1, 8 },
+};
+
 struct CryBase {
   const CryNote *p1; uint8_t n1;
   const CryNote *p2; uint8_t n2;
   const CryNote *nz; uint8_t nn;
   int16_t set1, set2;   // -1, or a pitch that replaces the species pitch
 };
-#define CRY_BASES 14
+#define CRY_BASES 16
 static const CryBase CRY_BASE_TBL[CRY_BASES] = {
   { CRY_00_P, 4, CRY_00_Q, 4, CRY_00_N, 1, -1, -1 },
   { CRY_01_P, 5, CRY_01_Q, 5, nullptr, 0, -1, -1 },
@@ -313,10 +366,12 @@ static const CryBase CRY_BASE_TBL[CRY_BASES] = {
   { CRY_11_P, 12, CRY_11_Q, 12, nullptr, 0, -1, -1 },
   { CRY_12_P, 12, nullptr, 0, nullptr, 0, -1, -1 },
   { CRY_13_P, 9, nullptr, 0, CRY_13_N, 1, -1, -1 },
+  { CRY_14_P, 11, CRY_14_Q, 11, CRY_14_N, 1, -1, -1 },
+  { CRY_15_P, 8, CRY_15_Q, 3, CRY_15_N, 1, -1, -1 },
 };
 
 struct CryMon { uint16_t base; int16_t pitch; uint16_t tempo; };
-#define CRY_DEX 325
+#define CRY_DEX 385
 
 static const CryMon CRY_MON[CRY_DEX] = {
   { 0, 30, 249 },  // 1 LION
@@ -644,4 +699,64 @@ static const CryMon CRY_MON[CRY_DEX] = {
   { 8, -58, 299 },  // 323 MAGELLANIC PENGUIN
   { 5, 48, 237 },  // 324 PIGEON GUILLEMOT
   { 7, -40, 268 },  // 325 GIANT PETREL
+  { 4, -46, 319 },  // 326 LA MADREMONTE
+  { 0, 4, 321 },  // 327 LA PATASOLA
+  { 11, -74, 219 },  // 328 EL MOHAN
+  { 14, -69, 325 },  // 329 EL SILBON
+  { 14, -5, 326 },  // 330 LA LLORONA
+  { 14, -59, 206 },  // 331 LA CANDILEJA
+  { 2, 30, 309 },  // 332 EL SOMBRERON
+  { 9, -100, 233 },  // 333 HOMBRE CAIMAN
+  { 2, 21, 316 },  // 334 MULA HERRADA
+  { 2, -22, 243 },  // 335 CABALLO TRES PATAS
+  { 7, -5, 281 },  // 336 POLLO MALIGNO
+  { 4, -89, 323 },  // 337 BRACAMONTE
+  { 9, -16, 277 },  // 338 SERPIENTE BACHUE
+  { 7, 59, 263 },  // 339 AVES CHIMINIGAGUA
+  { 10, 20, 241 },  // 340 RANA MUISCA
+  { 9, -11, 276 },  // 341 WALEKERU
+  { 8, 8, 275 },  // 342 AGUILA SAN AGUSTIN
+  { 15, 66, 231 },  // 343 MURCIELAGO TAYRONA
+  { 11, 88, 230 },  // 344 MARIMONDA
+  { 4, 68, 284 },  // 345 TORITO CARNAVAL
+  { 8, 17, 243 },  // 346 GUACO
+  { 9, -125, 298 },  // 347 ANACONDA ANCESTRAL
+  { 9, -12, 306 },  // 348 KUKULKAN
+  { 0, -10, 316 },  // 349 BALAM
+  { 15, -19, 209 },  // 350 CAMAZOTZ
+  { 7, -14, 282 },  // 351 MUAN OWL
+  { 2, 91, 219 },  // 352 SPIRIT DEER
+  { 9, -77, 262 },  // 353 ITZAM CAB AIN
+  { 1, 89, 292 },  // 354 XOLOTL
+  { 5, 67, 253 },  // 355 AHUIZOTL
+  { 9, -9, 291 },  // 356 CIPACTLI
+  { 7, -9, 230 },  // 357 HUITZILIN
+  { 1, 10, 220 },  // 358 HUEHUECOYOTL
+  { 9, 13, 323 },  // 359 AMARU
+  { 9, -76, 286 },  // 360 YACUMAMA
+  { 8, -27, 295 },  // 361 APU CONDOR
+  { 0, -25, 257 },  // 362 CCOA
+  { 9, -60, 247 },  // 363 BOITATA
+  { 12, -33, 323 },  // 364 ENCANTADO
+  { 4, -72, 201 },  // 365 MAPINGUARI
+  { 11, -81, 311 },  // 366 BIGFOOT
+  { 4, -76, 274 },  // 367 LOCH NESS MONSTER
+  { 11, -45, 249 },  // 368 YETI
+  { 13, -66, 277 },  // 369 KRAKEN
+  { 1, 24, 250 },  // 370 CHUPACABRA
+  { 5, 20, 326 },  // 371 JACKALOPE
+  { 2, -22, 247 },  // 372 PEGASUS
+  { 0, 14, 305 },  // 373 GRIFFIN
+  { 1, 12, 225 },  // 374 CERBERUS
+  { 9, -24, 279 },  // 375 HYDRA
+  { 7, -56, 284 },  // 376 PHOENIX
+  { 2, -57, 238 },  // 377 UNICORN
+  { 0, -30, 305 },  // 378 SPHINX
+  { 1, -54, 210 },  // 379 ANUBIS JACKAL
+  { 1, -31, 214 },  // 380 FENRIR
+  { 2, -74, 326 },  // 381 SLEIPNIR
+  { 1, -41, 287 },  // 382 KITSUNE
+  { 2, -57, 306 },  // 383 QILIN
+  { 8, -74, 258 },  // 384 GARUDA
+  { 12, -17, 224 },  // 385 WHITE WHALE
 };

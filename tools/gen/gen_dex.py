@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Generates dex.h, moves.h and trainers.h from tools/gen/animals.json.
+"""Generates dex.h, moves.h and trainers.h from tools/gen/animals.json and tools/gen/legends.json.
 
-Everything here is original to Tamanimals: the 13 trait-based types and their
+Everything here is original to Tamanimals: the 14 trait-based types and their
 chart, the move list, the learnsets (derived from each animal's traits) and the
 ranger roster. Standard library only.
 
@@ -14,16 +14,20 @@ import zlib
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, '..', '..')
 ANIMALS = json.load(open(os.path.join(HERE, 'animals.json')))
-TYPES = ['STRENGTH', 'SPEED', 'AGILITY', 'INTELLIGENCE', 'FLIGHT', 'SWIM', 'DIG', 'HIDE', 'VENOM', 'ARMOR', 'SIZE', 'SOUND', 'PACK']
+# the Legends region (326-385): myths and legends, Colombia at its heart. Same fields, plus their look.
+ANIMALS += json.load(open(os.path.join(HERE, 'legends.json'), encoding='utf-8'))
+assert [a['id'] for a in ANIMALS] == list(range(1, len(ANIMALS) + 1))
+# SPIRIT came with the legends; it is last so every older type keeps its number in saves.
+TYPES = ['STRENGTH', 'SPEED', 'AGILITY', 'INTELLIGENCE', 'FLIGHT', 'SWIM', 'DIG', 'HIDE', 'VENOM', 'ARMOR', 'SIZE', 'SOUND', 'PACK', 'SPIRIT']
 ACCENT = {'STRENGTH': 0xC186, 'SPEED': 0xFD20, 'AGILITY': 0xFEA0, 'INTELLIGENCE': 0xA254, 'FLIGHT': 0x7E9F, 'SWIM': 0x34DF,
-          'DIG': 0xB3C8, 'HIDE': 0x5249, 'VENOM': 0x8A9C, 'ARMOR': 0x8C71, 'SIZE': 0x5DCD, 'SOUND': 0xF454, 'PACK': 0xCC47}
+          'DIG': 0xB3C8, 'HIDE': 0x5249, 'VENOM': 0x8A9C, 'ARMOR': 0x8C71, 'SIZE': 0x5DCD, 'SOUND': 0xF454, 'PACK': 0xCC47, 'SPIRIT': 0xB59F}
 
 # attacker: (strong against, weak against, cannot affect). Written for this game.
 CHART = {
-    'STRENGTH': (['ARMOR', 'PACK', 'DIG'], ['FLIGHT', 'VENOM'], []),
-    'SPEED': (['SIZE', 'DIG', 'HIDE'], ['ARMOR', 'AGILITY'], []),
+    'STRENGTH': (['ARMOR', 'PACK', 'DIG'], ['FLIGHT', 'VENOM', 'SPIRIT'], []),
+    'SPEED': (['SIZE', 'DIG', 'HIDE'], ['ARMOR', 'AGILITY', 'SPIRIT'], []),
     'AGILITY': (['SPEED', 'VENOM'], ['PACK', 'SOUND'], []),
-    'INTELLIGENCE': (['STRENGTH', 'SIZE', 'PACK'], ['HIDE', 'SOUND'], []),
+    'INTELLIGENCE': (['STRENGTH', 'SIZE', 'PACK', 'SPIRIT'], ['HIDE', 'SOUND'], []),
     'FLIGHT': (['STRENGTH', 'DIG', 'VENOM'], ['SOUND', 'ARMOR'], []),
     'SWIM': (['DIG', 'ARMOR'], ['SIZE', 'SWIM'], []),
     'DIG': (['VENOM', 'SOUND'], ['SWIM', 'SIZE'], ['FLIGHT']),
@@ -32,7 +36,8 @@ CHART = {
     'ARMOR': (['FLIGHT', 'SPEED'], ['STRENGTH', 'ARMOR'], []),
     'SIZE': (['SWIM', 'DIG'], ['INTELLIGENCE', 'VENOM'], []),
     'SOUND': (['FLIGHT', 'INTELLIGENCE'], ['SOUND', 'DIG'], []),
-    'PACK': (['AGILITY', 'HIDE', 'FLIGHT'], ['STRENGTH', 'SIZE'], []),
+    'PACK': (['AGILITY', 'HIDE', 'FLIGHT', 'SPIRIT'], ['STRENGTH', 'SIZE'], []),
+    'SPIRIT': (['INTELLIGENCE', 'SOUND', 'SPIRIT'], ['PACK', 'ARMOR'], []),
 }
 
 # name, type, category, power, accuracy, effect, param, stat mask, stages, target, ailment, chance
@@ -86,6 +91,10 @@ MOVES = [
     hit('LEECH BITE', 'VENOM', P, 60, 100, 'EF_DRAIN', 50), hit('NECTAR SIP', 'FLIGHT', S, 40, 100, 'EF_DRAIN', 50),
     hit('KNOCK ASIDE', 'STRENGTH', P, 0, 100, 'EF_FIXED', 40), hit('OVERREACH', 'SIZE', S, 140, 90, 'EF_RECHARGE'),
     hit('STRUGGLE', 'STRENGTH', P, 50, 0, 'EF_RECOIL', 4),
+    # the Spirit type's moves (1.3.0): appended, so every older move keeps its number
+    hit('HAUNT', 'SPIRIT', S, 40), hit('WAIL', 'SPIRIT', S, 60, 100, 'EF_NONE', 0, 'AIL_CONFUSE', 15),
+    hit('WISP FLAME', 'SPIRIT', S, 75, 100, 'EF_NONE', 0, 'AIL_BURN', 15), hit('PHANTOM RUSH', 'SPIRIT', P, 90),
+    hit('NIGHTMARE', 'SPIRIT', S, 110, 85, 'EF_NONE', 0, 'AIL_SLEEP', 10), stat('FADE OUT', 'SPIRIT', 'ST_SPD', 2),
 ]
 MOVE_ID = {m[0]: i for i, m in enumerate(MOVES)}
 assert all(len(m[0]) <= 12 for m in MOVES), [m[0] for m in MOVES if len(m[0]) > 12]
@@ -101,9 +110,12 @@ PROFILE = {
     'lizard': (14, 18, 15, 21, 17, 15), 'frog': (14, 13, 12, 22, 23, 16), 'fish': (13, 22, 13, 24, 15, 13), 'scorpion': (13, 23, 24, 15, 13, 12),
     'wader': (15, 16, 13, 18, 18, 20), 'flightless': (19, 21, 13, 25, 10, 12), 'penguin': (18, 16, 18, 16, 16, 16), 'raptor': (14, 25, 12, 25, 13, 11),
     'parrot': (14, 13, 12, 20, 25, 16), 'bird': (14, 15, 12, 25, 18, 16), 'small': (14, 18, 15, 22, 16, 15),
+    'bat': (14, 17, 12, 24, 19, 14), 'spider': (13, 20, 15, 20, 18, 14), 'octopus': (20, 18, 15, 13, 20, 14),
+    'plesio': (24, 18, 18, 12, 14, 14), 'spirit': (15, 12, 12, 18, 25, 18), 'wisp': (12, 14, 10, 26, 24, 14),
 }
 TOTAL = {1: 290, 2: 390, 3: 470, 4: 560}
-REGIONS = [('AFRICA', 1, 145, [1, 2, 3]), ('ASIA', 146, 200, [146, 147, 171]), ('AMERICAS', 201, 325, [201, 202, 205])]
+REGIONS = [('AFRICA', 1, 145, [1, 2, 3]), ('ASIA', 146, 200, [146, 147, 171]), ('AMERICAS', 201, 325, [201, 202, 205]),
+           ('LEGENDS', 326, 385, [340, 345, 357])]     # the golden frog, the carnival bull, the hummingbird
 ALL_STARTERS = [1, 2, 3, 146, 147, 171, 201, 202, 205]
 CLASSIC = [1, 2, 3, 201, 146]
 
@@ -184,7 +196,9 @@ def learnset(a):
     support = {'cat': 'WAR DANCE', 'dog': 'HUNT CALL', 'primate': 'FOCUS', 'parrot': 'FOCUS', 'bird': 'LIMBER UP', 'raptor': 'WAR DANCE',
                'bear': 'BRACE', 'turtle': 'HARDEN UP', 'armadillo': 'HARDEN UP', 'elephant': 'STAND TALL', 'hippo': 'STAND TALL',
                'snake': 'STARE DOWN', 'lizard': 'LIMBER UP', 'frog': 'FOCUS', 'antelope': 'LIMBER UP', 'zebra': 'LIMBER UP',
-               'sloth': 'LONG NAP', 'manatee': 'LONG NAP', 'rhino': 'BRACE', 'bovine': 'BRACE'}.get(arch, 'SNARL')
+               'sloth': 'LONG NAP', 'manatee': 'LONG NAP', 'rhino': 'BRACE', 'bovine': 'BRACE',
+               'spirit': 'FADE OUT', 'wisp': 'FADE OUT', 'bat': 'LIMBER UP', 'spider': 'STARE DOWN', 'octopus': 'FOCUS',
+               'plesio': 'LONG NAP'}.get(arch, 'SNARL')
     plan = [(t1[0], 1), ('SNARL' if h(a['name']) % 2 else 'STARE DOWN', 1), (t2[0], 7), (support, 12), (t1[min(1, len(t1) - 1)], 16),
             (t2[min(1, len(t2) - 1)], 24), ('LICK WOUNDS' if h(a['name'] + 'h') % 3 == 0 else 'DIRT CLOUD', 30),
             (t1[min(2, len(t1) - 1)], 34), (t2[min(2, len(t2) - 1)], 42), (t1[-1], 52)]
@@ -262,6 +276,11 @@ ROSTER = {
                  ('VALERIA', 'CHOCO', 'VENOM', 4, 40), ('NAHUEL', 'TIERRA FUEGO', 'ARMOR', 5, 44), ('PAZ', 'SUMMIT', 'SOUND', 5, 48),
                  ('DIEGO', 'SUMMIT', 'SPEED', 5, 49), ('ISABEL', 'SUMMIT', 'HIDE', 5, 50), ('SANTOS', 'SUMMIT', 'SIZE', 5, 52),
                  ('AURORA', 'HEAD RANGER', 'STRENGTH', 6, 58)],
+    'LEGENDS': [('MARIANA', 'TAYRONA', 'FLIGHT', 2, 14), ('CAMILO', 'LOS LLANOS', 'SPIRIT', 3, 19), ('YURANI', 'LA GUAJIRA', 'INTELLIGENCE', 3, 24),
+                ('ESTEBAN', 'MAGDALENA', 'SWIM', 3, 28), ('LUZ', 'SAN AGUSTIN', 'STRENGTH', 4, 33), ('JULIAN', 'GUATAVITA', 'SIZE', 4, 37),
+                ('MANUELA', 'AMAZONAS', 'HIDE', 4, 42), ('TOMAS', 'IGUAQUE', 'SPIRIT', 5, 46), ('GABRIEL', 'SUMMIT', 'FLIGHT', 5, 52),
+                ('CATALINA', 'SUMMIT', 'SPIRIT', 5, 54), ('SEBASTIAN', 'SUMMIT', 'SIZE', 5, 55), ('LUCIANA', 'SUMMIT', 'VENOM', 5, 57),
+                ('JIMENA', 'HEAD RANGER', 'SPIRIT', 6, 62)],
 }
 
 

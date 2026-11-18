@@ -109,7 +109,7 @@ def eye(c, x, y, pose, big=False):
             c.dot(x + a, y + b, 'k')
     else:
         c.rect(x - 1, y - 1, x + 2 if big else x + 1, y + 2, 'w')
-        c.rect(x, y - 1, x + 2 if big else x + 1, y + 2, 'k')
+        c.rect(x, y - 1, x + 2 if big else x + 1, y + 2, getattr(c, 'eyecol', 'k'))
 
 
 def extras(c, pose, seed):
@@ -188,7 +188,22 @@ def quad(c, a, pose):
         c.oval(tx - 4, by + 4, 2, 2, a['mark'])
     elif tail == 'bushy':
         c.oval(tx - 3, by - 3, 4, 2.5, col)
-    legs(c, [bx - rx * .75, bx - rx * .35, bx + rx * .25, bx + rx * .6], by + ry * .5, foot + dy, a.get('legw', 3), col, dark, pose)
+    elif tail == 'many':                       # a fan of bushy tails with pale tips
+        n = a.get('tails', 3)
+        for i in range(n):
+            t = i / max(1, n - 1)
+            ex, ey = tx - 9 + t * 6, by - 13 + t * 15
+            c.line(tx + 1, by - 2, ex, ey, 1.3, a.get('tailcol', 'f') if i % 2 else col)
+            c.oval(ex, ey, 1.4, 1.2, a['mark'])
+    xs = [bx - rx * .75, bx - rx * .35, bx + rx * .25, bx + rx * .6]
+    n = a.get('legs_n', 4)
+    if n == 8:
+        xs = [v for x in xs for v in (x - 1.6, x + 1.4)]
+    elif n == 3:
+        xs = [xs[0], xs[2], xs[3]]
+    elif n == 1:
+        xs = [bx - 1]
+    legs(c, xs, by + ry * .5, foot + dy, a.get('legw', 3), col, dark, pose)
     c.oval(bx, by, rx, ry, col)
     c.oval(bx + 1, by + ry * .55, rx * .75, ry * .42, belly)
     if a.get('hump'):
@@ -204,42 +219,70 @@ def quad(c, a, pose):
     elif m == 'patches':
         for sx, sy in ((-6, -2), (0, -3), (5, -1), (-2, 2)):
             c.oval(bx + sx * br, by + sy * br, 2.2, 1.9, a['mark'])
+    if a.get('spikes'):                        # a row of spines down the back
+        for i in range(-3, 3):
+            c.line(bx + i * 3, by - ry + 1, bx + i * 3 - 1, by - ry - 3, 1.3, a['mark'])
+    if a.get('wings'):                         # a feathered wing, raised on the up beat
+        up = pose.get('leg', 0) in (1, 3) or pose.get('dy', 0) < 0 or lunge > 0
+        rx0, ry0 = bx - 1, by - ry + 2
+        tip = (bx - 9, by - ry - 11) if up else (bx - 13, by - ry - 4)
+        wc = a.get('wingcol', belly)
+        for i in range(4):
+            c.line(rx0 + i * 1.5, ry0, tip[0] + i * 2.2, tip[1] + i * 1.6, 2.4, wc if i % 2 == 0 else SHADE.get(wc, wc))
     # neck and head
     if a.get('neck', 5) > 0 and not low:
         c.line(bx + rx * .6, by - 1, hx - 1, hy + 1, a.get('neckw', 5), col)
-    if a.get('mane'):
-        c.oval(hx - 1, hy, hr + 3.5, hr + 3, a['mark'])
-    ear = a.get('ear', 'round')
-    if ear == 'round':
-        c.oval(hx - 3, hy - hr, 2, 2, dark)
-    elif ear == 'point':
-        c.line(hx - 3, hy - hr + 1, hx - 4, hy - hr - 3, 2, dark)
-        c.line(hx + 1, hy - hr + 1, hx + 1, hy - hr - 3, 1.6, dark)
-    elif ear == 'long':
-        c.line(hx - 3, hy - hr + 1, hx - 7, hy - hr - 1, 2, dark)
-    elif ear == 'big':
-        c.oval(hx - 5, hy - 1, 5, 6, dark)
-    c.oval(hx, hy, hr, hr * .92, col)
-    snout = a.get('snout', 2)
-    if snout:
-        c.oval(hx + hr - 1, hy + 1.5, snout + 1, 2, belly)
-        c.dot(hx + hr + snout - 1, hy + 1, 'k')
-    if a.get('horn') == 'nose':
-        c.line(hx + hr, hy, hx + hr + 3, hy - 5, 1.8, 's')
-    elif a.get('horn') == 'curve':
-        c.line(hx - 2, hy - hr, hx - 7, hy - hr - 5, 1.4, 'C')
-        c.line(hx, hy - hr, hx - 3, hy - hr - 6, 1.4, 'C')
-    elif a.get('horn') == 'ossicone':
-        c.line(hx - 1, hy - hr, hx - 1, hy - hr - 3, 1, 'C')
-        c.line(hx + 2, hy - hr, hx + 2, hy - hr - 3, 1, 'C')
-    if a.get('trunk'):
-        c.line(hx + hr - 1, hy + 2, hx + hr + 3, hy + 9 + pose.get('head', 0), 2.6, col)
-    if a.get('tusk'):
-        c.line(hx + hr - 1, hy + 4, hx + hr + 2, hy + 5, 1.1, 'w')
-    eye(c, hx + 1, hy - 1, pose)
-    if pose.get('mouth'):
-        c.rect(hx + 2, hy + 3, hx + hr, hy + 4, 'R')
+    if a.get('hmane') and not low:             # a horse's mane along the neck
+        c.line(bx + rx * .45, by - ry + 1, hx - 2, hy - a.get('head', 5) + 1, 2.2, a['mark'])
+    def head(hx, hy, a):
+        col = a['col']
+        if a.get('mane'):
+            c.oval(hx - 1, hy, hr + 3.5, hr + 3, a['mark'])
+        ear = a.get('ear', 'round')
+        if ear == 'round':
+            c.oval(hx - 3, hy - hr, 2, 2, dark)
+        elif ear == 'point':
+            c.line(hx - 3, hy - hr + 1, hx - 4, hy - hr - 3, 2, dark)
+            c.line(hx + 1, hy - hr + 1, hx + 1, hy - hr - 3, 1.6, dark)
+        elif ear == 'long':
+            c.line(hx - 3, hy - hr + 1, hx - 7, hy - hr - 1, 2, dark)
+        elif ear == 'big':
+            c.oval(hx - 5, hy - 1, 5, 6, dark)
+        c.oval(hx, hy, hr, hr * .92, a.get('headcol', col))
+        snout = a.get('snout', 2)
+        if snout:
+            c.oval(hx + hr - 1, hy + 1.5, snout + 1, 2, belly)
+            c.dot(hx + hr + snout - 1, hy + 1, 'k')
+        if a.get('horn') == 'nose':
+            c.line(hx + hr, hy, hx + hr + 3, hy - 5, 1.8, 's')
+        elif a.get('horn') == 'curve':
+            c.line(hx - 2, hy - hr, hx - 7, hy - hr - 5, 1.4, 'C')
+            c.line(hx, hy - hr, hx - 3, hy - hr - 6, 1.4, 'C')
+        elif a.get('horn') == 'uni':
+            c.line(hx + 1, hy - hr + 1, hx + 4, hy - hr - 5, 1.4, a.get('horncol', 'f'))
+        elif a.get('horn') == 'ossicone':
+            c.line(hx - 1, hy - hr, hx - 1, hy - hr - 3, 1, 'C')
+            c.line(hx + 2, hy - hr, hx + 2, hy - hr - 3, 1, 'C')
+        if a.get('trunk'):
+            c.line(hx + hr - 1, hy + 2, hx + hr + 3, hy + 9 + pose.get('head', 0), 2.6, col)
+        if a.get('tusk'):
+            c.line(hx + hr - 1, hy + 4, hx + hr + 2, hy + 5, 1.1, 'w')
+        if a.get('qbeak'):                         # an eagle's hooked beak
+            bc = a.get('beakcol', 'f')
+            c.line(hx + hr - 1, hy, hx + hr + 3, hy, 2.4, bc)
+            c.line(hx + hr + 3, hy, hx + hr + 3, hy + 2.5, 1.3, bc)
+        eye(c, hx + 1, hy - 1, pose)
+        if pose.get('mouth'):
+            c.rect(hx + 2, hy + 3, hx + hr, hy + 4, 'R')
 
+
+    for k, (ox, oy) in enumerate(((-6, -6), (1, 7), (-9, 2))[:a.get('heads', 1) - 1]):
+        back = dict(a)
+        back['col'] = a['dark'] if a['dark'] != a['col'] else a['belly']
+        if not low:
+            c.line(bx + rx * .6, by - 1, hx + ox - 1, hy + oy + 1, a.get('neckw', 5) * .8, back['col'])
+        head(hx + ox, hy + oy, back)
+    head(hx, hy, a)
 
 def bird(c, a, pose):
     col, dark, belly = a['col'], a['dark'], a['belly']
@@ -276,6 +319,10 @@ def bird(c, a, pose):
     if a.get('crest'):
         c.line(hx - 2, hy - hr + 1, hx - 5, hy - hr - 3, 1.6, a['mark'])
     c.oval(hx, hy, hr, hr, a.get('headcol', col))
+    if a.get('comb'):
+        for k in (-1.5, 0, 1.5):
+            c.oval(hx + k, hy - hr - .5 + abs(k) * .3, 1.3, 1.6, 'r')
+        c.oval(hx + hr - 1, hy + 2.6, 1, 1.5, 'r')
     b = a.get('beak', 'short')
     bc = a.get('beakcol', 'f')
     if b == 'short':
@@ -305,14 +352,22 @@ def primate(c, a, pose):
         c.rect(bx + 3, by + 4, bx + 6, 38 + dy - (ph == 2), dark)
     bs, hs = a.get('bs', 1.0), a.get('hs', 1.0)     # body and head scale (young ones: small body, big head)
     c.oval(bx, by, 8 * bs, 7.5 * bs, col)
+    if a.get('shag'):
+        for i in range(-3, 4):
+            c.line(bx + i * 2.3 * bs, by + 4 * bs, bx + i * 2.3 * bs + .6, by + 8.5 * bs, 1.4, a['mark'])
     c.oval(bx, by + 1, 5 * bs, 5 * bs, belly)
     c.line(bx - 7 * bs, by - 3, bx - 9 * bs, by + 5 - (ph == 1) * 2, 2.6, col)
     c.line(bx + 7 * bs, by - 3, bx + 9 * bs, by + 5 - (ph == 3) * 2, 2.6, col)
     hx, hy = bx + 1, by - 4 - 7 * bs * hs + pose.get('head', 0)
-    c.oval(hx - 6 * hs, hy, 2.4 * hs, 2.4 * hs, belly)
-    c.oval(hx + 6 * hs, hy, 2.4 * hs, 2.4 * hs, belly)
+    er = a.get('earr', 2.4)
+    if a.get('shag'):
+        c.oval(hx, hy + 2, 7.6 * hs, 7.4 * hs, a['mark'])
+    c.oval(hx - 6 * hs, hy, er * hs, er * hs, belly)
+    c.oval(hx + 6 * hs, hy, er * hs, er * hs, belly)
     c.oval(hx, hy, 6.4 * hs, 6 * hs, col)
     c.oval(hx + 1, hy + 2, 4 * hs, 3.2 * hs, a.get('face', belly))
+    if a.get('nose'):
+        c.line(hx + 2, hy + 1, hx + 2 + a['nose'], hy + 2.5, 2.2, a.get('nosecol', col))
     if a.get('mark') != col:
         c.oval(hx, hy - 4, 4, 1.6, a['mark'])
     eye(c, hx - 1, hy - 1, pose)
@@ -334,11 +389,26 @@ def snake(c, a, pose):
         c.oval(19 + wob + i * 2.4, 29 + dy, .8, .8, a['mark'])
     hy = (pose.get('low') and 27 or 15) + dy + pose.get('head', 0)
     hx = 25 + lunge + wob
+    nh = a.get('heads', 1)
+    for k in range(nh - 1, 0, -1):             # furthest first
+        kx = hx - 6 * k
+        ky = hy + (5 if k % 2 else -2) + (2 if pose.get('low') else 0)
+        tone = dark if k % 2 else col
+        if not pose.get('low'):
+            c.line(19 - k * 2, 29 + dy, kx, ky + 2, 3, tone)
+        c.oval(kx + 1, ky, 3.8, 3.1, tone)
+        eye(c, kx + 1, ky - 1, pose)
     if not pose.get('low'):
         c.line(25, 27 + dy, hx, hy + 2, 4, col)
+    if a.get('feathers'):                      # the quetzal ruff of a feathered serpent
+        for k, fc in enumerate(('r', 'T', 'g', 'f', 'T')):
+            c.line(hx - 1, hy + 2, hx - 7 + k * .6, hy - 3 + k * 2.4, 1.8, fc)
     if a.get('hood'):
         c.oval(hx, hy + 3, 5, 4, dark)
     c.oval(hx + 1, hy, 4.4, 3.4, col)
+    if a.get('feathers'):
+        for k in range(3):
+            c.line(hx - 1, hy - 2, hx - 3 + k * 1.5, hy - 7 + k * .5, 1.3, ('g', 'T', 'r')[k])
     eye(c, hx + 1, hy - 1, pose)
     if pose.get('mouth') or lunge:
         c.line(hx + 5, hy + 1, hx + 8, hy + 2, .9, 'r')
@@ -445,6 +515,289 @@ def scorpion(c, a, pose):
     eye(c, bx + 6, by - 2, pose)
 
 
+def bat(c, a, pose):
+    """Wings spread wide, two ears, front-facing; folded up when it sleeps."""
+    col, dark, belly = a['col'], a['dark'], a['belly']
+    dy, lunge = pose.get('dy', 0), pose.get('lunge', 0)
+    low = pose.get('low')
+    up = pose.get('leg', 0) in (1, 3) or dy < 0 or lunge > 0
+    bx, by = 20 + lunge, 24 + dy + (6 if low else 0)
+    if not low:
+        f = -4 if up else 2
+        for s in (-1, 1):
+            tip = (bx + s * 15, by - 6 + f)
+            mid = (bx + s * 9, by + 4 + f / 2)
+            c.oval(bx + s * 8, by + f / 2, 7, 4, a['mark'])
+            c.line(bx + s * 3, by - 2, tip[0], tip[1], 1.4, dark)
+            c.line(tip[0], tip[1], mid[0], mid[1], 1.0, dark)
+            c.line(bx + s * 3, by - 2, mid[0] - s * 3, mid[1] + 1, 1.0, dark)
+    else:
+        c.oval(bx, by + 1, 7, 7.5, a['mark'])
+    c.oval(bx, by, 5, 6, col)
+    c.oval(bx, by + 2, 3.2, 3.6, belly)
+    c.line(bx - 2, by + 5, bx - 2, by + 9, 1, dark)
+    c.line(bx + 2, by + 5, bx + 2, by + 9, 1, dark)
+    hx, hy = bx, by - 7 + pose.get('head', 0)
+    c.line(hx - 3, hy - 1, hx - 4, hy - 6, 1.8, col)
+    c.line(hx + 3, hy - 1, hx + 4, hy - 6, 1.8, col)
+    c.oval(hx, hy, 4.2, 3.6, col)
+    c.oval(hx, hy + 2, 1.6, 1.1, belly)
+    eye(c, hx - 2, hy - 1, pose)
+    eye(c, hx + 2, hy - 1, pose)
+    if pose.get('mouth') or lunge > 0:
+        c.rect(hx - 1, hy + 2, hx + 2, hy + 3, 'R')
+        c.dot(hx - 1, hy + 3, 'w')
+        c.dot(hx + 1, hy + 3, 'w')
+
+
+def spider(c, a, pose):
+    """Eight legs, a round body; a woven pattern for the weaving spider."""
+    col, dark = a['col'], a['dark']
+    dy, lunge = pose.get('dy', 0), pose.get('lunge', 0)
+    ph = pose.get('leg', 0) % 2
+    bx, by = 17 + lunge, 29 + dy + (3 if pose.get('low') else 0)
+    for side in (0, 1):
+        for i, (kx, fx) in enumerate(((-4, -12), (-1, -7), (3, 9), (6, 14))):
+            lift = 1 if (i + side + ph) % 2 else 0
+            knee = (bx + kx + side * 2, by - 6 - lift)
+            foot = (bx + fx + (1 if side else -1), 38 + dy - lift)
+            tone = dark if side == 0 else a.get('legcol', dark)
+            c.line(bx + 2, by, knee[0], knee[1], 1.3, tone)
+            c.line(knee[0], knee[1], foot[0], foot[1], 1.1, tone)
+    c.oval(bx - 5, by - 1, 7.5, 6.5, col)
+    weave = a.get('weave')
+    if weave:
+        for row in range(-2, 3):
+            for k in range(-2, 2):
+                c.oval(bx - 5 + k * 3 + (row % 2) * 1.5, by - 1 + row * 2.2, .9, .9, weave[(row + k) % len(weave)])
+    c.oval(bx + 4, by + 1, 4.5, 4, col)
+    eye(c, bx + 6, by, pose)
+    c.dot(bx + 4, by - 2, 'k')
+    c.dot(bx + 7, by - 2, 'k')
+    c.line(bx + 8, by + 2, bx + 9, by + 4, 1, dark)
+    if pose.get('mouth') or lunge > 0:
+        c.dot(bx + 8, by + 3, 'R')
+
+
+def octopus(c, a, pose):
+    """A big round head and six curling arms."""
+    col, belly = a['col'], a['belly']
+    dy, lunge = pose.get('dy', 0), pose.get('lunge', 0)
+    w = {0: 0, 1: 1, 2: 0, 3: -1}[pose.get('leg', 0)]
+    bx, by = 19 + lunge, 22 + dy + (5 if pose.get('low') else 0)
+    for i, k in enumerate((-8, -5, -2, 2, 5, 8)):
+        x0 = bx + k * .7
+        sw = w if i % 2 else -w
+        ex, ey = x0 + k * .5 + sw, by + 11
+        c.line(x0, by + 4, ex, ey, 2.4, col)
+        c.line(ex, ey, ex + (2 if k > 0 else -2), 38 + dy, 1.7, col)
+        c.dot(ex, ey - 2, belly)
+    c.oval(bx - 1, by - 4, 9, 9.5, col)
+    for sx, sy in ((-5, -8), (-1, -10), (3, -7), (-6, -3)):
+        c.oval(bx + sx, by + sy, 1.3, 1.1, a['mark'])
+    c.oval(bx, by + 3, 7, 3.6, col)
+    eye(c, bx - 3, by, pose, big=True)
+    eye(c, bx + 3, by, pose, big=True)
+    if pose.get('mouth') or lunge > 0:
+        c.oval(bx, by + 4, 1.4, 1, 'R')
+
+
+def plesio(c, a, pose):
+    """A lake monster: a round body with flippers and a long neck held high."""
+    col, dark, belly = a['col'], a['dark'], a['belly']
+    dy, lunge = pose.get('dy', 0), pose.get('lunge', 0)
+    low = pose.get('low')
+    f = {0: 1, 1: 0, 2: -1, 3: 0}[pose.get('leg', 0)]
+    bx, by = 15 + lunge, 31 + dy
+    c.line(bx - 9, by, bx - 15, by + 2, 2.4, col)
+    c.oval(bx + 5 + f, by + 5, 4, 1.6, dark)
+    c.oval(bx - 6 - f, by + 5, 3.6, 1.5, dark)
+    c.oval(bx, by, 10, 5.5, col)
+    c.oval(bx + 1, by + 3, 8, 2, belly)
+    for sx in (-5, -1, 3):
+        c.oval(bx + sx, by - 3, 1.4, 1.1, a['mark'])
+    c.oval(bx + 6 - f, by + 5.5, 4.2, 1.8, col)
+    c.oval(bx - 5 + f, by + 5.5, 3.8, 1.7, col)
+    if low:
+        hx, hy, mid = bx + 13, by - 1, (bx + 10, by - 2)
+    else:
+        hx, hy, mid = bx + 16, by - 17 + pose.get('head', 0), (bx + 12, by - 7)
+    c.line(bx + 7, by - 2, mid[0], mid[1], 3, col)
+    c.line(mid[0], mid[1], hx - 1, hy + 1, 2.6, col)
+    c.oval(hx, hy, 3.6, 2.8, col)
+    c.rect(hx + 2, hy, hx + 5, hy + 1.5, col)
+    eye(c, hx, hy - 1, pose)
+    if pose.get('mouth') or lunge > 0:
+        c.rect(hx + 2, hy + 1.5, hx + 5, hy + 2.2, 'R')
+
+
+def spirit(c, a, pose):
+    """A floating figure in a long robe, with long hair, a hat or a sack as its legend has it."""
+    col = a['col']
+    dy, lunge = pose.get('dy', 0), pose.get('lunge', 0)
+    low = pose.get('low')
+    w = {0: 0, 1: 1, 2: 0, 3: -1}[pose.get('leg', 0)]
+    bx, by = 19 + lunge, (25 if not low else 29) + dy
+    hx, hy = bx + 1, by - 9 + pose.get('head', 0)
+    hair = a.get('hair')
+    if hair:
+        c.oval(hx - 1, hy + 4, 6.5, 8.5, hair)
+    if a.get('sack'):
+        c.line(bx - 4, by - 3, bx - 7, by - 1, 1, 'C')
+        c.oval(bx - 8, by + 3, 4, 4.5, 'c')
+    c.oval(bx, by + 1, 7, 8, col)
+    for i, k in enumerate((-5, 0, 5)):
+        c.oval(bx + k + (w if i % 2 else -w), by + 9, 2.6, 2.4, col)
+    c.line(bx - 5, by - 3, bx - 8, by + 3 - w, 2, col)
+    c.line(bx + 5, by - 3, bx + 8, by + 3 + w, 2, col)
+    c.oval(hx, hy, 5, 5, a.get('face', col))
+    if hair:
+        c.oval(hx, hy - 4, 5, 2, hair)
+    eye(c, hx - 2, hy, pose)
+    eye(c, hx + 2, hy, pose)
+    if pose.get('mouth') or lunge > 0:
+        c.oval(hx, hy + 3, 1.3, 1.1, 'k')
+
+
+def wisp(c, a, pose):
+    """Three flames that move together, with a face in the middle one."""
+    dy, lunge = pose.get('dy', 0), pose.get('lunge', 0)
+    fl = {0: 0, 1: 1, 2: 0, 3: -1}[pose.get('leg', 0)]
+    bx, by = 19 + lunge, 28 + dy + (3 if pose.get('low') else 0)
+    for i, k in enumerate((-7, 7, 0)):
+        big = k == 0
+        r = 4.5 if big else 3.5
+        x, y = bx + k, by + (0 if big else 3)
+        sw = fl if i % 2 else -fl
+        tip = y - (13 if big else 9) + sw
+        c.line(x, y - 1, x + sw, tip, 3 if big else 2.4, a['mark'])
+        c.oval(x, y, r, r, a['col'])
+        c.line(x, y - 1, x, tip + 3, 1.6 if big else 1.2, a['belly'])
+        c.oval(x, y + 1, r * .6, r * .55, a['belly'])
+    eye(c, bx - 1.5, by, pose)
+    eye(c, bx + 1.5, by, pose)
+    if pose.get('mouth') or lunge > 0:
+        c.rect(bx - 1, by + 2.5, bx + 1, by + 3.2, 'R')
+
+
+def surface(c, top=True):
+    """Topmost (or bottom-most) painted pixel of each column, as (x, y)."""
+    out = []
+    for x in range(c.n):
+        ys = [y for y in range(c.n) if c.g[y][x] is not None]
+        if ys:
+            out.append((x, min(ys) if top else max(ys)))
+    return out
+
+
+def decorate(c, a, pose, seed):
+    """What a legend wears or gives off: a hat, a headdress, plants, flames, glowing hooves, confetti."""
+    eyes = getattr(c, 'eyes', [])
+    ex, ey = eyes[-1] if eyes else (24, 14)
+    hat = a.get('hat')
+    if hat:
+        x, y = ex + a.get('hatx', -1), ey + a.get('haty', -4)
+        if hat == 'vueltiao':                  # the sombrero vueltiao: cream with black bands
+            c.rect(x - 6, y, x + 6, y + 1, 'y')
+            c.rect(x - 3, y - 3, x + 3, y, 'y')
+            c.line(x - 3, y - 1.6, x + 3, y - 1.6, .7, 'k')
+            c.line(x - 6, y + .6, x + 6, y + .6, .5, 'k')
+        elif hat == 'wide':                    # a huge black hat
+            c.rect(x - 8, y, x + 8, y + 1.4, 'k')
+            c.oval(x, y - 2, 4.5, 3, 'k')
+            c.line(x - 4, y - 1, x + 4, y - 1, .8, 'S')
+        elif hat == 'straw':
+            c.rect(x - 5, y, x + 5, y + 1, 'Y')
+            c.oval(x, y - 1.5, 3, 2.2, 'Y')
+            c.line(x - 3, y - .6, x + 3, y - .6, .7, 'C')
+        elif hat == 'fedora':
+            c.rect(x - 5, y, x + 5, y + 1, 'w')
+            c.oval(x, y - 2, 3.2, 2.6, 'w')
+            c.line(x - 3, y - 1, x + 3, y - 1, .8, 'k')
+    top = (ex + a.get('hatx', -1), ey + a.get('haty', -4))
+    if a.get('helmet'):                        # a hard hat or a motorbike helmet
+        hc = a['helmet']
+        c.oval(top[0], top[1] + 1, 5, 3.4, hc)
+        c.line(top[0] - 5, top[1] + 2.6, top[0] + 5.5, top[1] + 2.6, 1.1, SHADE.get(hc, 'k'))
+    if a.get('crown'):                         # a beauty queen's crown
+        x, y = top
+        c.rect(x - 3, y, x + 3, y + 1, 'f')
+        for k in (-3, 0, 3):
+            c.line(x + k, y, x + k * .8, y - 2.5, .9, 'f')
+        c.dot(x, y, 'r')
+    if a.get('halo'):                          # a golden halo floating over the head
+        x, y = top
+        c.line(x - 3.5, y - 2, x + 3.5, y - 2, 1.1, 'f')
+    glasses = a.get('glasses')
+    if glasses:                                # round glasses or dark sunglasses, over every eye
+        for x, y in eyes:
+            if glasses == 'sun':
+                c.rect(x - 1.5, y - 1.5, x + 2.5, y + 1.8, 'k')
+                c.dot(x - 1, y - 1, 'w')
+            else:
+                for (x0, y0, x1, y1) in ((x - 2, y - 2, x + 2, y - 2), (x - 2, y + 2, x + 2, y + 2), (x - 2, y - 2, x - 2, y + 2), (x + 2, y - 2, x + 2, y + 2)):
+                    c.line(x0, y0, x1, y1, .6, 'k')
+        if len(eyes) >= 2:
+            (x0, y0), (x1, _) = eyes[-2], eyes[-1]
+            c.line(x0 + 2, y0 - 1, x1 - 2, y0 - 1, .6, 'k')
+    if a.get('mask'):                          # a face mask -- worn over the eyes
+        xs = [x for x, _ in eyes] or [ex]
+        y = ey
+        c.rect(min(xs) - 2.5, y - 1.6, max(xs) + 3, y + 1.8, a['mask'])
+        c.line(min(xs) - 2.5, y, min(xs) - 5, y - 2, .6, 'w')
+    if a.get('tie'):                           # a necktie
+        c.line(ex - 1, ey + 5, ex - 1.4, ey + 10, 1.5, a['tie'])
+        c.dot(ex - 1, ey + 5, SHADE.get(a['tie'], 'k'))
+    if a.get('mic'):                           # a singer's microphone
+        c.line(ex + 4, ey + 4, ex + 6, ey + 8, 1, 'S')
+        c.oval(ex + 3.6, ey + 3.4, 1.2, 1.2, 'k')
+    if a.get('headdress'):                     # a striped royal headcloth
+        c.line(ex - 5, ey - 4, ex - 6, ey + 6, 2.4, 'f')
+        c.line(ex - 5, ey - 4, ex + 3, ey - 4, 1.4, 'f')
+        for i in range(3):
+            c.line(ex - 7, ey - 2 + i * 3, ex - 4, ey - 2 + i * 3, .8, 'N')
+        c.line(ex - 4, ey - 4, ex + 3, ey - 4, .6, 'N')
+    if a.get('snakebeak'):                     # an eagle holding a serpent
+        c.line(ex + 5, ey + 3, ex + 7, ey + 8, 1.1, 'g')
+        c.dot(ex + 7, ey + 9, 'G')
+    eg = int(ex * c.f) + c.ox
+    r = seed
+    flick = pose.get('leg', 0) + pose.get('dy', 0) * 3
+
+    def rnd():
+        nonlocal r
+        r = (r * 1103515245 + 12345) & 0x7fffffff
+        return r
+    if a.get('plants'):                        # moss, leaves and flowers growing on its back
+        for x, y in surface(c):
+            if abs(x - eg) <= 2 or rnd() % 3:
+                continue
+            flower = rnd() % (2 if a.get('flowers') else 4) == 0
+            for k, cc in enumerate(('g', 'p' if rnd() % 2 else 'f') if flower else ('g', 'G')):
+                if y - 1 - k >= 0:
+                    c.g[y - 1 - k][x] = cc
+    if a.get('flames'):                        # flames flickering along its back
+        for x, y in surface(c):
+            if abs(x - eg) <= 1:
+                continue
+            h = 1 + (x * 7 + flick + seed) % 3
+            for k in range(h):
+                if y - 1 - k >= 0:
+                    c.g[y - 1 - k][x] = ('f', 'o', 'r')[min(k, 2)]
+    if a.get('glowfeet'):                      # hooves that strike sparks
+        bottom = surface(c, top=False)
+        low = max(y for _, y in bottom)
+        for x, y in bottom:
+            if y >= low - 1:
+                c.g[y][x] = 'f' if (x + flick) % 2 else 'o'
+    conf = a.get('confetti')
+    if conf:                                   # carnival ribbons and confetti
+        pts = [(x, y) for y, row in enumerate(c.g) for x, v in enumerate(row) if v not in (None, 'w') and abs(x - eg) > 2]
+        for _ in range(max(6, len(pts) // 25)):
+            x, y = pts[rnd() % len(pts)]
+            c.g[y][x] = conf[rnd() % len(conf)]
+
+
 # name fragments -> (base, dark, belly, mark, pattern)
 LOOK = [
     ('ZEBRA', dict(col='w', dark='s', belly='w', mark='k', pattern='stripes')),
@@ -519,7 +872,7 @@ TONES = [('c', 'C', 'y'), ('Y', 'c', 'y'), ('C', 'S', 'c'), ('S', 'k', 's'), ('s
 BIRD_TONES = [('B', 'N', 'w', 'N'), ('r', 'R', 'y', 'k'), ('g', 'G', 'f', 'd'), ('f', 'Y', 'w', 'k'), ('l', 'L', 'w', 'L'), ('C', 'S', 'y', 'k'), ('t', 'T', 'w', 'd'), ('p', 'P', 'w', 'P'), ('S', 'k', 's', 'k')]
 
 
-def look(name, arch):
+def look(name, arch, extra=None):
     """Combine body-plan defaults, name-driven markings and a stable colour variation."""
     a = dict(BASE.get(arch, {}))
     h = zlib.crc32(name.encode())
@@ -555,11 +908,14 @@ def look(name, arch):
     a.setdefault('belly', 'y')
     a.setdefault('mark', a['dark'])
     a.setdefault('leg_col', 'k')
+    if extra:                                  # a legend's own look wins over everything
+        a.update(extra)
     return a
 
 
 PLAN = {'wader': bird, 'flightless': bird, 'penguin': bird, 'raptor': bird, 'parrot': bird, 'bird': bird, 'primate': primate, 'snake': snake,
-        'lizard': low_reptile, 'croc': low_reptile, 'turtle': turtle, 'frog': frog, 'fish': fish, 'dolphin': fish, 'manatee': fish, 'scorpion': scorpion}
+        'lizard': low_reptile, 'croc': low_reptile, 'turtle': turtle, 'frog': frog, 'fish': fish, 'dolphin': fish, 'manatee': fish, 'scorpion': scorpion,
+        'bat': bat, 'spider': spider, 'octopus': octopus, 'plesio': plesio, 'spirit': spirit, 'wisp': wisp}
 
 
 # Growth stages: 0 cub, 1 juvenile, 2 adult. Young ones are drawn from the same plan with a young
@@ -619,7 +975,7 @@ def stage_look(a, arch, stage):
             if arch == 'penguin':
                 a.update(col='S', dark='k', mark='S', headcol='S')
     elif arch == 'primate':
-        a['bs'] = mix(.7, 1.0)
+        a['bs'] = a.get('bs', 1.0) * mix(.7, 1.0)
         a['hs'] = mix(.95, 1.0)
         zoom = mix(.85, 1.0)
     elif arch == 'frog' and cub:                 # frogs start as tadpoles
@@ -638,10 +994,12 @@ def stage_look(a, arch, stage):
     return plan, a, zoom
 
 
-def draw(name, arch, pose, size=40, stage=STAGE_ADULT):
-    plan, a, zoom = stage_look(look(name, arch), arch, stage)
+def draw(name, arch, pose, size=40, stage=STAGE_ADULT, extra=None):
+    plan, a, zoom = stage_look(look(name, arch, extra), arch, stage)
     c = Canvas(size, zoom)
+    c.eyecol = a.get('eyecol', 'k')
     plan(c, a, pose)
+    decorate(c, a, pose, zlib.crc32(name.encode()))
     extras(c, pose, zlib.crc32(name.encode()))
     return c.finish()
 
@@ -677,7 +1035,7 @@ def grid_indexed(grid, order):
     return bytes(0xFF if c is None else idx[c] for row in grid for c in row)
 
 
-def tpk2(name, arch, stage=STAGE_ADULT):
+def tpk2(name, arch, stage=STAGE_ADULT, extra=None):
     """A complete sprite file in the firmware's TPK2 format."""
     import struct
     out = bytearray(b'TPK2')
@@ -690,7 +1048,7 @@ def tpk2(name, arch, stage=STAGE_ADULT):
         for _ in poses:
             out += struct.pack('<H', ms)
         for p in poses:
-            g = draw(name, arch, p, stage=stage)
+            g = draw(name, arch, p, stage=stage, extra=extra)
             if act == ACTION_WALK_LEFT:
                 g = [list(reversed(r)) for r in g]
             out += grid_indexed(g, LETTERS)

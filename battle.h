@@ -28,7 +28,7 @@ struct Combatant {
   uint8_t charging = 0;      // EF_CHARGE move already wound up
   bool shiny = false;        // which sprite variant to stream
   uint8_t growth = 2;        // and which growth stage (2 = adult: wild ones and rangers' teams)
-  char name[12] = "";
+  char name[20] = "";   // the longest names (some legends) have 18 letters
 
   bool fainted() const { return hp == 0; }
 };

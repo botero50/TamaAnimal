@@ -78,7 +78,8 @@ def sun(c, cx, cy, s, col):
 SYMBOLS = [paw, leaf, wave, feather, claw, fang, horn, sun]
 RING = {'AFRICA': [('o', 'O'), ('f', 'Y'), ('r', 'R'), ('c', 'C'), ('Y', 'c'), ('O', 'R'), ('y', 'Y'), ('o', 'R')],
         'ASIA': [('r', 'R'), ('p', 'P'), ('f', 'Y'), ('t', 'T'), ('l', 'L'), ('P', 'R'), ('g', 'G'), ('r', 'P')],
-        'AMERICAS': [('g', 'G'), ('T', 'd'), ('b', 'B'), ('f', 'G'), ('B', 'N'), ('t', 'd'), ('l', 'L'), ('g', 'd')]}
+        'AMERICAS': [('g', 'G'), ('T', 'd'), ('b', 'B'), ('f', 'G'), ('B', 'N'), ('t', 'd'), ('l', 'L'), ('g', 'd')],
+        'LEGENDS': [('f', 'Y'), ('B', 'N'), ('r', 'R'), ('f', 'N'), ('l', 'L'), ('p', 'P'), ('t', 'T'), ('f', 'R')]}   # gold, and the flag's blue and red
 
 
 def gen_badges():

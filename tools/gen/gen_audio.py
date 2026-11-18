@@ -12,6 +12,7 @@ import zlib
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, '..', '..')
 ANIMALS = json.load(open(os.path.join(HERE, 'animals.json')))
+ANIMALS += json.load(open(os.path.join(HERE, 'legends.json'), encoding='utf-8'))   # the Legends region
 
 SEMI = {'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5, 'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11}
 
@@ -129,10 +130,14 @@ CALLS = {
     'chatter': (sum((sweep(880 + i * 80, 640, 2, 3, 1, 12, 1) + [(0, 1, 0, 0, 0, 2)] for i in range(4)), []), sum((sweep(600 + i * 50, 450, 2, 3, 2, 7, 1) + [(0, 2, 0, 0, 0, 2)] for i in range(4)), []), []),
     'click': (sum(([(reg(3000), 0, 13, -1, 1, 2), (0, 0, 0, 0, 0, 3)] for _ in range(4)), []) + sweep(1800, 2600, 4, 4, 1, 10, 2), [], []),
     'bubble': (sweep(300, 700, 4, 3, 2, 9, 1) + [(0, 2, 0, 0, 0, 3)] + sweep(350, 800, 4, 3, 2, 9, 1), [], [(3, 2, 3, -1, 1, 12)]),
+    # the legends (appended, so every older call keeps its number): a rising and falling eerie wail, and a bat's screech
+    'wail': (sweep(260, 520, 5, 6, 2, 11, 4) + sweep(520, 300, 6, 7, 2, 11, 5), sweep(262, 523, 5, 6, 0, 6, 4) + sweep(523, 302, 6, 7, 0, 6, 5), [(9, 3, 3, -1, 6, 30)]),
+    'screech': (sweep(2400, 3400, 3, 2, 1, 12, 1) + [(0, 1, 0, 0, 0, 2)] + sweep(3200, 2000, 4, 2, 1, 11, 1), sweep(1800, 2400, 3, 2, 3, 6, 1), [(1, 3, 6, -1, 1, 8)]),
 }
 ARCH_CALL = {'cat': 'roar', 'dog': 'bark', 'giraffe': 'low', 'zebra': 'whinny', 'antelope': 'whinny', 'elephant': 'trumpet', 'rhino': 'low', 'hippo': 'low', 'bovine': 'low', 'camel': 'low', 'pig': 'squeal',
              'primate': 'chatter', 'bear': 'roar', 'sloth': 'low', 'armadillo': 'squeal', 'dolphin': 'click', 'manatee': 'bubble', 'croc': 'hiss', 'turtle': 'hiss', 'snake': 'hiss', 'lizard': 'hiss', 'frog': 'croak',
-             'fish': 'bubble', 'scorpion': 'hiss', 'wader': 'caw', 'flightless': 'hoot', 'penguin': 'caw', 'raptor': 'caw', 'parrot': 'caw', 'bird': 'tweet', 'small': 'squeal'}
+             'fish': 'bubble', 'scorpion': 'hiss', 'wader': 'caw', 'flightless': 'hoot', 'penguin': 'caw', 'raptor': 'caw', 'parrot': 'caw', 'bird': 'tweet', 'small': 'squeal',
+             'spirit': 'wail', 'wisp': 'wail', 'bat': 'screech', 'spider': 'hiss', 'octopus': 'bubble', 'plesio': 'low'}
 
 
 def gen_cries():

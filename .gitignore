@@ -16,3 +16,6 @@ tamanimals.nvs.*
 
 # old local sprite files, never published
 tools/sdcard/
+
+# your own content, never committed: an extra private region (tools/build_private.py)
+private/

@@ -35,7 +35,7 @@ static inline bool hasStab(int16_t dex, uint8_t moveType) {
 static inline const char *typeName(uint8_t t) {
   static const char *const N[TYPE_COUNT] = {
     "STRENGTH", "SPEED", "AGILITY", "SMARTS", "FLIGHT", "SWIM", "DIG",
-    "STEALTH", "VENOM", "ARMOR", "SIZE", "SOUND", "PACK",
+    "STEALTH", "VENOM", "ARMOR", "SIZE", "SOUND", "PACK", "SPIRIT",
   };
   return (t < TYPE_COUNT) ? N[t] : "?";
 }
@@ -52,13 +52,13 @@ static const uint16_t TYPE_COL[TYPE_COUNT] = {
   0xC186, 0xFD20, 0xFEA0, 0xA254,   // STRENGTH, SPEED, AGILITY, SMARTS
   0x7E9F, 0x34DF, 0xB3C8, 0x5249,   // FLIGHT, SWIM, DIG, STEALTH
   0x8A9C, 0x8C71, 0x5DCD, 0xF454,   // VENOM, ARMOR, SIZE, SOUND
-  0xCC47,                           // PACK
+  0xCC47, 0xB59F,                   // PACK, SPIRIT
 };
 
 // Whether a type's colour is light enough to need dark text on it. Precomputed
 // from the same luminance the eye uses (0.299/0.587/0.114) so the label never
 // comes out grey-on-yellow.
-static const uint8_t TYPE_COL_LIGHT[TYPE_COUNT] = { 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1 };
+static const uint8_t TYPE_COL_LIGHT[TYPE_COUNT] = { 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1 };
 
 static inline uint16_t typeColor(uint8_t t) {
   return t < TYPE_COUNT ? TYPE_COL[t] : 0x8410;

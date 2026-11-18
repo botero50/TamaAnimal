@@ -46,7 +46,7 @@
 
 // Version del firmware. Subir este numero en cada release (y manifest.json para
 // el instalador web). Se muestra en la pantalla de ajustes y por serie al arrancar.
-#define FW_VERSION "1.2.0"
+#define FW_VERSION "1.3.0"
 #define PET_CRY_GAP_MS 6000  // minimum time between cries from petting
 
 Arduino_DataBus *bus = new Arduino_ESP32QSPI(
@@ -5822,6 +5822,7 @@ static const uint8_t ARENA_OF_TYPE[TYPE_COUNT] = {
   ARENA_GRASS,    // size
   ARENA_ELECTRIC, // sound
   ARENA_FIRE,     // pack
+  ARENA_GHOST,    // spirit
 };
 
 // Gym, Grand 4 and Champion fights happen in the trainer's own arena, and every
@@ -6512,13 +6513,17 @@ static void btlSide(int tx, int ty, int sx, int sy, const Combatant &c, uint8_t 
   int ph = 68;
   gfx->fillRoundRect(tx - 8, ty - 8, 190, ph, 8, UI_BG_DAY);
   gfx->drawRoundRect(tx - 8, ty - 8, 190, ph, 8, UI_INK);
-  char l[28];
+  char l[32];
   snprintf(l, sizeof(l), "%s Lv.%u", c.name, c.level);
-  uiTextFit(UIF_TINY, tx, ty + 12, l, UI_INK, 0, 174);
+  // A long name (some legends have 18 letters) keeps all of it, and its level moves
+  // down beside the HP numbers rather than the name being cut off.
+  bool longName = uiTextWidth(UIF_TINY, l) > 174;
+  uiTextFit(UIF_TINY, tx, ty + 12, longName ? c.name : l, UI_INK, 0, 174);
   uiText(UIF_TINY, tx, ty + 32, "HP", UI_BAR_WARN, 0);
   btlHpBar(tx + 26, ty + 20, 148, c, btlHpShown[who]);
-  char hp[16];
-  snprintf(hp, sizeof(hp), "%u/%u", btlHpShown[who], c.maxHp);
+  char hp[24];
+  if (longName) snprintf(hp, sizeof(hp), "Lv.%u  %u/%u", c.level, btlHpShown[who], c.maxHp);
+  else snprintf(hp, sizeof(hp), "%u/%u", btlHpShown[who], c.maxHp);
   uiText(UIF_TINY, tx + 174, ty + 52, hp, UI_INK, 2);
   if (c.ailment != AIL_NONE) {   // a status is the thing you most need to see
     static const StrId AIL_STR[] = { S_AIL_PARA, S_AIL_PARA, S_AIL_BURN, S_AIL_POISON,
@@ -7490,7 +7495,7 @@ void renderGyms() {
   char title[28];
   snprintf(title, sizeof(title), "%s %s", TRAINER_SETS[gymRegion % GYM_REGIONS].region,
            T(S_GYMS));
-  uiTextFit(UIF_MID, CX, 54, title, UI_INK, 1, 280);
+  uiTextFit(UIF_MID, CX, 54, title, UI_INK, 1, 240);   // the circle is narrow this high up
   // The badge count used to sit here, directly behind the difficulty pill. The
   // region chooser already shows it per region, which is where you are choosing
   // from, so it was both redundant and in the way.

@@ -28,7 +28,8 @@ void setup(); void render(); void ensureMon(); void emuSetMillis(uint32_t); void
 void startTrainerBattle(uint8_t, bool); void startBattle(int16_t, uint8_t); void startFunPackGame(uint8_t);
 extern Pet pet; extern Party party; extern TpCanvas *gfx;
 extern bool battleOpen, mapOpen, galleryOpen, galleryPick, gymOpen, gymPick, partyOpen, menuOpen, shopOpen, cardOpen, fpOpen;
-extern uint8_t rpickPage, cardPage, choiceKind, galleryRegion;
+extern uint8_t rpickPage, cardPage, choiceKind, galleryRegion, gymRegion;
+extern int16_t galleryDetail;
 extern uint32_t choiceUntil;
 extern bool galleryDirty;
 extern Combatant btlYou, btlFoe;
@@ -110,9 +111,14 @@ int main(int argc, char **argv) {
   memset(pet.dexReg, 0x6D, sizeof(pet.dexReg));   // a well-filled field guide
   galleryOpen = true; galleryPick = true; rpickPage = 0; pump(2); shot("guide_regions");
   galleryPick = false; galleryRegion = 0; galleryDirty = true; pump(4); shot("guide_africa");
+  galleryRegion = 3; galleryDirty = true; pump(4); shot("guide_legends");
+  galleryDetail = 329; galleryDirty = true; pump(4); shot("guide_legend_detail");
+  galleryDetail = 0;
   closeAll();
   gymOpen = true; gymPick = true; rpickPage = 0; pump(2); shot("ranger_regions");
   gymPick = false; pump(2); shot("ranger_ladder");
+  gymRegion = 3; pump(2); shot("ranger_legends");
+  gymRegion = 0;
   closeAll();
   startTrainerBattle(0, false); pump(5); shot("battle_ranger");
   closeAll();
@@ -122,6 +128,8 @@ int main(int argc, char **argv) {
   btlYou.ailment = AIL_FREEZE; btlFoe.ailment = AIL_CONFUSE; pump(3); shot("battle_freeze_confuse");
   btlYou.ailment = AIL_SLEEP; btlFoe.ailment = AIL_PARA; pump(3); shot("battle_sleep_para");
   btlYou.ailment = btlFoe.ailment = AIL_NONE;
+  closeAll();
+  startBattle(342, 34); pump(5); shot("battle_legend");      // a wild eagle of San Agustin: the longest name
   closeAll();
   mapOpen = true; pump(2); shot("map");
   closeAll();

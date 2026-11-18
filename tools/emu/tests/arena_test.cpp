@@ -74,7 +74,7 @@ static void arenaTests() {
   // What each speciality should fight in, restated here so a slip in the table fails.
   static const uint8_t WANT[TYPE_COUNT] = {
     ARENA_ROCK, ARENA_FIRE, ARENA_ELECTRIC, ARENA_DRAGON, ARENA_ICE, ARENA_WATER, ARENA_ROCK,
-    ARENA_GHOST, ARENA_GRASS, ARENA_ROCK, ARENA_GRASS, ARENA_ELECTRIC, ARENA_FIRE };
+    ARENA_GHOST, ARENA_GRASS, ARENA_ROCK, ARENA_GRASS, ARENA_ELECTRIC, ARENA_FIRE, ARENA_GHOST };
   bool types = true, halls = true, inRange = true;
   uint32_t used = 0;
   for (uint8_t r = 0; r < GYM_REGIONS; r++) {

@@ -194,8 +194,8 @@ def sprite_gif(path, cells, cols, scale=3, steps=12, ms=14):
         img = [BG] * (w * h)
         for i, cell in enumerate(cells):
             name, arch, stage = cell[:3]
-            seq = own[cell[3]] if len(cell) > 3 else walking
-            g = sl.draw(name, arch, seq[k % len(seq)], stage=stage)
+            seq = own[cell[3]] if len(cell) > 3 and cell[3] is not None else walking
+            g = sl.draw(name, arch, seq[k % len(seq)], stage=stage, extra=cell[4] if len(cell) > 4 else None)
             ox, oy = (i % cols) * cw + 4, (i // cols) * cw + 4
             for y, row in enumerate(g):
                 for x, c in enumerate(row):
@@ -215,6 +215,7 @@ def sprite_gif(path, cells, cols, scale=3, steps=12, ms=14):
 def main():
     os.makedirs(DOCS, exist_ok=True)
     animals = {a['name']: a for a in json.load(open(os.path.join(HERE, 'animals.json')))}
+    legends = {a['name']: a for a in json.load(open(os.path.join(HERE, 'legends.json'), encoding='utf-8'))}
 
     def pick(*names):
         return [(n, animals[n]['arch']) for n in names]
@@ -226,10 +227,14 @@ def main():
     # the moods: sad, sick, tired, hungry, dirty, happy (actions 12-17), for a cub and two adults
     moods = [(n, a, s, act) for (n, a), s in zip(pick('LION', 'GIANT PANDA', 'TOCO TOUCAN'), (0, 2, 2)) for act in range(12, 18)]
     sprite_gif(os.path.join(DOCS, 'moods.gif'), moods, cols=6, scale=2, steps=6, ms=45)
+    myth = ['EL SILBON', 'LA CANDILEJA', 'HOMBRE CAIMAN', 'LA MADREMONTE', 'EL SOMBRERON', 'KUKULKAN',
+            'BIGFOOT', 'LOCH NESS MONSTER', 'KRAKEN', 'PEGASUS', 'HYDRA', 'PHOENIX']
+    sprite_gif(os.path.join(DOCS, 'legends.gif'), [(n, legends[n]['arch'], 2, None, legends[n]['look']) for n in myth], cols=6, scale=2)
 
     shots = screens(capture())
     tour(shots, ['main_cub', 'card_growth', 'grow_dialog', 'main_juvenile', 'main_adult', 'card_growth'], os.path.join(DOCS, 'tour-growth.gif'))
     tour(shots, ['main_adult', 'guide_africa', 'ranger_ladder', 'battle_ranger', 'battle_wild', 'map', 'shop', 'game_whois'], os.path.join(DOCS, 'tour-play.gif'))
+    tour(shots, ['guide_regions', 'guide_legends', 'guide_legend_detail', 'ranger_legends', 'battle_legend'], os.path.join(DOCS, 'tour-legends.gif'))
     tour(shots, ['mood_happy', 'mood_hungry', 'mood_dirty', 'mood_tired', 'mood_sad', 'mood_sick'], os.path.join(DOCS, 'tour-moods.gif'), delay=120)
 
 
