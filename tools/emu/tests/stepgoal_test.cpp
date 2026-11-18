@@ -194,6 +194,10 @@ int main() {
   click(233, 145);
   if (pet.awaitingStarter()) { printf("FAIL: no starter\n"); return 1; }
   pumpMs(120);
+  // The clock here is real time, and on a loaded machine the steps above can take longer
+  // than the 3 minutes after which an untouched screen turns itself off -- and toasts
+  // wait for the screen. Wake it, as the player would before looking.
+  { extern bool screenOff; screenOff = false; pet.setScreenOff(false); lastInteract = millis(); }
   toastTests();
   if (bad) { printf("FAILURES: %d\n", bad); return 1; }
   printf("step goal test passed\n");

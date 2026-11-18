@@ -13,6 +13,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, '..', '..')
 ANIMALS = json.load(open(os.path.join(HERE, 'animals.json')))
 ANIMALS += json.load(open(os.path.join(HERE, 'legends.json'), encoding='utf-8'))   # the Legends region
+ANIMALS += json.load(open(os.path.join(HERE, 'memes.json'), encoding='utf-8'))   # the Memes region (386-408)
 
 SEMI = {'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5, 'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11}
 

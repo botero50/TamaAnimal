@@ -16,6 +16,8 @@ ROOT = os.path.join(HERE, '..', '..')
 ANIMALS = json.load(open(os.path.join(HERE, 'animals.json')))
 # the Legends region (326-385): myths and legends, Colombia at its heart. Same fields, plus their look.
 ANIMALS += json.load(open(os.path.join(HERE, 'legends.json'), encoding='utf-8'))
+# the Memes region (386-408): Colombian internet culture, as animals, under the memes' own nicknames
+ANIMALS += json.load(open(os.path.join(HERE, 'memes.json'), encoding='utf-8'))
 assert [a['id'] for a in ANIMALS] == list(range(1, len(ANIMALS) + 1))
 # SPIRIT came with the legends; it is last so every older type keeps its number in saves.
 TYPES = ['STRENGTH', 'SPEED', 'AGILITY', 'INTELLIGENCE', 'FLIGHT', 'SWIM', 'DIG', 'HIDE', 'VENOM', 'ARMOR', 'SIZE', 'SOUND', 'PACK', 'SPIRIT']
@@ -115,7 +117,8 @@ PROFILE = {
 }
 TOTAL = {1: 290, 2: 390, 3: 470, 4: 560}
 REGIONS = [('AFRICA', 1, 145, [1, 2, 3]), ('ASIA', 146, 200, [146, 147, 171]), ('AMERICAS', 201, 325, [201, 202, 205]),
-           ('LEGENDS', 326, 385, [340, 345, 357])]     # the golden frog, the carnival bull, the hummingbird
+           ('LEGENDS', 326, 385, [340, 345, 357]),     # the golden frog, the carnival bull, the hummingbird
+           ('MEMES', 386, 408, [389, 390, 403])]       # El Fuicioso, Yensi mi Amor, Dona Mechas
 ALL_STARTERS = [1, 2, 3, 146, 147, 171, 201, 202, 205]
 CLASSIC = [1, 2, 3, 201, 146]
 
@@ -281,6 +284,11 @@ ROSTER = {
                 ('MANUELA', 'AMAZONAS', 'HIDE', 4, 42), ('TOMAS', 'IGUAQUE', 'SPIRIT', 5, 46), ('GABRIEL', 'SUMMIT', 'FLIGHT', 5, 52),
                 ('CATALINA', 'SUMMIT', 'SPIRIT', 5, 54), ('SEBASTIAN', 'SUMMIT', 'SIZE', 5, 55), ('LUCIANA', 'SUMMIT', 'VENOM', 5, 57),
                 ('JIMENA', 'HEAD RANGER', 'SPIRIT', 6, 62)],
+    'MEMES': [('DAVID', 'ESTUDIO', 'SOUND', 2, 12), ('ALBA', 'YO ME LLAMO', 'INTELLIGENCE', 3, 17), ('PACHO', 'METROCABLE', 'FLIGHT', 3, 22),
+              ('LUCHO', 'TRANSMILENIO', 'PACK', 3, 26), ('MARGARITA', 'LA LANCHA', 'SWIM', 4, 31), ('JHON', 'LA VOLQUETA', 'SIZE', 4, 35),
+              ('YULY', 'EL RETEN', 'HIDE', 4, 40), ('BRAYAN', 'EL ESTADIO', 'STRENGTH', 5, 44), ('KAREN', 'SUMMIT', 'SPEED', 5, 50),
+              ('STIVEN', 'SUMMIT', 'SOUND', 5, 52), ('DAYANA', 'SUMMIT', 'AGILITY', 5, 53), ('ALIRIO', 'SUMMIT', 'INTELLIGENCE', 5, 55),
+              ('PILAR', 'HEAD RANGER', 'FLIGHT', 6, 60)],
 }
 
 

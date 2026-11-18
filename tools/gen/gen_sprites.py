@@ -25,7 +25,8 @@ import spritelib as sl
 ANIMALS = json.load(open(os.path.join(HERE, 'animals.json')))
 # the legends (Colombia at the heart, then the Americas and the world's best-known myths) carry their own look
 ANIMALS += json.load(open(os.path.join(HERE, 'legends.json'), encoding='utf-8'))
-REGIONS = [('africa', 1, 145), ('asia', 146, 200), ('americas', 201, 325), ('legends', 326, 385)]
+ANIMALS += json.load(open(os.path.join(HERE, 'memes.json'), encoding='utf-8'))   # the Memes region (386-408)
+REGIONS = [('africa', 1, 145), ('asia', 146, 200), ('americas', 201, 325), ('legends', 326, 385), ('memes', 386, 408)]
 MONS = os.path.join(ROOT, 'build', 'sdcard', 'mons')
 WEB = os.path.join(ROOT, 'web')
 

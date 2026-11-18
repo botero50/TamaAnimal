@@ -46,7 +46,7 @@
 
 // Version del firmware. Subir este numero en cada release (y manifest.json para
 // el instalador web). Se muestra en la pantalla de ajustes y por serie al arrancar.
-#define FW_VERSION "1.3.0"
+#define FW_VERSION "1.4.0"
 #define PET_CRY_GAP_MS 6000  // minimum time between cries from petting
 
 Arduino_DataBus *bus = new Arduino_ESP32QSPI(
@@ -776,7 +776,12 @@ uint32_t lastRender = 0;
 uint32_t lastInteract = 0;
 uint32_t lastTouchAt = 0;    // a real touch, unlike lastInteract, which events also move
 uint32_t gClockJumps = 0;    // RTC reads thrown out as glitches (STATS)
-uint8_t dimStage = 0;        // 0 despierto, 1 atenuado (90s), 2 casi apagado (5min)
+uint8_t dimStage = 0;        // 0 awake, 1 dimmed (90 s), 2 nearly off (150 s); then it turns off (3 min)
+// The screen used to stop at "nearly off" and keep drawing ten frames a second for as long
+// as nobody touched it: only the PWR button turned it off, and an idle device sat there
+// draining the battery. Now a quiet screen turns itself off, exactly as PWR does.
+#define AUTO_OFF_MS 180000UL
+uint32_t lastSerialAt = 0;   // the installer is talking to it: keep the screen up
 bool swallowGesture = false; // el toque que despierta no acciona nada
 bool sliderDrag = false;     // this touch began on the volume slider
 uint32_t holdStart = 0;     // pulsacion larga sobre el bicho
@@ -1205,17 +1210,24 @@ void loop() {
     uint32_t end = millis();
     if (end - now > renderGap - 55) lastRender = end - (renderGap - 55);
   }
-  delay(1);   // the other tasks get a turn on every pass
+  // the other tasks get a turn on every pass; with the screen off there is nothing to
+  // draw, so the loop rests longer and the battery lasts (a touch still wakes it at once)
+  delay(screenOff && !(lastSerialAt && now - lastSerialAt < 30000) ? 10 : 1);
 }
 
 // brightness according to sleep + inactivity (AMOLED protection)
 void updateBrightness(uint32_t now) {
-  // visible events wake the screen by themselves
+  // short visible events keep the screen up while they play
   if (pet.evolving() || pet.ceremony || pet.eating() || pet.showHeart()) {
     lastInteract = now;
   }
   uint32_t idle = now - lastInteract;
-  dimStage = (idle > 300000) ? 2 : (idle > 90000) ? 1 : 0;
+  dimStage = (idle > 150000) ? 2 : (idle > 90000) ? 1 : 0;
+  bool installer = lastSerialAt && now - lastSerialAt < 30000;
+  if (!screenOff && idle > AUTO_OFF_MS && !installer) {
+    screenOff = true;
+    pet.setScreenOff(true);          // the same as a press of PWR: a touch or PWR wakes it
+  }
   // the player's level (1..10) sets the awake brightness; the sleep and idle
   // dim levels below it only ever go DOWN from it, never above
   uint8_t base = (uint8_t)(gBright * 255 / 10);
@@ -1245,6 +1257,7 @@ static int8_t gBiomeOverride = -1;
 
 void handleSerial() {
   if (!Serial.available()) return;
+  lastSerialAt = millis();
   String line = Serial.readStringUntil('\n');
   line.trim();
   if (line.length() == 0) return;

@@ -21,11 +21,17 @@ static void ck(bool ok, const char *w) { printf("%s  %s\n", ok ? "PASS" : "FAIL"
 int main() {
   // the region itself
   const uint8_t LG = 3;
-  ck(DEX_COUNT == 385, "the field guide holds the 325 animals and the 60 legends");
+  ck(DEX_COUNT == 408, "the field guide holds the 325 animals, the 60 legends and the 23 memes");
   ck(!strcmp(REGIONS[LG].name, "LEGENDS") && REGIONS[LG].lo == 326 && REGIONS[LG].hi == 385, "region 3 is LEGENDS, 326-385");
-  ck(REGION_ALL == 4 && !strcmp(REGIONS[REGION_ALL].name, "WORLD") && REGIONS[REGION_ALL].hi == DEX_COUNT,
+  ck(REGION_ALL == REGION_COUNT - 1 && !strcmp(REGIONS[REGION_ALL].name, "WORLD") && REGIONS[REGION_ALL].hi == DEX_COUNT,
      "WORLD is still the last region and spans everything");
-  ck(GYM_REGIONS == 4 && !strcmp(TRAINER_SETS[LG].region, "LEGENDS"), "the Legends rangers have their ladder");
+  ck(!strcmp(TRAINER_SETS[LG].region, "LEGENDS"), "the Legends rangers have their ladder");
+  // and the Memes region after it (1.4.0)
+  ck(!strcmp(REGIONS[4].name, "MEMES") && REGIONS[4].lo == 386 && REGIONS[4].hi == 408 && GYM_REGIONS == 5 &&
+     !strcmp(TRAINER_SETS[4].region, "MEMES"), "region 4 is MEMES, 386-408, with its own rangers");
+  bool memesOk = true;
+  for (int d = 386; d <= 408; d++) if (learnCount(d) < 4 || CRY_MON[d - 1].base >= CRY_BASES) memesOk = false;
+  ck(memesOk, "every meme has moves and a call");
   bool startersIn = true;
   for (int i = 0; i < REGIONS[LG].starterCount; i++)
     if (REGIONS[LG].starters[i] < 326 || REGIONS[LG].starters[i] > 385 || DEX_TBL[REGIONS[LG].starters[i]].rarity != R_COMUN) startersIn = false;
@@ -86,6 +92,19 @@ int main() {
     Pet q; q.begin();
     ck(q.region == REGION_ALL, "an old save's WORLD loads as WORLD, not as LEGENDS");
     ck(q.eggByRegion[REGION_ALL] == 201 && q.eggByRegion[LG] == 0, "and its remembered egg moves with it");
+  }
+  // a save from 1.3.x: WORLD was index 4, which is MEMES now
+  {
+    Pet p; p.begin(); p.dbgHatchAs(1, false); p.setRegion(1); p.renameTrainer("ANA");
+    Preferences raw; raw.begin("tamanimals", false);
+    raw.putUChar("reg", 4);
+    raw.putUChar("rlay", 4);
+    int16_t old[5] = { 0, 0, 0, 0, 202 };
+    raw.putBytes("eggR", old, sizeof(old));
+    raw.end();
+    Pet q; q.begin();
+    ck(q.region == REGION_ALL && q.eggByRegion[REGION_ALL] == 202 && q.eggByRegion[4] == 0,
+       "a 1.3 save's WORLD loads as WORLD, not as MEMES, its egg with it");
   }
   {
     Pet p; p.begin(); p.dbgHatchAs(1, false); p.setRegion(LG); p.renameTrainer("ANA");

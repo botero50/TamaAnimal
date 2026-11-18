@@ -103,6 +103,12 @@ static void fire() {
 
 // One press/release at (x,y), driven exactly as the SDL event loop drives it.
 static void click(int x, int y) {
+  // This test runs in real time and can take minutes on a loaded machine, past the point
+  // where an untouched screen turns itself off; then a tap would only wake it. The taps
+  // here are meant for a lit screen, so keep it lit, as the player looking at it would.
+  { extern bool screenOff; extern uint32_t lastInteract; extern uint8_t dimStage;
+    if (screenOff) { screenOff = false; pet.setScreenOff(false); }
+    lastInteract = millis(); dimStage = 0; }
   g_touchX = x; g_touchY = y; g_touchDown = true;
   fire();
   pump(5);                       // finger held: gesture starts

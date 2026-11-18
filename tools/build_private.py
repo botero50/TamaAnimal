@@ -10,7 +10,7 @@ Put a region in private/<anything>.json (the folder is gitignored):
 Ids carry on after the last public animal. This regenerates the headers, the calls, the stamps and
 every sprite pack into build/private/, compiles the firmware there, and makes a local installer:
 
-    python tools/build_private.py
+    python tools/build_private.py                   (add --firmware-only to keep the packs and only rebuild the firmware)
     python -m http.server 8000 -d build/private/web      then open http://localhost:8000
 
 Nothing here writes into the repo's own files, and build/ and private/ are both gitignored.
@@ -61,11 +61,14 @@ def main():
     gen_art.gen_badges()
 
     web = os.path.join(OUT, 'web')
-    shutil.rmtree(web, ignore_errors=True)
-    shutil.copytree(os.path.join(ROOT, 'web'), web, ignore=shutil.ignore_patterns('*.pak'))
-    gen_sprites.MONS = os.path.join(OUT, 'sdcard', 'mons')
-    gen_sprites.WEB = web
-    gen_sprites.main()
+    if '--firmware-only' in sys.argv and os.path.isdir(web):
+        print('Keeping the sprite packs already in build/private/web (--firmware-only)')
+    else:
+        shutil.rmtree(web, ignore_errors=True)
+        shutil.copytree(os.path.join(ROOT, 'web'), web, ignore=shutil.ignore_patterns('*.pak'))
+        gen_sprites.MONS = os.path.join(OUT, 'sdcard', 'mons')
+        gen_sprites.WEB = web
+        gen_sprites.main()
 
     fw_out = os.path.join(OUT, 'firmware')
     os.makedirs(fw_out, exist_ok=True)
@@ -91,8 +94,9 @@ def main():
     end = s.index('</button>', anchor) + len('</button>')
     extra = ''.join(f'\n      <button id="autop{i}" data-region="{r["region"].lower()}" disabled>⬇️ {r["region"].title()} ({len(r["animals"])}, private)</button>'
                     for i, r in enumerate(regions))
-    s = s[:end] + extra + s[end:]
-    s = s.replace('<title>', '<title>PRIVATE ')
+    if 'id="autop0"' not in s:                # added once, not again on a --firmware-only rebuild
+        s = s[:end] + extra + s[end:]
+        s = s.replace('<title>', '<title>PRIVATE ')
     open(page, 'w', encoding='utf-8', newline='\n').write(s)
     print(f'OK: your private build {version}-private with {dex} animals is in build/private/web')
     print('Serve it with:  python -m http.server 8000 -d build/private/web   then open http://localhost:8000')
