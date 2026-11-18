@@ -46,7 +46,7 @@
 
 // Version del firmware. Subir este numero en cada release (y manifest.json para
 // el instalador web). Se muestra en la pantalla de ajustes y por serie al arrancar.
-#define FW_VERSION "1.4.0"
+#define FW_VERSION "1.4.1"
 #define PET_CRY_GAP_MS 6000  // minimum time between cries from petting
 
 Arduino_DataBus *bus = new Arduino_ESP32QSPI(
@@ -782,6 +782,15 @@ uint8_t dimStage = 0;        // 0 awake, 1 dimmed (90 s), 2 nearly off (150 s); 
 // draining the battery. Now a quiet screen turns itself off, exactly as PWR does.
 #define AUTO_OFF_MS 180000UL
 uint32_t lastSerialAt = 0;   // the installer is talking to it: keep the screen up
+
+// How long since the last interaction, as seen from `now`. A tap records its time with a
+// FRESH millis(), a moment after the loop read `now`, so lastInteract can be a few ms
+// AHEAD of it: a plain `now - lastInteract` then wraps to ~49 days, and the screen that
+// was just tapped turned itself off. A time ahead of `now` is "just now". (Wrap-safe.)
+uint32_t idleSince(uint32_t now) {
+  int32_t d = (int32_t)(now - lastInteract);
+  return d > 0 ? (uint32_t)d : 0;
+}
 bool swallowGesture = false; // el toque que despierta no acciona nada
 bool sliderDrag = false;     // this touch began on the volume slider
 uint32_t holdStart = 0;     // pulsacion larga sobre el bicho
@@ -1148,7 +1157,7 @@ void loop() {
   // care update: nobody has touched it for a while in the evening and the screen
   // is still on -- it nods off with the light on (Pet::dozeOff checks the hour)
   if (!screenOff && !pet.sleeping && uiCurrentScreen() == SCR_MAIN &&
-      now - lastInteract > DOZE_IDLE_MS)
+      idleSince(now) > DOZE_IDLE_MS)
     pet.dozeOff();
 
   // flush the periodic autosave ONLY with the screen dimmed/off or
@@ -1221,7 +1230,7 @@ void updateBrightness(uint32_t now) {
   if (pet.evolving() || pet.ceremony || pet.eating() || pet.showHeart()) {
     lastInteract = now;
   }
-  uint32_t idle = now - lastInteract;
+  uint32_t idle = idleSince(now);
   dimStage = (idle > 150000) ? 2 : (idle > 90000) ? 1 : 0;
   bool installer = lastSerialAt && now - lastSerialAt < 30000;
   if (!screenOff && idle > AUTO_OFF_MS && !installer) {

@@ -70,6 +70,17 @@ int main() {
   at(600300 + 185000);
   ck(screenOff, "and three quiet minutes later it is off again");
 
+  // THE bug of 1.4.0: a tap stamps lastInteract with a fresh millis(), a moment AFTER the
+  // loop read `now`. now - lastInteract wrapped to ~49 days and the tapped screen went off.
+  fresh();
+  at(60000);
+  lastInteract = millis() + 500;      // stamped "after" the loop's own reading of the clock
+  loop(); loop();
+  ck(!screenOff && dimStage == 0, "a tap timed just after the loop's clock does not turn the screen off");
+  lastInteract = millis() + 50;
+  for (int i = 0; i < 20; i++) loop();
+  ck(!screenOff, "nor on the passes that follow");
+
   // sending sprites from the installer keeps it up
   fresh();
   for (uint32_t t = 10000; t <= 400000; t += 10000) { lastSerialAt = T0 + t; at(t); }
