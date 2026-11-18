@@ -114,6 +114,7 @@ PROFILE = {
     'parrot': (14, 13, 12, 20, 25, 16), 'bird': (14, 15, 12, 25, 18, 16), 'small': (14, 18, 15, 22, 16, 15),
     'bat': (14, 17, 12, 24, 19, 14), 'spider': (13, 20, 15, 20, 18, 14), 'octopus': (20, 18, 15, 13, 20, 14),
     'plesio': (24, 18, 18, 12, 14, 14), 'spirit': (15, 12, 12, 18, 25, 18), 'wisp': (12, 14, 10, 26, 24, 14),
+    'person': (16, 17, 15, 17, 19, 16),
 }
 TOTAL = {1: 290, 2: 390, 3: 470, 4: 560}
 REGIONS = [('AFRICA', 1, 145, [1, 2, 3]), ('ASIA', 146, 200, [146, 147, 171]), ('AMERICAS', 201, 325, [201, 202, 205]),
@@ -201,7 +202,7 @@ def learnset(a):
                'snake': 'STARE DOWN', 'lizard': 'LIMBER UP', 'frog': 'FOCUS', 'antelope': 'LIMBER UP', 'zebra': 'LIMBER UP',
                'sloth': 'LONG NAP', 'manatee': 'LONG NAP', 'rhino': 'BRACE', 'bovine': 'BRACE',
                'spirit': 'FADE OUT', 'wisp': 'FADE OUT', 'bat': 'LIMBER UP', 'spider': 'STARE DOWN', 'octopus': 'FOCUS',
-               'plesio': 'LONG NAP'}.get(arch, 'SNARL')
+               'plesio': 'LONG NAP', 'person': 'FOCUS'}.get(arch, 'SNARL')
     plan = [(t1[0], 1), ('SNARL' if h(a['name']) % 2 else 'STARE DOWN', 1), (t2[0], 7), (support, 12), (t1[min(1, len(t1) - 1)], 16),
             (t2[min(1, len(t2) - 1)], 24), ('LICK WOUNDS' if h(a['name'] + 'h') % 3 == 0 else 'DIRT CLOUD', 30),
             (t1[min(2, len(t1) - 1)], 34), (t2[min(2, len(t2) - 1)], 42), (t1[-1], 52)]

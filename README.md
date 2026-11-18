@@ -2,7 +2,7 @@
 
 [![Install in browser](https://img.shields.io/badge/install-in%20browser-FF6B00?logo=googlechrome&logoColor=white)](https://botero50.github.io/TamaAnimal/web/)
 ![Board](https://img.shields.io/badge/board-ESP32--S3%20round%20AMOLED-E7352C?logo=espressif&logoColor=white)
-![Firmware](https://img.shields.io/badge/firmware-v1.4.1-8A2BE2)
+![Firmware](https://img.shields.io/badge/firmware-v1.4.2-8A2BE2)
 ![Animals](https://img.shields.io/badge/animals-325%20%2B%2060%20legends%20%2B%2023%20memes-58B868)
 ![Languages](https://img.shields.io/badge/languages-8-FFCB05)
 ![Code](https://img.shields.io/badge/code-MIT-blue)
@@ -80,8 +80,8 @@ Tayrona to the Head Ranger, and its own sprite pack in the installer.
 
 ## Memes
 
-A fifth region of **23 Colombian internet memes**, each drawn as an animal and named after the meme
-rather than the person: La del Metrocable, Par de Catres, El del Tapabocas (wearing it over its eyes),
+A fifth region of **23 Colombian internet memes**, each drawn as a cartoon person dressed for the meme
+and named after the meme rather than the person: La del Metrocable, Par de Catres, El del Tapabocas (wearing it over the eyes),
 El Fuicioso in Nacional's colours, Yensi mi Amor, El Tormento Tuyo, No Sabe Quién Soy, Hombre con
 Hombre, Felicing, Mucho Risa, El de la Volqueta, Los del Guaro and more, with their own rangers from
 the TransMilenio to the stadium.

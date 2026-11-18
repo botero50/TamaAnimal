@@ -138,7 +138,7 @@ CALLS = {
 ARCH_CALL = {'cat': 'roar', 'dog': 'bark', 'giraffe': 'low', 'zebra': 'whinny', 'antelope': 'whinny', 'elephant': 'trumpet', 'rhino': 'low', 'hippo': 'low', 'bovine': 'low', 'camel': 'low', 'pig': 'squeal',
              'primate': 'chatter', 'bear': 'roar', 'sloth': 'low', 'armadillo': 'squeal', 'dolphin': 'click', 'manatee': 'bubble', 'croc': 'hiss', 'turtle': 'hiss', 'snake': 'hiss', 'lizard': 'hiss', 'frog': 'croak',
              'fish': 'bubble', 'scorpion': 'hiss', 'wader': 'caw', 'flightless': 'hoot', 'penguin': 'caw', 'raptor': 'caw', 'parrot': 'caw', 'bird': 'tweet', 'small': 'squeal',
-             'spirit': 'wail', 'wisp': 'wail', 'bat': 'screech', 'spider': 'hiss', 'octopus': 'bubble', 'plesio': 'low'}
+             'spirit': 'wail', 'wisp': 'wail', 'bat': 'screech', 'spider': 'hiss', 'octopus': 'bubble', 'plesio': 'low', 'person': 'chatter'}
 
 
 def gen_cries():

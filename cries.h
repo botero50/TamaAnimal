@@ -759,27 +759,27 @@ static const CryMon CRY_MON[CRY_DEX] = {
   { 2, -57, 306 },  // 383 QILIN
   { 8, -74, 258 },  // 384 GARUDA
   { 12, -17, 224 },  // 385 WHITE WHALE
-  { 0, -23, 212 },  // 386 LA DEL METROCABLE
-  { 1, -81, 226 },  // 387 PAR DE CATRES
+  { 11, -23, 212 },  // 386 LA DEL METROCABLE
+  { 11, -81, 226 },  // 387 PAR DE CATRES
   { 11, -58, 221 },  // 388 EL DEL TAPABOCAS
-  { 8, -5, 226 },  // 389 EL FUICIOSO
-  { 7, 14, 265 },  // 390 YENSI MI AMOR
-  { 13, 20, 289 },  // 391 TORMENTO TUYO
-  { 7, -30, 226 },  // 392 NO SABE QUIEN SOY
-  { 8, -64, 248 },  // 393 HOMBRE CON HOMBRE
-  { 8, -90, 273 },  // 394 FELICING
+  { 11, -5, 226 },  // 389 EL FUICIOSO
+  { 11, 14, 265 },  // 390 YENSI MI AMOR
+  { 11, 20, 289 },  // 391 TORMENTO TUYO
+  { 11, -30, 226 },  // 392 NO SABE QUIEN SOY
+  { 11, -64, 248 },  // 393 HOMBRE CON HOMBRE
+  { 11, -90, 273 },  // 394 FELICING
   { 11, -125, 267 },  // 395 QUERUBIN REBELDE
-  { 0, 17, 302 },  // 396 NO SABE CON QUIEN
-  { 0, -38, 305 },  // 397 QUE ASCO EL MINIMO
-  { 5, 3, 251 },  // 398 ALCOHOLIMETRO
-  { 4, 17, 213 },  // 399 EL DE LA VOLQUETA
-  { 0, -12, 210 },  // 400 EL DEL PIQUE
-  { 1, -14, 207 },  // 401 MUCHO RISA
-  { 8, 8, 249 },  // 402 LA DEL EH EH EH
+  { 11, 17, 302 },  // 396 NO SABE CON QUIEN
+  { 11, -38, 305 },  // 397 QUE ASCO EL MINIMO
+  { 11, 3, 251 },  // 398 ALCOHOLIMETRO
+  { 11, 17, 213 },  // 399 EL DE LA VOLQUETA
+  { 11, -12, 210 },  // 400 EL DEL PIQUE
+  { 11, -14, 207 },  // 401 MUCHO RISA
+  { 11, 8, 249 },  // 402 LA DEL EH EH EH
   { 11, 98, 263 },  // 403 DONA MECHAS
-  { 1, 58, 205 },  // 404 LOS DEL GUARO
+  { 11, 58, 205 },  // 404 LOS DEL GUARO
   { 11, 29, 300 },  // 405 EL DEL CHICLE
   { 11, 68, 267 },  // 406 LA DE LA TORTURA
-  { 8, 97, 272 },  // 407 CHISTE SABATINO
-  { 7, 63, 272 },  // 408 PELEA TRANSMILENIO
+  { 11, 97, 272 },  // 407 CHISTE SABATINO
+  { 11, 63, 272 },  // 408 PELEA TRANSMILENIO
 };
