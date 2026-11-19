@@ -169,7 +169,24 @@ def gen_dex():
         t2 = 'PT_' + a['type2'] if a['type2'] else 'PT_NONE'
         tier = {1: 1, 2: 1, 3: 2, 4: 3}[a['rarity']]
         o.append(f'  {{ "{a["name"]}", 0, 0, {tier}, 0x{ACCENT[a["type1"]]:04X}, {hp}, {at}, {de}, {sp}, {sa}, {sd}, {a["biome"]}, PT_{a["type1"]}, {t2} }},  // {a["id"]}')
+    # the names in Spanish (tools/gen/names_es.py): shown when the board is set to Spanish
+    from names_es import NAMES_ES
     o += ['};', '',
+          '// Spanish names, used when the board is in Spanish (nullptr: the name above is used)',
+          'enum Lang : uint8_t;  // i18n.h (not included here: its T() would clash with names in some files)',
+          'extern Lang gLang;',
+          'static const char *const DEX_NAME_ES[DEX_COUNT + 1] = {', '  nullptr,']
+    for a in ANIMALS:
+        es = NAMES_ES.get(a['id'])
+        o.append(f'  "{es}",  // {a["id"]}' if es else f'  nullptr,  // {a["id"]}')
+    o += ['};', '',
+          "// An animal's name in the language the board is set to.",
+          'static inline const char *dexName(uint16_t d) {',
+          '  if (d > DEX_COUNT) d = 0;',
+          '  return ((uint8_t)gLang == 0 /* LANG_ES */ && DEX_NAME_ES[d]) ? DEX_NAME_ES[d] : DEX_TBL[d].name;',
+          '}',
+          'static inline const char *dexName(const DexEntry &e) { return dexName((uint16_t)(&e - DEX_TBL)); }']
+    o += ['',
           '// the first egg: a friendly mix',
           f'static const int16_t CLASSIC_DEX[] = {{ {", ".join(map(str, CLASSIC))} }};',
           f'#define NUM_CLASSIC_DEX {len(CLASSIC)}', '',

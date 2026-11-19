@@ -4,6 +4,7 @@
 // Idiomas soportados. La fuente del firmware no tiene acentos: ambos textos van
 // sin tildes ni enes (igual que ya iba el espanol).
 enum Lang : uint8_t { LANG_ES = 0, LANG_EN, LANG_FR, LANG_DE, LANG_IT, LANG_PT, LANG_ZH, LANG_KO, LANG_COUNT };
+static_assert(LANG_ES == 0, "dexName() in dex.h takes Spanish to be language 0");
 #define LANG_DEFAULT LANG_EN  // idioma por defecto: ingles
 
 extern Lang gLang;  // active language (defined in i18n.cpp)

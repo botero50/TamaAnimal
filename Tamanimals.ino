@@ -46,7 +46,7 @@
 
 // Version del firmware. Subir este numero en cada release (y manifest.json para
 // el instalador web). Se muestra en la pantalla de ajustes y por serie al arrancar.
-#define FW_VERSION "1.5.1"
+#define FW_VERSION "1.5.2"
 #define PET_CRY_GAP_MS 6000  // minimum time between cries from petting
 
 Arduino_DataBus *bus = new Arduino_ESP32QSPI(
@@ -1076,7 +1076,7 @@ void loop() {
     // party first, then the box; only a full box makes it your choice
     if (party.add(pet.endedMon) || party.boxAdd(pet.endedMon)) {
       snprintf(partyBannerName, sizeof(partyBannerName), "%s",
-               pet.endedMon.nick[0] ? pet.endedMon.nick : DEX_TBL[pet.endedMon.dex].name);
+               pet.endedMon.nick[0] ? pet.endedMon.nick : dexName(pet.endedMon.dex));
       partyBannerUntil = now + 3500;
       pet.endedKind = CER_NONE;
       sfxPlay(SFX_MEDAL);
@@ -1280,7 +1280,7 @@ void handleSerial() {
     if (n >= 1 && n <= DEX_COUNT) {
       pet.prevSpeciesId = pet.speciesId;
       pet.speciesId = n;
-      Serial.printf("species #%d %s\n", n, DEX_TBL[n].name);
+      Serial.printf("species #%d %s\n", n, dexName(n));
     }
     Serial.println("DONE");
   } else if (line.startsWith("BIOME ")) {
@@ -1453,7 +1453,7 @@ void handleSerial() {
     // simulates 20 egg rolls (does not change the game state)
     for (int i = 0; i < 20; i++) {
       int16_t d = pet.pickEggSpecies();
-      Serial.printf("%d:%s(r%u) ", d, DEX_TBL[d].name, DEX_TBL[d].rarity);
+      Serial.printf("%d:%s(r%u) ", d, dexName(d), DEX_TBL[d].rarity);
     }
     Serial.println();
     Serial.println("DONE");
@@ -1465,7 +1465,7 @@ void handleSerial() {
     int n = sscanf(line.c_str() + 4, "%d %d", &dex, &sh);
     if (n >= 1 && dex >= 1 && dex <= DEX_COUNT) {
       pet.dbgHatchAs(dex, sh != 0);
-      Serial.printf("%s%s iv=%u/%u/%u/%u\n", DEX_TBL[dex].name,
+      Serial.printf("%s%s iv=%u/%u/%u/%u\n", dexName(dex),
                     pet.shiny ? " *SHINY*" : "", pet.ivAtk, pet.ivDef,
                     pet.ivSpe, pet.ivHp);
     }
@@ -1476,7 +1476,7 @@ void handleSerial() {
     int n = sscanf(line.c_str() + 6, "%d %d", &dex, &lvl);
     if (n >= 1 && dex >= 1 && dex <= DEX_COUNT) {
       startBattle(dex, lvl > 0 ? (uint8_t)lvl : pet.level());
-      Serial.printf("battle vs %s Lv.%u\n", DEX_TBL[dex].name, btlFoe.level);
+      Serial.printf("battle vs %s Lv.%u\n", dexName(dex), btlFoe.level);
     } else {
       Serial.println("usage: BATTLE <dex> [level]");
     }
@@ -1599,7 +1599,7 @@ void handleSerial() {
     for (int i = 0; i < PARTY_SLOTS; i++) {
       const PartyMon &m = party.slots[i];
       if (m.empty()) Serial.print(" -");
-      else Serial.printf(" %s%s(lv%u)", DEX_TBL[m.dex].name, m.shiny ? "*" : "", m.level);
+      else Serial.printf(" %s%s(lv%u)", dexName(m.dex), m.shiny ? "*" : "", m.level);
     }
     Serial.println();
     Serial.println("DONE");
@@ -1838,7 +1838,7 @@ void renderMonSheet(const PartyMon &m, bool fromBox) {
   gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
   char head[36];
   snprintf(head, sizeof(head), "%s%s Lv.%u", m.shiny ? "*" : "",
-           m.nick[0] ? m.nick : d.name, (unsigned)m.level);
+           m.nick[0] ? m.nick : dexName(d), (unsigned)m.level);
   uiText(UIF_SMALL, CX, 54, head, d.accent, 1);
   char ty[24];
   if (d.type2 == T_NONE) snprintf(ty, sizeof(ty), "%s", typeName(d.type1));
@@ -1890,7 +1890,7 @@ void renderMonSheet(const PartyMon &m, bool fromBox) {
   // a farewell, it does not join anything, and there is no undo.
   if (releaseConfirm) {
     char q[40];
-    snprintf(q, sizeof(q), T(S_RELEASE_FMT), m.nick[0] ? m.nick : d.name);
+    snprintf(q, sizeof(q), T(S_RELEASE_FMT), m.nick[0] ? m.nick : dexName(d));
     drawConfirmPanel(q, T(S_RELEASE_GONE), nullptr, UI_BAR_BAD,
                      T(S_YES), UI_BAR_BAD, UI_WHITE, T(S_NO), UI_TRACK_TEXT, UI_INK);
   }
@@ -2092,7 +2092,7 @@ void partyTap(int16_t x, int16_t y) {
     }
     party.replaceAt(i, pet.endedMon);
     snprintf(partyBannerName, sizeof(partyBannerName), "%s",
-             pet.endedMon.nick[0] ? pet.endedMon.nick : DEX_TBL[pet.endedMon.dex].name);
+             pet.endedMon.nick[0] ? pet.endedMon.nick : dexName(pet.endedMon.dex));
     partyBannerUntil = millis() + 3500;
     pet.endedKind = CER_NONE;
     partyPick = false;
@@ -4269,7 +4269,7 @@ void renderStarterSelect() {
   // the three names share one size: the longest one decides it
   const char *nm[3]; int nw[3]; int nn = starterCountShown(pet.region);
   if (nn > 3) nn = 3;
-  for (int i = 0; i < nn; i++) { nm[i] = DEX_TBL[starterOf(pet.region, i)].name; nw[i] = 208; }
+  for (int i = 0; i < nn; i++) { nm[i] = dexName(starterOf(pet.region, i)); nw[i] = 208; }
   const UiFont &nameFont = uiFitAll(UIF_BIG, nm, nw, nn);
   for (int i = 0; i < nn; i++) {
     int16_t d = starterOf(pet.region, i);
@@ -4525,7 +4525,7 @@ void render() {
     const char *msg = (pet.ceremony == CER_FAREWELL) ? T(S_FAREWELL)
                       : (pet.ceremony == CER_RUNAWAY) ? T(S_RUNAWAY)
                                                       : T(S_GOODBYE);
-    drawHeader(d.name, nameOnSky(d.accent), msg);
+    drawHeader(dexName(d), nameOnSky(d.accent), msg);
     drawCeremony();
     gfx->flush();
     return;
@@ -4561,7 +4561,7 @@ void render() {
   } else {
     const DexEntry &d = DEX_TBL[pet.speciesId];
     char name[28];
-    const char *base = pet.nick[0] ? pet.nick : d.name;
+    const char *base = pet.nick[0] ? pet.nick : dexName(d);
     snprintf(name, sizeof(name), T(S_NAME_FMT), pet.shiny ? "*" : "", base, pet.level());
     drawHeader(name, gNight ? UI_INK_NIGHT : nameOnSky(d.accent), statusMsg());
     drawStreakBadge();
@@ -4625,7 +4625,7 @@ void render() {
       gfx->fillRoundRect(94, 168, 278, 152, 16, UI_WHITE);
       gfx->drawRoundRect(94, 168, 278, 152, 16, UI_INK);
       char q[28];
-      snprintf(q, sizeof(q), T(S_RELEASE_FMT), DEX_TBL[pet.speciesId].name);
+      snprintf(q, sizeof(q), T(S_RELEASE_FMT), dexName(pet.speciesId));
       uiTextFit(UIF_SMALL, CX, 196 + 14, q, UI_INK, 1, 258);
       gfx->fillRoundRect(118, 252, 100, 52, 12, UI_BAR_OK);
       uiTextFit(UIF_SMALL, 118 + 50, 270 + 14, T(S_YES), UI_WHITE, 1, 92);
@@ -5491,7 +5491,7 @@ void drawMedalBadge(int x, int y, int i) {
 // page 0: profile (big portrait, identity, streak, bond, berry)
 void renderCardProfile() {
   const DexEntry &d = DEX_TBL[pet.speciesId];
-  const char *nm = pet.nick[0] ? pet.nick : d.name;
+  const char *nm = pet.nick[0] ? pet.nick : dexName(d);
   char head[26];
   snprintf(head, sizeof(head), T(S_NAME_FMT), pet.shiny ? "*" : "", nm, pet.level());
   // long names do not fit the narrow strip at the top of the round panel, so
@@ -5499,7 +5499,7 @@ void renderCardProfile() {
   uiTextFit(UIF_BIG, CX, 56, head, d.accent, 1, 230);
   if (pet.nick[0]) {  // real species under the nickname
     char sp[32];
-    snprintf(sp, sizeof(sp), "(%s)", d.name);
+    snprintf(sp, sizeof(sp), "(%s)", dexName(d));
     uiText(UIF_SMALL, CX, 82, sp, UI_TRACK_TEXT, 1);
   }
 
@@ -6140,7 +6140,7 @@ bool startWildBattle() {
 // ---------- the animal trip (phase 45) ----------
 
 static const char *tripPetName() {
-  return pet.nick[0] ? pet.nick : DEX_TBL[pet.speciesId].name;
+  return pet.nick[0] ? pet.nick : dexName(pet.speciesId);
 }
 
 // The Trip tile. Says why and starts nothing if it cannot leave.
@@ -6186,7 +6186,7 @@ void drawTripTale() {
   char line[64];
   if (t == TALE_FRIEND) {
     int16_t f = pet.tripFriend >= 1 && pet.tripFriend <= DEX_COUNT ? pet.tripFriend : pet.speciesId;
-    snprintf(line, sizeof(line), T(A[t]), tripPetName(), DEX_TBL[f].name);
+    snprintf(line, sizeof(line), T(A[t]), tripPetName(), dexName(f));
   } else {
     snprintf(line, sizeof(line), T(A[t]), tripPetName());
   }
@@ -7263,11 +7263,11 @@ static void drawPickCell(uint8_t n, int x, int y, uint8_t capLvl) {
   int16_t dex; uint16_t lvl; const char *nm; bool shiny;
   if (n == 0) {
     dex = pet.speciesId; lvl = pet.level(); shiny = pet.shiny;
-    nm = pet.nick[0] ? pet.nick : DEX_TBL[dex].name;
+    nm = pet.nick[0] ? pet.nick : dexName(dex);
   } else {
     const PartyMon &m = party.slots[n - 1];
     dex = m.dex; lvl = m.level; shiny = m.shiny;
-    nm = m.nick[0] ? m.nick : DEX_TBL[dex].name;
+    nm = m.nick[0] ? m.nick : dexName(dex);
   }
   if (capLvl && lvl > capLvl) lvl = capLvl;   // show the level it will FIGHT at
   gfx->fillRoundRect(x, y, PICK_CELL_W, PICK_CELL_H, 10, on ? UI_BG_DAY : UI_TRACK_TEXT);
@@ -7805,7 +7805,7 @@ void renderLearn() {
   gfx->fillCircle(CX, CY, 231, UI_BG_DAY);
   uint8_t mv = pet.learnOffer();
   char head[40];
-  const char *nm = pet.nick[0] ? pet.nick : DEX_TBL[pet.speciesId].name;
+  const char *nm = pet.nick[0] ? pet.nick : dexName(pet.speciesId);
   snprintf(head, sizeof(head), T(S_LEARN_Q), nm);
   uiTextFit(UIF_SMALL, CX, 56, head, UI_INK, 1, 250);
   uiTextFit(UIF_BIG, CX, 90, MOVE_TBL[mv].name, DEX_TBL[pet.speciesId].accent, 1, 250);
@@ -7983,7 +7983,7 @@ void renderBox() {
     const PartyMon &p = party.slots[boxSwapFrom - 1];
     char sub[40];
     snprintf(sub, sizeof(sub), T(S_BOX_SWAP),
-             p.empty() ? "-" : (p.nick[0] ? p.nick : DEX_TBL[p.dex].name));
+             p.empty() ? "-" : (p.nick[0] ? p.nick : dexName(p.dex)));
     uiTextFit(UIF_TINY, CX, 76, sub, UI_BAR_WARN, 1, 300);
   }
   for (uint8_t i = 0; i < BOX_PER_PAGE; i++) {
@@ -8002,7 +8002,7 @@ void renderBox() {
     }
     const uint8_t *th = thumbs.get(m.dex);
     if (th) drawThumb(th, x - 14, y - 4, 2, false);
-    uiTextFit(UIF_SMALL, x + 52, y + 28, m.nick[0] ? m.nick : DEX_TBL[m.dex].name,
+    uiTextFit(UIF_SMALL, x + 52, y + 28, m.nick[0] ? m.nick : dexName(m.dex),
               UI_INK, 0, PARTY_CELL_W - 58);
     char l[16];
     snprintf(l, sizeof(l), "Lv.%u%s", (unsigned)m.level, m.shiny ? " *" : "");
@@ -8094,7 +8094,7 @@ void drawPartySlot(int i, int x, int y) {
   const uint8_t *th = thumbs.get(m.dex);
   if (th) drawThumb(th, x - 6, y - 3, 1, false);
   const DexEntry &d = DEX_TBL[m.dex];
-  const char *nm = m.nick[0] ? m.nick : d.name;
+  const char *nm = m.nick[0] ? m.nick : dexName(d);
   uiTextFit(UIF_SMALL, x + 60, y + 28, nm, d.accent, 0, PARTY_CELL_W - 60 - 6);
   char lv[12];
   snprintf(lv, sizeof(lv), T(S_LVL_FMT), (unsigned)m.level);
@@ -8126,7 +8126,7 @@ void renderParty() {
     const PartyMon &b = party.box[boxSel - 1];
     char sw[44];
     snprintf(sw, sizeof(sw), T(S_BOX_SWAP),
-             b.nick[0] ? b.nick : DEX_TBL[b.dex].name);
+             b.nick[0] ? b.nick : dexName(b.dex));
     uiTextFit(UIF_TINY, CX, 80, sw, UI_BAR_WARN, 1, 300);
   }
 
@@ -8244,7 +8244,7 @@ void renderGallery() {
     bool reg = pet.isRegistered(galleryDetail);
     char head[24];
     snprintf(head, sizeof(head), "N.%03d %s%s", galleryDetail,
-             pet.isShinyRegistered(galleryDetail) ? "*" : "", reg ? d.name : "???");
+             pet.isShinyRegistered(galleryDetail) ? "*" : "", reg ? dexName(d) : "???");
     uiTextFit(UIF_BIG, CX, 77, head, reg ? d.accent : UI_INK, 1, 260);  // long names step down
     if (gallerySprt.loaded) {
       // animated and in colour if registered; static silhouette if not ("?" style)
@@ -8676,7 +8676,7 @@ void drawFarewellButton() {
   gfx->fillRoundRect(x, y, w, h, 16, UI_BAR_WARN);
   gfx->drawRoundRect(x, y, w, h, 16, UI_INK);
   char buf[52];
-  const char *nm = pet.nick[0] ? pet.nick : DEX_TBL[pet.speciesId].name;
+  const char *nm = pet.nick[0] ? pet.nick : dexName(pet.speciesId);
   snprintf(buf, sizeof(buf), T(S_FAREWELL_BTN), nm);
   uiTextFit(UIF_SMALL, CX, y + h / 2 - 8 + 14, buf, UI_INK, 1, FAR_BTN_W - 24);
 }
@@ -8690,7 +8690,7 @@ void drawRunawayButton() {
   gfx->fillRoundRect(x, y, w, h, 16, C565(0x3a, 0x44, 0x5a));
   gfx->drawRoundRect(x, y, w, h, 16, C565(0x70, 0x80, 0x98));
   char buf[52];
-  const char *nm = pet.nick[0] ? pet.nick : DEX_TBL[pet.speciesId].name;
+  const char *nm = pet.nick[0] ? pet.nick : dexName(pet.speciesId);
   snprintf(buf, sizeof(buf), T(S_RUNAWAY_BTN), nm);
   uiTextFit(UIF_SMALL, CX, y + h / 2 - 8 + 14, buf, C565(0xc8, 0xd2, 0xe0), 1, FAR_BTN_W - 24);
 }
@@ -12090,7 +12090,7 @@ static void parkScene(uint32_t now) {
           if (regionAvailable(regionOfDex(c)) && thumbs.get(c)) d = c;
         }
         placeFriend = d ? d : 16;
-        snprintf(b, sizeof(b), T(S_PARK_FRIEND_FMT), DEX_TBL[placeFriend].name);
+        snprintf(b, sizeof(b), T(S_PARK_FRIEND_FMT), dexName(placeFriend));
         sfxPlay(SFX_HEART);
         break;
       }
@@ -13237,8 +13237,8 @@ static void lakeAction() {
   char what[32], b[48];
   fishShow = 0;
   switch (r) {
-    case FISH_COMMON:    snprintf(what, sizeof(what), "%s", DEX_TBL[DEX_FISH_A].name); fishShow = DEX_FISH_A; break;
-    case FISH_GOOD: snprintf(what, sizeof(what), "%s", DEX_TBL[DEX_FISH_B].name); fishShow = DEX_FISH_B; break;
+    case FISH_COMMON:    snprintf(what, sizeof(what), "%s", dexName(DEX_FISH_A)); fishShow = DEX_FISH_A; break;
+    case FISH_GOOD: snprintf(what, sizeof(what), "%s", dexName(DEX_FISH_B)); fishShow = DEX_FISH_B; break;
     case FISH_BOOT:    snprintf(what, sizeof(what), "%s", T(S_ITEM_BOOT)); break;
     case FISH_SNACK:   snprintf(what, sizeof(what), "%s", T(foodName(FOOD_ONIGIRI))); break;
     case FISH_SHELL:   snprintf(what, sizeof(what), "%s", T(S_ITEM_SHELL)); break;
@@ -13309,7 +13309,7 @@ static void adventureClaim() {
       int16_t d = 0;
       for (int t = 0; t < 40 && !d; t++) { int16_t c = (int16_t)(1 + random(DEX_COUNT)); if (regionAvailable(regionOfDex(c)) && thumbs.get(c)) d = c; }
       placeFriend = d ? d : 16;
-      snprintf(b, sizeof(b), T(S_PARK_FRIEND_FMT), DEX_TBL[placeFriend].name);
+      snprintf(b, sizeof(b), T(S_PARK_FRIEND_FMT), dexName(placeFriend));
       break;
     }
     default: snprintf(b, sizeof(b), "%s", T(S_ADV_DONE)); break;
@@ -14878,7 +14878,7 @@ static void libraryScene(uint32_t now) {
     gfx->drawFastVLine(CX, 116, 162, UI_TRACK_TEXT);
     fpThumb(townDex, 158, 190, 2, false);
     const DexEntry &d = DEX_TBL[townDex];
-    uiTextFit(UIF_SMALL, 300, 168, d.name, UI_INK, 1, 150);
+    uiTextFit(UIF_SMALL, 300, 168, dexName(d), UI_INK, 1, 150);
     typeChipSmall(300, 186, d.type1);
     if (d.type2 < TYPE_COUNT) typeChipSmall(300, 224, d.type2);
   } else townUntil = 0;

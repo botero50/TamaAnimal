@@ -461,6 +461,428 @@ static const DexEntry DEX_TBL[DEX_COUNT + 1] = {
   { "PELEA TRANSMILENIO", 0, 0, 1, 0xCC47, 51, 48, 36, 51, 49, 51, 0, PT_PACK, PT_STRENGTH },  // 408
 };
 
+// Spanish names, used when the board is in Spanish (nullptr: the name above is used)
+enum Lang : uint8_t;  // i18n.h (not included here: its T() would clash with names in some files)
+extern Lang gLang;
+static const char *const DEX_NAME_ES[DEX_COUNT + 1] = {
+  nullptr,
+  "LEON",  // 1
+  "CEBRA",  // 2
+  "JIRAFA",  // 3
+  "GUEPARDO",  // 4
+  "ELEFANTE",  // 5
+  "RINOCERONTE",  // 6
+  "HIPOPOTAMO",  // 7
+  "COCODRILO",  // 8
+  "FLAMENCO",  // 9
+  "SECRETARIO",  // 10
+  "SURICATA",  // 11
+  "HIENA",  // 12
+  "AVESTRUZ",  // 13
+  "BUFALO AFRICANO",  // 14
+  "FACOQUERO",  // 15
+  "NU",  // 16
+  "GRULLA CORONADA",  // 17
+  "CERDO HORMIGUERO",  // 18
+  "IMPALA",  // 19
+  "GACELA",  // 20
+  "SERVAL",  // 21
+  "PUERCOESPIN",  // 22
+  "CHACAL",  // 23
+  "TEJON MELERO",  // 24
+  "LICAON",  // 25
+  "ELAND",  // 26
+  "KUDU",  // 27
+  "ORIX",  // 28
+  "FENEC",  // 29
+  "CAMELLO",  // 30
+  "ESCORPION",  // 31
+  "COLOBO",  // 32
+  "CHIMPANCE",  // 33
+  "LORO",  // 34
+  "LEMUR",  // 35
+  "BABUINO",  // 36
+  "GINETA",  // 37
+  "PANGOLIN",  // 38
+  "AGAMA",  // 39
+  "MAMBA VERDE",  // 40
+  "DAMAN ROQUERO",  // 41
+  "DIK DIK",  // 42
+  "SUIMANGA",  // 43
+  "CALAO",  // 44
+  "IBIS",  // 45
+  "AGUILA PESCADORA",  // 46
+  "MARABU",  // 47
+  "TORTUGA",  // 48
+  "MANGOSTA",  // 49
+  "ANTILOPE",  // 50
+  "BUBAL",  // 51
+  "ANTILOPE RUANO",  // 52
+  "ANTILOPE SABLE",  // 53
+  "TOPI",  // 54
+  "AGUILA CORONADA",  // 55
+  "AGUILA MARCIAL",  // 56
+  "MOCHUELO PERLADO",  // 57
+  "AVE MARTILLO",  // 58
+  "ESPATULA",  // 59
+  "GARZA GOLIAT",  // 60
+  "JACANA AFRICANA",  // 61
+  "ALIMOCHE",  // 62
+  "BUITRE OREJUDO",  // 63
+  "BUITRE DORSIBLANCO",  // 64
+  "AGUILA CRESTADA",  // 65
+  "AVUTARDA KORI",  // 66
+  "MAMBA NEGRA",  // 67
+  "VIBORA BUFADORA",  // 68
+  "COBRA",  // 69
+  "PITON",  // 70
+  "VARANO DEL NILO",  // 71
+  "VIBORA DE ARENA",  // 72
+  "SERPIENTE CRISTAL",  // 73
+  "COBRA ESCUPIDORA",  // 74
+  "BOOMSLANG",  // 75
+  "PITON DE ROCA",  // 76
+  "CAMALEON",  // 77
+  "GECO",  // 78
+  "ESCINCO",  // 79
+  "TORTUGA LEOPARDO",  // 80
+  "TORTUGA BLANDA",  // 81
+  "VARANO DE PANTANO",  // 82
+  "GOANNA",  // 83
+  "LAGARTO DE GOLA",  // 84
+  "LAGARTO ESPINOSO",  // 85
+  "POTAMOQUERO",  // 86
+  "ANTILOPE ARBUSTO",  // 87
+  "SITATUNGA",  // 88
+  "GALAGO ENANO",  // 89
+  "DAMAN ARBORICOLA",  // 90
+  "GALAGO",  // 91
+  "GATO MONTES",  // 92
+  "CIVETA AFRICANA",  // 93
+  "CIVETA DE PALMERA",  // 94
+  "RATEL",  // 95
+  "HIENA MOTEADA",  // 96
+  "HIENA RAYADA",  // 97
+  "HIENA PARDA",  // 98
+  "LOBO DE TIERRA",  // 99
+  "KINKAJU",  // 100
+  "COATI",  // 101
+  "MUSARANA NUTRIA",  // 102
+  "TEJON AFRICANO",  // 103
+  "HURON",  // 104
+  "VISON",  // 105
+  "COMADREJA",  // 106
+  "ARMINO",  // 107
+  "TURON",  // 108
+  "GRISON",  // 109
+  "PERRO DEL CABO",  // 110
+  "CARACAL",  // 111
+  "PANGOLIN TERRESTRE",  // 112
+  "PANGOLIN ARBOREO",  // 113
+  "PANGOLIN NEGRO",  // 114
+  "PANGOLIN GIGANTE",  // 115
+  "ESPATULA AFRICANA",  // 116
+  "IBIS SAGRADO",  // 117
+  "TANTALO AFRICANO",  // 118
+  "RAYADOR AFRICANO",  // 119
+  "GAVIOTA MENOR",  // 120
+  "GAVIOTA CABECIGRIS",  // 121
+  "AGUILA VOLATINERA",  // 122
+  "MARTIN PESCADOR",  // 123
+  "CORMORAN",  // 124
+  "AVE SERPIENTE",  // 125
+  "GARZA",  // 126
+  "GARCETA",  // 127
+  "JABIRU AFRICANO",  // 128
+  "GRULLA CARUNCULADA",  // 129
+  "PICO ZAPATO",  // 130
+  "PEREZOSO GIGANTE",  // 131
+  "DIENTES DE SABLE",  // 132
+  "HIENA GIGANTE",  // 133
+  "BUFALO GIGANTE",  // 134
+  "RINOCERONTE LANUDO",  // 135
+  "JIRAFA GIGANTE",  // 136
+  "ELEFANTE GIGANTE",  // 137
+  "DEINOTERIO",  // 138
+  "HIPOPOTAMO ENANO",  // 139
+  "DINOFELIS",  // 140
+  "MACHAIRODUS",  // 141
+  "BABUINO GIGANTE",  // 142
+  "LEOPARDO CAVERNAS",  // 143
+  "GELADA",  // 144
+  "MANDRIL",  // 145
+  "TIGRE",  // 146
+  "PANDA GIGANTE",  // 147
+  "PANDA ROJO",  // 148
+  "LEOPARDO NIVAL",  // 149
+  "ELEFANTE ASIATICO",  // 150
+  "ORANGUTAN",  // 151
+  "GIBON",  // 152
+  "MACACO",  // 153
+  "OSO MALAYO",  // 154
+  "OSO BEZUDO",  // 155
+  "PANTERA NEBULOSA",  // 156
+  "CUON",  // 157
+  "CHACAL DORADO",  // 158
+  "TANUKI",  // 159
+  "YAK",  // 160
+  "BANTENG",  // 161
+  "BUFALO DE AGUA",  // 162
+  "RINOCERONTE INDIO",  // 163
+  "CIERVO ALMIZCLERO",  // 164
+  "CIERVO SIKA",  // 165
+  "CIERVO AXIS",  // 166
+  "SAIGA",  // 167
+  "TAKIN",  // 168
+  "JABALI",  // 169
+  "TAPIR MALAYO",  // 170
+  "PAVO REAL",  // 171
+  "FAISAN DORADO",  // 172
+  "GRULLA JAPONESA",  // 173
+  "PATO MANDARIN",  // 174
+  "GANSO INDIO",  // 175
+  "PIGARGO DE STELLER",  // 176
+  "BUHO REAL",  // 177
+  "CHARLATAN",  // 178
+  "CALAO BICORNE",  // 179
+  "DRAGON DE KOMODO",  // 180
+  "COBRA REAL",  // 181
+  "PITON RETICULADA",  // 182
+  "VIBORA DE FOSETA",  // 183
+  "GECO TOKAY",  // 184
+  "DRAGON VOLADOR",  // 185
+  "GAVIAL",  // 186
+  "COCODRILO MARINO",  // 187
+  "TORTUGA MOTEADA",  // 188
+  "SALAMANDRA GIGANTE",  // 189
+  "RANA ARBORICOLA",  // 190
+  "KOI",  // 191
+  "PEZ SERPIENTE",  // 192
+  "BETTA",  // 193
+  "PANGOLIN MALAYO",  // 194
+  "ZORRO VOLADOR",  // 195
+  "LORIS PEREZOSO",  // 196
+  "TARSERO",  // 197
+  "BINTURONG",  // 198
+  "CABALLO MONGOL",  // 199
+  "CAMELLO BACTRIANO",  // 200
+  "JAGUAR",  // 201
+  "GUACAMAYO",  // 202
+  "ANACONDA",  // 203
+  "TUCAN",  // 204
+  "PEREZOSO",  // 205
+  "CHIGUIRO",  // 206
+  "AGUILA HARPIA",  // 207
+  "CONDOR",  // 208
+  "LLAMA",  // 209
+  "ALPACA",  // 210
+  "PUMA",  // 211
+  "PIRANA",  // 212
+  "RANA DARDO",  // 213
+  "BOA CONSTRICTORA",  // 214
+  "DANTA",  // 215
+  "NUTRIA GIGANTE",  // 216
+  "MONO AULLADOR",  // 217
+  "IGUANA",  // 218
+  "OCELOTE",  // 219
+  "MONO CAPUCHINO",  // 220
+  "OSO DE ANTEOJOS",  // 221
+  "OSO HORMIGUERO",  // 222
+  "MANATI",  // 223
+  "ARMADILLO",  // 224
+  "CAIMAN",  // 225
+  "VENADO COLORADO",  // 226
+  "PECARI",  // 227
+  "COATI II",  // 228
+  "NEQUE",  // 229
+  "LAPA",  // 230
+  "KINKAJU II",  // 231
+  "MARGAY",  // 232
+  "LOBO DE CRIN",  // 233
+  "PERRO DE MONTE",  // 234
+  "ARMADILLO GIGANTE",  // 235
+  "DELFIN ROSADO",  // 236
+  "JAGUAR GIGANTE",  // 237
+  "PEREZOSO TERRESTRE",  // 238
+  "SMILODON",  // 239
+  "GLIPTODONTE",  // 240
+  "TITANOBOA",  // 241
+  "EREMOTERIO",  // 242
+  "MACRAUQUENIA",  // 243
+  "TOXODONTE",  // 244
+  "DOEDICURO",  // 245
+  "MILODON",  // 246
+  "FORORRACOS",  // 247
+  "AVE DEL TERROR",  // 248
+  "LEPTARCTUS",  // 249
+  "TILACOSMILO",  // 250
+  "NOTROTERIO",  // 251
+  "HEMIAUCHENIA",  // 252
+  "HIPPIDION",  // 253
+  "PALEOLAMA",  // 254
+  "ANQUILOTERIO",  // 255
+  "BOA ESMERALDA",  // 256
+  "PITON VERDE",  // 257
+  "VERRUGOSA",  // 258
+  "MAPANA",  // 259
+  "SERPIENTE CORAL",  // 260
+  "ANACONDA DEL BENI",  // 261
+  "ANACONDA AMARILLA",  // 262
+  "GUACAMAYO ROJO",  // 263
+  "GUACAMAYO JACINTO",  // 264
+  "AGUILA SOLITARIA",  // 265
+  "AGUILA CRESTUDA",  // 266
+  "GAVILAN NEGRO",  // 267
+  "HOATZIN",  // 268
+  "PAVA ENCAPUCHADA",  // 269
+  "PAVON CORNUDO",  // 270
+  "JABIRU",  // 271
+  "TIGANA",  // 272
+  "CHAJA",  // 273
+  "CIGUENA AMERICANA",  // 274
+  "ESPATULA ROSADA",  // 275
+  "COROCORA ROJA",  // 276
+  "CODORNIZ DE MONTE",  // 277
+  "TINAMU",  // 278
+  "PAVA CARUNCULADA",  // 279
+  "GUACHARACA",  // 280
+  "JACANA",  // 281
+  "CARRAO",  // 282
+  "TROMPETERO",  // 283
+  "CHILACOA",  // 284
+  "MARTIN AMAZONICO",  // 285
+  "COLIBRI",  // 286
+  "SERRETA BRASILENA",  // 287
+  "LORO AMAZONICO",  // 288
+  "GUACAMAYO CASTANO",  // 289
+  "PERICO",  // 290
+  "PERIQUITO",  // 291
+  "GUACAMAYO BOLIVIA",  // 292
+  "GUACAMAYO DE SPIX",  // 293
+  "GUACAMAYO DE LEAR",  // 294
+  "COTORRITA",  // 295
+  "GUACAMAYO MILITAR",  // 296
+  "CUCO ARDILLA",  // 297
+  "GAVILAN CAMINERO",  // 298
+  "BUHO DE ANTEOJOS",  // 299
+  "TUCANCITO",  // 300
+  "TUCAN TOCO",  // 301
+  "BARBUDO",  // 302
+  "CARPINTERO CAMPO",  // 303
+  "ATRAPAMOSCAS",  // 304
+  "TANGARA",  // 305
+  "MIELERO",  // 306
+  "CANARIO",  // 307
+  "SALTADOR",  // 308
+  "COLAESPINA",  // 309
+  "TROGON",  // 310
+  "SALTARIN",  // 311
+  "COTINGA",  // 312
+  "PAJARO CAMPANA",  // 313
+  "URRACA COPETONA",  // 314
+  "AVESOL",  // 315
+  "SOMORMUJO PLATEADO",  // 316
+  "PELICANO PERUANO",  // 317
+  "FRAGATA",  // 318
+  "PIQUERO",  // 319
+  "GUANAY",  // 320
+  "PATO AGUJA",  // 321
+  "ALCATRAZ",  // 322
+  "PINGUINO PATAGON",  // 323
+  "ARAO PALOMA",  // 324
+  "PETREL GIGANTE",  // 325
+  nullptr,  // 326
+  nullptr,  // 327
+  nullptr,  // 328
+  nullptr,  // 329
+  nullptr,  // 330
+  nullptr,  // 331
+  nullptr,  // 332
+  nullptr,  // 333
+  nullptr,  // 334
+  nullptr,  // 335
+  nullptr,  // 336
+  nullptr,  // 337
+  nullptr,  // 338
+  nullptr,  // 339
+  nullptr,  // 340
+  nullptr,  // 341
+  nullptr,  // 342
+  nullptr,  // 343
+  nullptr,  // 344
+  nullptr,  // 345
+  nullptr,  // 346
+  nullptr,  // 347
+  nullptr,  // 348
+  nullptr,  // 349
+  nullptr,  // 350
+  "BUHO MUAN",  // 351
+  "VENADO ESPIRITU",  // 352
+  nullptr,  // 353
+  nullptr,  // 354
+  nullptr,  // 355
+  nullptr,  // 356
+  nullptr,  // 357
+  nullptr,  // 358
+  nullptr,  // 359
+  nullptr,  // 360
+  nullptr,  // 361
+  nullptr,  // 362
+  nullptr,  // 363
+  nullptr,  // 364
+  nullptr,  // 365
+  "PIE GRANDE",  // 366
+  "MONSTRUO LAGO NESS",  // 367
+  nullptr,  // 368
+  nullptr,  // 369
+  "CHUPACABRAS",  // 370
+  "LIEBRE CORNUDA",  // 371
+  "PEGASO",  // 372
+  "GRIFO",  // 373
+  "CERBERO",  // 374
+  "HIDRA",  // 375
+  "FENIX",  // 376
+  "UNICORNIO",  // 377
+  "ESFINGE",  // 378
+  "CHACAL ANUBIS",  // 379
+  nullptr,  // 380
+  nullptr,  // 381
+  nullptr,  // 382
+  nullptr,  // 383
+  nullptr,  // 384
+  "BALLENA BLANCA",  // 385
+  nullptr,  // 386
+  nullptr,  // 387
+  nullptr,  // 388
+  nullptr,  // 389
+  nullptr,  // 390
+  nullptr,  // 391
+  nullptr,  // 392
+  nullptr,  // 393
+  nullptr,  // 394
+  nullptr,  // 395
+  nullptr,  // 396
+  nullptr,  // 397
+  nullptr,  // 398
+  nullptr,  // 399
+  nullptr,  // 400
+  nullptr,  // 401
+  nullptr,  // 402
+  nullptr,  // 403
+  nullptr,  // 404
+  nullptr,  // 405
+  nullptr,  // 406
+  nullptr,  // 407
+  nullptr,  // 408
+};
+
+// An animal's name in the language the board is set to.
+static inline const char *dexName(uint16_t d) {
+  if (d > DEX_COUNT) d = 0;
+  return ((uint8_t)gLang == 0 /* LANG_ES */ && DEX_NAME_ES[d]) ? DEX_NAME_ES[d] : DEX_TBL[d].name;
+}
+static inline const char *dexName(const DexEntry &e) { return dexName((uint16_t)(&e - DEX_TBL)); }
+
 // the first egg: a friendly mix
 static const int16_t CLASSIC_DEX[] = { 1, 2, 3, 201, 146 };
 #define NUM_CLASSIC_DEX 5
