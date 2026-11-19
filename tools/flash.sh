@@ -5,10 +5,13 @@
 #   bash tools/flash.sh --monitor  # ...then open the serial console
 #   bash tools/flash.sh -p /dev/cu.usbmodem1101
 #
+# Works on macOS, Linux and Windows (Git Bash), from a clone with any folder name.
+#
 # The port is found rather than hardcoded: the ESP32-S3 shows up as
 # /dev/cu.usbmodem* on macOS and the number changes between plug-ins. The Mac's
 # own Bluetooth and debug consoles are also /dev/cu.*, so they are excluded by
 # name -- matching them and trying to flash a debug console is the obvious trap.
+# On Linux it is /dev/ttyACM*; on Windows a COM port, found with arduino-cli.
 set -e
 cd "$(dirname "$0")/.."
 
@@ -25,7 +28,11 @@ done
 
 if [ -z "$PORT" ]; then
   # usbmodem/wchusbserial/SLAB are the real adapters; the rest are the Mac's own
-  PORT=$(ls /dev/cu.usbmodem* /dev/cu.wchusbserial* /dev/cu.SLAB* 2>/dev/null | head -1 || true)
+  PORT=$(ls /dev/cu.usbmodem* /dev/cu.wchusbserial* /dev/cu.SLAB* /dev/ttyACM* 2>/dev/null | head -1 || true)
+fi
+if [ -z "$PORT" ] && command -v arduino-cli >/dev/null; then
+  # Windows: the first serial port arduino-cli sees on a USB adapter (COM1 is the PC's own)
+  PORT=$(arduino-cli board list 2>/dev/null | awk '$1 ~ /^COM[0-9]+$/ && $1 != "COM1" && /USB|ESP32|esp32/ {print $1; exit}' || true)
 fi
 
 if [ -z "$PORT" ]; then
@@ -52,14 +59,22 @@ echo "      first over the serial console and keep the block -- it is the only"
 echo "      way back if anything goes wrong."
 echo
 
+# arduino-cli wants the sketch folder named after the .ino, whatever the clone is
+# called (a clone named "TamaAnimal" fails with "main file missing"), so the
+# sources are copied into a folder that has the right name.
+STAGE=$(mktemp -d)
+trap 'rm -rf "$STAGE"' EXIT
+mkdir -p "$STAGE/Tamanimals"
+cp ./*.ino ./*.cpp ./*.h "$STAGE/Tamanimals/"
+
 echo "Compiling..."
-arduino-cli compile --fqbn "$FQBN" .
+arduino-cli compile --fqbn "$FQBN" "$STAGE/Tamanimals"
 
 echo "Uploading..."
-arduino-cli upload -p "$PORT" --fqbn "$FQBN" .
+arduino-cli upload -p "$PORT" --fqbn "$FQBN" "$STAGE/Tamanimals"
 
 echo
-echo "Done. Firmware v$(grep -o '"[0-9.]*"' Tamanimals.ino | head -1 | tr -d '"') on $PORT"
+echo "Done. Firmware v$(grep -o 'FW_VERSION "[^"]*"' Tamanimals.ino | head -1 | cut -d'"' -f2) on $PORT"
 
 if [ "$MONITOR" = "1" ]; then
   echo "Opening the console at 115200 -- ctrl-C to leave."
