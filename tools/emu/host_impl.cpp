@@ -148,9 +148,14 @@ void rtcSetEpoch(uint32_t e) { g_epoch = e - millis() / 1000; }
 bool batBegin() { return true; }
 void pmuEnablePanel() {}
 bool boardIs175C() { return false; }
-int batPercent() { return 87; }
+int g_emuBatPct = 87;   // tests set it
+int batPercent() { return g_emuBatPct; }
+int batSmoothMv() { return 3950; }
 bool batCharging() { return false; }
-bool usbPresent() { return true; }
+bool g_emuUsb = false;   // tests set it: the standby clock and self-care need USB power
+bool usbPresent() { return g_emuUsb; }
+bool batShouldShutdown() { return false; }
+void batPowerOff() {}
 void pwrSetup() {}
 bool pwrShortPressed() { return false; }
 
@@ -161,11 +166,19 @@ void i2cUnlock() {}
 bool imuReadAccel(float &, float &, float &) { return false; }
 uint8_t imuReadBatch(float *, uint32_t *, uint8_t) { return 0; }
 bool imuFifoOn() { return false; }
+static bool g_emuFifo = false;
+bool imuFifoEnter() { g_emuFifo = true; return true; }
+void imuFifoExit() { g_emuFifo = false; }
+bool imuFifoActive() { return g_emuFifo; }
+uint32_t imuFifoFailCount() { return 0; }
+uint32_t imuFifoSampleCount() { return 0; }
 uint32_t imuDroppedCount() { return 0; }
 
 // --- audio (silent) ---
 void audioBegin() {}
-void sfxPlay(uint8_t) {}
+uint8_t g_emuLastSfx = 255; int g_emuSfxCount = 0;
+void sfxPlay(uint8_t id) { g_emuLastSfx = id; g_emuSfxCount++; }
+bool cryHas(int16_t d) { return d >= 1 && d <= DEX_COUNT; }   // every animal has a call
 void audioSetQuiet(bool) {}
 // remembers the last request so tests can see which creature was asked to cry
 int16_t g_emuLastCry = 0; int g_emuCryCount = 0;

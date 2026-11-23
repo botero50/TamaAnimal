@@ -34,7 +34,8 @@ def main():
     flt = sys.argv[1] if len(sys.argv) > 1 else ''
     out = os.path.join(ROOT, 'build', 'tests')
     os.makedirs(out, exist_ok=True)
-    flags = ['-std=c++17', '-O0', '-w', '-I' + EMU, '-I' + ROOT, '-DSPRITE_DIR="' + os.path.join(ROOT, 'build', 'sdcard', 'mons').replace('\\', '/') + '"']
+    flags = ['-std=c++17', '-O0', '-w', '-DCARE_PACE_DEFAULT=0',   # the tests measure the original needs' pace
+              '-I' + EMU, '-I' + ROOT, '-DSPRITE_DIR="' + os.path.join(ROOT, 'build', 'sdcard', 'mons').replace('\\', '/') + '"']
 
     runsh = open(os.path.join(HERE, 'run.sh'), encoding='utf-8').read()
     m = re.search(r'CORE=\(([^)]*)\)', runsh)
@@ -71,6 +72,8 @@ def main():
         links = list(core_objs)
         if name in STANDALONE:
             links = [objs['gbsynth'], objs['cry']]
+        if name == 'powersave_test':
+            links = []                       # a header of pure rules: it needs nothing else
         if name in sketch_tests:
             links += [objs['sketch'], objs['host_impl'], objs['font'], objs['clock']]
         if name in NEEDS_HOST:

@@ -16,6 +16,11 @@ notices the MIT license requires are kept in [LICENSE](LICENSE).
   [nzlov](https://github.com/nzlov/TamaPoke), [ShadowEnemyx](https://github.com/ShadowEnemyx/TamaPoke),
   [AlteSocke](https://github.com/AlteSocke/TamaPoke), [danielberndt](https://github.com/danielberndt/TamaPoke)
   and [Spocky2024](https://github.com/Spocky2024/TamaPoke_MrsSpock)
+- The standby clock, self-care while plugged in, light sleep with the sensor's FIFO, the battery curve and
+  safe power-off, the Tournament (rules and numbers adapted from its `sport.h`), the training fruits and the
+  Mine follow [Mu-Muu/TamaPoke](https://github.com/Mu-Muu/TamaPoke) (MIT, Copyright (c) 2026 Quique Tortosa
+  and the fork's contributors), by way of [botero50/TamaPoke](https://github.com/botero50/TamaPoke). None of
+  its art is used: what the screens show is drawn with plain shapes here
 
 Tamanimals replaces all of that project's game content. Nothing from any game franchise is used here.
 

@@ -14,9 +14,12 @@ bool boardIs175C();
 // PMU AXP2101: battery state
 bool batBegin();
 void pmuEnablePanel();           // turns on BLDO1 (OLED VDD 3.3V); call before gfx->begin()
+int batSmoothMv();                // the smoothed battery voltage in mV, 0 if unknown
 int batPercent();                // 0-100, -1 if no battery is connected
 bool batCharging();
 bool usbPresent();
+bool batShouldShutdown();        // on battery, the smoothed voltage has stayed under the cut-off (see batcurve.h)
+void batPowerOff();              // the PMU turns every rail off (save the pet first)
 
 // AXP2101 PWR button: long press 4s = physical power-off (RTC stays alive);
 // the short press is captured by the firmware (screen on/off)

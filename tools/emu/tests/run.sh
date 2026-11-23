@@ -47,10 +47,10 @@ fi
 # arrays, not a string: the sprite dir has to reach the compiler still quoted,
 # and passing these through eval silently strips them
 CORE=("$ROOT/gbsynth.cpp" "$ROOT/pet.cpp" "$ROOT/i18n.cpp" "$ROOT/party.cpp" "$ROOT/battle.cpp" "$ROOT/link.cpp" "$ROOT/save.cpp" "$ROOT/steps.cpp" "$ROOT/weather.cpp" "$ROOT/talk.cpp" "$ROOT/album.cpp")
-FLAGS=(-std=c++17 -O1 -w -I"$EMU" -I"$ROOT" -DSPRITE_DIR="\"$ROOT/build/sdcard/mons\"")
+FLAGS=(-std=c++17 -O1 -w -DCARE_PACE_DEFAULT=0 -I"$EMU" -I"$ROOT" -DSPRITE_DIR="\"$ROOT/build/sdcard/mons\"")
 
 # these drive setup()/loop()/render(), so they need the sketch itself
-needs_sketch() { case "$1" in trip_test|wild_test|stepgoal_test|hardening_test|arena_test|powerloss_test|touch_test|flush_test|joy_test|anim_test|swipe_test|lan_test|console_test|hit_test|starter_test|release_test|volume_test|night_test|autooff_test) return 0;; *) return 1;; esac; }
+needs_sketch() { case "$1" in trip_test|wild_test|stepgoal_test|hardening_test|arena_test|powerloss_test|touch_test|flush_test|joy_test|anim_test|swipe_test|lan_test|console_test|hit_test|starter_test|release_test|volume_test|night_test|autooff_test|updates_test) return 0;; *) return 1;; esac; }
 
 # and these are standalone: gbsynth.cpp has no Arduino dependency at all, which
 # is the point of it -- linking the game core in would only demand stubs for

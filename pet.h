@@ -16,6 +16,8 @@ inline void sweepTimer(uint32_t &t, uint32_t now) { if (t && (int32_t)(t - now) 
 #include "dex.h"
 #include "trainers.h"   // GYM_REGIONS sizes the badge masks
 #include "party.h"
+#include "mine.h"
+#include "fruit.h"
 
 // 1 tick = 1 game minute. Lower this value to test faster
 // (e.g. 5000UL = stats fall 12x faster).
@@ -23,6 +25,14 @@ inline void sweepTimer(uint32_t &t, uint32_t now) { if (t && (int32_t)(t - now) 
 // Game minutes per level. With 60, LION evolves at ~16 h
 // of play with perfect care. Drop to 1 to see evolutions instantly.
 #define MINUTES_PER_LEVEL 60
+#define TOUR_EVENTS 11         // the Tournament's events (tourney.h EV_COUNT)
+#define AUTO_CARE_LEVEL 50    // what self-care raises a low need to
+#define AUTO_CARE_FROM 40     // and the level under which it steps in
+// The care pace a save starts with when it has none (every save made before the setting existed).
+// 1 = relaxed. The emulator tests build with -DCARE_PACE_DEFAULT=0 so they keep the original rates.
+#ifndef CARE_PACE_DEFAULT
+#define CARE_PACE_DEFAULT 1
+#endif
 #define MAX_LEVEL 100              // reached at 4d 3h; see level()
 #define EAT_ANIM_MS 2500UL
 #define HEART_MS 1500UL
@@ -317,6 +327,7 @@ enum TrophyId : uint8_t {
   TRO_DECOR, TRO_STREAK, TRO_LEVEL, TRO_STUDY, TRO_TEETH, TRO_PERFECT, TRO_CAPSULE,
   TRO_FISH, TRO_ROUTE,
   TRO_GOLD, TRO_PRIZES,                      // the arcade (phase 27)
+  TRO_STADIUM,                               // five Tournament golds
   TRO_COUNT
 };
 static_assert(TRO_COUNT <= 32, "trophies needs a bit each");
@@ -677,7 +688,11 @@ public:
   bool plantSeed();             // needs a seed, an empty plot and the clock
   bool gardenReady() const;
   uint8_t gardenPercent() const;  // 0..100 grown
-  int8_t harvest();             // the FoodId it gave, or -1 when not ready
+  int8_t harvest();             // the FoodId it gave (FRUIT_FOOD_BASE + kind for a training fruit), or -1 when not ready
+  uint8_t fruitCount[FRUIT_KINDS] = { 0 };   // training fruits kept: Power, Guard, Swift
+  uint8_t lastFruitGain = 0;
+  enum FruitResult : uint8_t { FRUIT_NONE = 0, FRUIT_EATEN, FRUIT_AT_BEST };
+  FruitResult eatFruit(uint8_t kind);   // +FRUIT_GAIN to that training stat, up to its ceiling; nothing is spent at the ceiling
   GiftKind holidayToday() const;  // which holiday the RTC date is, if any
   GiftKind claimHolidayGift();  // hands today's gift over once; the screen says what
   static void civilDate(uint32_t days, int &y, int &m, int &d);   // days since 1970 -> date
@@ -823,6 +838,24 @@ public:
   uint8_t quizHi = 0;
   uint8_t quizDone(uint8_t correct);    // coins paid
   uint8_t parentBed = 0;        // 0 off, else the hour games stop (until 6:00)
+  uint8_t carePace = CARE_PACE_DEFAULT;   // 0 normal, 1 relaxed (needs every 2nd minute), 2 slow (every 4th)
+  // Self-care while plugged in and untouched for 10 minutes (the sketch reports it each loop):
+  // once a minute, silently, one need under AUTO_CARE_FROM goes back up to AUTO_CARE_LEVEL, in
+  // this order: food, hygiene (and the piles), energy, joy. It is not the player's care (no
+  // streak, bond or care mark) and it never cures sickness. Not while asleep, an egg or a ceremony.
+  bool pluggedIdle = false;
+  void setPlugged(bool idle10) { pluggedIdle = idle10; }
+  uint8_t careEvery() const { return carePace == 1 ? 2 : carePace == 2 ? 4 : 1; }
+  bool careDue() const { return ageMinutes % careEvery() == 0; }
+  // The Tournament (the Stadium, see tourney.h): the best mark per event (hundredths; tenths of a
+  // second in the long races), the medals, and the day of the last daily gold bonus.
+  uint16_t tourBest[TOUR_EVENTS] = { 0 };
+  uint16_t tourGold = 0, tourSilver = 0, tourBronze = 0;
+  uint32_t tourGoldDay = 0;
+  struct TourPay { uint16_t coins; bool record; bool bonus; };
+  bool canCompete() const;                                       // awake, healthy, at home, not tired
+  TourPay tourFinish(uint8_t ev, uint8_t place, uint16_t mark);  // what an event pays, and what it costs
+  uint8_t dozeStart = 21;      // the hour it may doze off with the light on: 21, 22, 23 or 0 (midnight)
   uint8_t parentGames = 0;      // 0 off, else games a day
   uint8_t gamesToday = 0;
   ParentBlock parentBlock() const;
@@ -840,6 +873,18 @@ public:
   uint8_t lastFishCoins = 0;
   uint8_t fishPaidLeft() const { return fishDay == today() ? (fishToday < FISH_PER_DAY ? FISH_PER_DAY - fishToday : 0) : FISH_PER_DAY; }
   FishResult fishCatch();              // a fish on the line, caught in time
+  // The Mine (mine.h): digs a day, pieces of amber, and a fossil waiting to hatch. fossilDex is
+  // the species of the next fossil egg, from the moment it is found until it hatches.
+  uint32_t mineDay = 0;
+  uint8_t mineToday = 0, mineAmber = 0;
+  uint16_t fossilDex = 0;
+  bool eggFossil = false;              // the waiting egg is the fossil's (not rerolled by a region change)
+  struct MineFind { MineKind kind; uint8_t coins; uint16_t dex; bool fossil; };
+  uint8_t mineDigsLeft() const { return ::mineDigsLeft(mineDay, mineToday, today()); }
+  bool canMine() const { return !isEgg() && !sleeping && ceremony == CER_NONE && !atWork() && energy >= MINE_MIN_ENERGY && mineDigsLeft() > 0; }
+  uint8_t mineTaps() const;            // taps this companion needs to break a rock
+  int16_t pickFossil() const;          // a prehistoric animal that can hatch here, 0 = none
+  MineFind mineDig();                  // the rock broke: costs the energy, one dig, the loot
   static const Recipe &recipe(uint8_t r);
   bool canCook(uint8_t r) const;
   bool cook(uint8_t r);
@@ -869,6 +914,7 @@ public:
   void diaryFlag(uint8_t f) { diaryRoll(); diary[0].flags |= f; pendingSave = true; }
   uint16_t diaryCoins(uint8_t i) const { return i == 0 ? (uint16_t)(coinsEarned - diaryCoinBase) : diary[i].coins; }
   bool isDozeHour() const;
+  bool dozeWindow() const;              // is it the hour the player chose (or later) for dozing off
 
   // combat stats: real early base + level + IV + training
   uint16_t atkStat() const;
@@ -911,6 +957,13 @@ public:
   // level() working untouched rather than needing a second source of truth.
   bool frozen = false;
   void reviveFrom(const PartyMon &m);
+  // Swapping the companion with a party member, no egg needed: the live one is banked WITH its raising
+  // state (PartyExt) in the same slot and the chosen one comes out growing (a banked one with no state
+  // comes out at its level with its needs topped up). False when it cannot: a ceremony, away at work,
+  // asleep, choosing a starter, an egg, or an empty slot.
+  bool canSwap() const { return !isEgg() && !sleeping && ceremony == CER_NONE && !atWork() && !starterPick && !evolving(); }
+  bool swapWith(uint8_t slot);
+  void restoreFrom(const PartyMon &m, const PartyExt &x);   // revive, then growing again
 
   // The player's own name, alongside the badges and the streak: it belongs to
   // whoever is playing, not to the creature, so newEgg() must never clear it.
@@ -1317,6 +1370,7 @@ private:
   void statusTick();          // per awake minute: sickness, boredom, dozing off
   void tick();
   void applyAutoSleep();
+  void autoCare();                      // one need back up, silently (see pluggedIdle)
   void hatch();
   void registerSpecies(int16_t dex);
   void save();

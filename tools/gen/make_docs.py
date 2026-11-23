@@ -25,7 +25,7 @@ BUILD = os.path.join(ROOT, 'build', 'docs')
 DOCS = os.path.join(ROOT, 'docs')
 N = 466
 BG = (0xf2, 0xef, 0xe1)
-CORE = ['gbsynth', 'pet', 'i18n', 'party', 'battle', 'link', 'save', 'steps', 'cry', 'talk', 'album', 'weather']
+CORE = ['gbsynth', 'pet', 'i18n', 'party', 'battle', 'link', 'save', 'steps', 'talk', 'album', 'weather']
 
 
 # ---------------------------------------------------------------- image writers

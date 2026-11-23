@@ -7,6 +7,7 @@
 #include "noart.h"   // speciesHasArt(): the egg pool skips what cannot be drawn
 #include "audio.h"
 #include "save.h"
+#include "tourney.h"   // the Tournament's rules and prizes
 
 // Reads a blob that may be LONGER than the array we are reading it into.
 //
@@ -84,6 +85,13 @@ void Pet::newEgg() {
     eggByRegion[region % REGION_COUNT] = eggTarget;
     eggShiny = nursery.eggShiny != 0;
     eggBred = true;
+  }
+  // a fossil found in the Mine is waiting: this egg is its (the Nursery's egg, if kept, goes first)
+  eggFossil = false;
+  if (fossilDex && !starterPick && !eggBred) {
+    eggTarget = fossilDex;
+    eggByRegion[region % REGION_COUNT] = eggTarget;
+    eggFossil = true;
   }
   // The debt lands on the creature about to hatch, and is spent doing so --
   // it is a one-day penalty, not a running total that compounds each retire.
@@ -163,15 +171,17 @@ void Pet::syncClock(uint32_t nowEpoch) {
       if (ageMinutes % 3 == 0) hygiene = dropTo(hygiene, 1, 45);
       continue;
     }
-    fullness = dropTo(fullness, 2, 15);
-    energy = dropTo(energy, 1, 15);
-    hygiene = dropTo(hygiene, 1, 15);
-    joy = dropTo(joy, 1, 15);
+    if (careDue()) {                         // the care pace slows the awake needs here too
+      fullness = dropTo(fullness, 2, 15);
+      energy = dropTo(energy, 1, 15);
+      hygiene = dropTo(hygiene, 1, 15);
+      joy = dropTo(joy, 1, 15);
+    }
     if (boredTicks < 0xFFFF) boredTicks++;  // nobody played with it meanwhile
   }
   if (!isEgg()) {
     if (!sleeping) {  // does not get dirty while sleeping
-      uint8_t p = poops + mins / 240;
+      uint8_t p = poops + mins / (240u * careEvery());
       poops = p > 3 ? 3 : p;
     }
     // evolution is NOT applied offline: it is left ready and the user triggers it
@@ -265,21 +275,30 @@ void Pet::tick() {
 
   if (ageMinutes % MINUTES_PER_LEVEL == 0) sfxPlay(SFX_LEVEL);  // levelled up (awake)
 
-  fullness = clamp100(fullness - 2);
-  energy = clamp100(energy - 1);
-  if (fullness > 40 && poops < 3 && random(100) < 15) poops++;
+  // The needs (food, energy, poop, hygiene, joy) move only on every Nth minute, N set
+  // by the care pace (1 = as always, 2 relaxed, 4 slow); everything else ticks as before.
+  const bool careNow = careDue();
+  if (careNow) {
+    fullness = clamp100(fullness - 2);
+    energy = clamp100(energy - 1);
+    if (fullness > 40 && poops < 3 && random(100) < 15) poops++;
 
-  hygiene = clamp100(hygiene - 1 - POOP_DRAIN_PER_PILE * poops);
-  // overweight makes it lazy: energy falls twice as fast
-  if (weight > 50) energy = clamp100(energy - 1);
+    hygiene = clamp100(hygiene - 1 - POOP_DRAIN_PER_PILE * poops);
+    // overweight makes it lazy: energy falls twice as fast
+    if (weight > 50) energy = clamp100(energy - 1);
+  }
   if (weight > 0 && ageMinutes % 3 == 0) weight--;
 
   defTick(false);  // calm forges defence
 
-  int dJoy = -1;
-  if (fullness < 30) dJoy -= 2;
-  if (hygiene < 30) dJoy -= 2;
-  joy = clamp100(joy + dJoy);
+  if (careNow) {
+    int dJoy = -1;
+    if (fullness < 30) dJoy -= 2;
+    if (hygiene < 30) dJoy -= 2;
+    joy = clamp100(joy + dJoy);
+  }
+
+  if (pluggedIdle) autoCare();   // plugged in and left alone: one low need is quietly seen to
 
   statusTick();  // care update: sickness, boredom, dozing off with the light on
 
@@ -351,6 +370,47 @@ void Pet::reviveFrom(const PartyMon &m) {
   nick[sizeof(nick) - 1] = 0;
   registerSpecies(speciesId);
   save();
+}
+
+// A banked companion comes out growing again: with the state it was swapped out with, or, when it has
+// none (it was retired in an earlier version), at its banked level with its needs at 80.
+void Pet::restoreFrom(const PartyMon &m, const PartyExt &x) {
+  reviveFrom(m);
+  frozen = false;
+  bornDay = today();
+  if (x.live) {
+    ageMinutes = x.ageMinutes;
+    bornDay = x.bornDay;
+    bond = x.bond > 100 ? 100 : x.bond;
+    fullness = x.fullness > 100 ? 100 : x.fullness;
+    joy = x.joy > 100 ? 100 : x.joy;
+    energy = x.energy > 100 ? 100 : x.energy;
+    hygiene = x.hygiene > 100 ? 100 : x.hygiene;
+    lastLearnLevel = level();
+  }
+  neglectTicks = 0;
+  save();
+}
+
+bool Pet::swapWith(uint8_t slot) {
+  if (slot >= PARTY_SLOTS || party.slots[slot].empty() || !canSwap()) return false;
+  PartyMon out = PartyMon();
+  out.dex = speciesId; out.level = level(); out.medals = medals;
+  out.ivAtk = ivAtk; out.ivDef = ivDef; out.ivSpe = ivSpe; out.ivHp = ivHp;
+  out.trAtk = trAtk; out.trDef = trDef; out.trSpe = trSpe;
+  out.shiny = shiny ? 1 : 0;
+  out.growth = growth;                            // each one keeps the stage it reached
+  for (int i = 0; i < MOVE_SLOTS; i++) out.moves[i] = moves[i];
+  strncpy(out.nick, nick, sizeof(out.nick) - 1);
+  PartyExt ox = { ageMinutes, bornDay, bond, fullness, joy, energy, hygiene, 1 };
+  PartyMon in = party.slots[slot];
+  PartyExt ix = party.ext[slot];
+  party.slots[slot] = out; party.ext[slot] = ox;
+  restoreFrom(in, ix);
+  party.save();                                   // both halves land together
+  sfxPlay(SFX_EVOLVE);
+  evolveUntil = millis() + EVOLVE_ANIM_MS;
+  return true;
 }
 
 void Pet::snapshotForParty() {
@@ -581,7 +641,7 @@ void Pet::setRegion(uint8_t r) {
   if (r == region) return;
   uint8_t old = region;
   region = r;
-  if (isEgg() && eggTarget >= 1 && !eggBred) {   // a bred egg is its parents', whatever the region
+  if (isEgg() && eggTarget >= 1 && !eggBred && !eggFossil) {   // a bred or fossil egg is its parents', whatever the region
     if (old < REGION_COUNT) eggByRegion[old] = eggTarget;
     int16_t known = eggByRegion[r];
     eggTarget = known >= 1 ? known : rollInRegion(r, eggRarity());
@@ -1235,6 +1295,7 @@ void Pet::hatch() {
     nursery.eggDex = 0;
   }
   eggBred = false;
+  if (eggFossil) { fossilDex = 0; eggFossil = false; }   // the fossil hatched
   trAtk = trDef = trSpe = 0;
   goodTicks = 0;
   berryKnown = false;
@@ -1656,6 +1717,64 @@ bool Pet::isDozeHour() const {
   if (!lastSeenEpoch) return false;   // no clock, no evening
   int h = (int)((lastSeenEpoch / 3600) % 24);
   return h >= DOZE_START || h < DOZE_END;
+}
+
+// Dozing off with the light on starts at the hour the player picked (Settings >
+// Parent): 21, 22, 23 or 0 (midnight), and ends at DOZE_END like the evening.
+bool Pet::dozeWindow() const {
+  if (!lastSeenEpoch) return false;
+  int h = (int)((lastSeenEpoch / 3600) % 24);
+  if (dozeStart == 0) return h < DOZE_END;
+  return h >= dozeStart || h < DOZE_END;
+}
+
+// ---------- the Tournament ----------
+
+bool Pet::canCompete() const {
+  return !isEgg() && !sleeping && ceremony == CER_NONE && !isSick() && !atWork() && !evolving() &&
+         energy >= TOUR_MIN_ENERGY;
+}
+
+// An event is over: it tires the companion, adds the medal, pays the coins (the first gold of a day
+// pays a bonus) and keeps the best mark.
+Pet::TourPay Pet::tourFinish(uint8_t ev, uint8_t place, uint16_t mark) {
+  TourPay r = { 0, false, false };
+  if (ev >= TOUR_EVENTS || place < 1 || place > 3) return r;
+  energy = energy > TOUR_ENERGY_COST ? (uint8_t)(energy - TOUR_ENERGY_COST) : 0;
+  if (place == 1) {
+    if (tourGold < 65535) tourGold++;
+    joy = clamp100(joy + TOUR_JOY_GOLD);
+  } else if (place == 2) {
+    if (tourSilver < 65535) tourSilver++;
+  } else {
+    if (tourBronze < 65535) tourBronze++;
+  }
+  r.coins = tourCoins(place);
+  if (place == 1 && today() && tourGoldDay != today()) {
+    tourGoldDay = today();
+    r.coins += TOUR_DAILY_BONUS;
+    r.bonus = true;
+  }
+  if (eventRecord(ev, tourBest[ev], mark)) { tourBest[ev] = mark; r.record = true; }
+  earnCoins(r.coins, false);
+  save();
+  return r;
+}
+
+void Pet::autoCare() {
+  if (fullness < AUTO_CARE_FROM) {
+    fullness = AUTO_CARE_LEVEL;
+  } else if (hygiene < AUTO_CARE_FROM || poops >= 2) {
+    if (hygiene < AUTO_CARE_LEVEL) hygiene = AUTO_CARE_LEVEL;
+    poops = 0;
+  } else if (energy < AUTO_CARE_FROM) {
+    energy = AUTO_CARE_LEVEL;
+  } else if (joy < AUTO_CARE_FROM) {
+    joy = AUTO_CARE_LEVEL;
+  } else {
+    return;
+  }
+  pendingSave = true;
 }
 
 void Pet::statusTick() {
@@ -2174,7 +2293,9 @@ int8_t Pet::harvest() {
   static const uint8_t CROP[8] = { FOOD_JUICE, FOOD_JUICE, FOOD_COOKIE, FOOD_ICECREAM,
                                    FOOD_CAKE, FOOD_SANDWICH, FOOD_SOUP, FOOD_ONIGIRI };
   uint8_t f = CROP[random(8)];
-  if (foodCount[f] < FOOD_STACK_MAX) foodCount[f]++;
+  int8_t fk = fruitFromRoll((uint8_t)random(100), (uint8_t)random(FRUIT_KINDS));
+  if (fk >= 0 && fruitCount[fk] < FRUIT_STACK_MAX) { fruitCount[fk]++; f = (uint8_t)(FRUIT_FOOD_BASE + fk); }
+  else if (foodCount[f] < FOOD_STACK_MAX) foodCount[f]++;
   plantEpoch = 0;
   bumpTally(TALLY_HARVEST);
   noteMission(MIS_GARDEN, 1);
@@ -2182,6 +2303,21 @@ int8_t Pet::harvest() {
   registerCare();
   save();
   return (int8_t)f;
+}
+
+Pet::FruitResult Pet::eatFruit(uint8_t kind) {
+  lastFruitGain = 0;
+  if (kind >= FRUIT_KINDS || !fruitCount[kind] || isEgg() || ceremony != CER_NONE) return FRUIT_NONE;
+  uint8_t *tr = kind == 0 ? &trAtk : kind == 1 ? &trDef : &trSpe;
+  uint8_t cap = kind == 0 ? trMaxAtk() : kind == 1 ? trMaxDef() : trMaxSpe();
+  uint8_t g = fruitGain(*tr, cap);
+  if (!g) return FRUIT_AT_BEST;
+  *tr = (uint8_t)(*tr + g);
+  fruitCount[kind]--;
+  lastFruitGain = g;
+  registerCare();
+  save();
+  return FRUIT_EATEN;
 }
 
 // ---------- the capsule machine ----------
@@ -2822,6 +2958,7 @@ void Pet::trophyProgress(uint8_t t, uint32_t &cur, uint32_t &goal) const {
     case TRO_ROUTE:   cur = tally[TALLY_ROUTE];   goal = 1;   break;
     case TRO_GOLD:    cur = goldBadges();         goal = 10;  break;
     case TRO_PRIZES:  cur = prizeOwned(PRIZE_CAP) + prizeOwned(PRIZE_VISOR) + prizeOwned(PRIZE_CABINET); goal = 3; break;
+    case TRO_STADIUM: cur = tourGold;             goal = 5;   break;
     default: cur = 0; goal = 1; break;
   }
   if (cur > goal) cur = goal;
@@ -2968,6 +3105,56 @@ FishResult Pet::fishCatch() {
   }
   save();
   return r;
+}
+
+// ---------- the mine ----------
+
+uint8_t Pet::mineTaps() const {
+  if (isEgg()) return 14;
+  const DexEntry &d = DEX_TBL[speciesId];
+  return mineTapsFor(d.type1, d.type2, atkStat());
+}
+
+// A prehistoric animal whose region is on the card, one the field guide lacks when there is one; 0 = none can.
+int16_t Pet::pickFossil() const {
+  int16_t fresh[FOSSIL_COUNT], any[FOSSIL_COUNT];
+  int nf = 0, na = 0;
+  for (int i = 0; i < FOSSIL_COUNT; i++) {
+    int16_t d = fossilAt(i);
+    if (!regionAvailable(regionOfDex(d))) continue;
+    any[na++] = d;
+    if (!isRegistered(d)) fresh[nf++] = d;
+  }
+  if (nf) return fresh[random(nf)];
+  return na ? any[random(na)] : 0;
+}
+
+Pet::MineFind Pet::mineDig() {
+  MineFind f = { ML_COINS, 0, 0, false };
+  if (!canMine()) return f;
+  if (mineDay != today()) { mineDay = today(); mineToday = 0; }
+  if (mineToday < 255) mineToday++;
+  energy = energy > MINE_ENERGY_COST ? (uint8_t)(energy - MINE_ENERGY_COST) : 0;
+  registerCare();
+  MineKind k = mineLootKind((uint8_t)random(100));
+  const int16_t wait = fossilDex ? 0 : pickFossil();             // one fossil at a time, of a region on the card
+  if (k == ML_FOSSIL && !wait) k = ML_AMBER;
+  if (k == ML_AMBER) {
+    AmberResult am = mineAddAmber(mineAmber, wait != 0);
+    mineAmber = am.amber; f.fossil = am.fossil;
+    if (am.fossil) { fossilDex = (uint16_t)wait; f.dex = fossilDex; }
+  } else if (k == ML_FOSSIL) {
+    fossilDex = (uint16_t)wait; f.dex = fossilDex;
+  } else if (k == ML_SEEDS) {
+    if (seedCount < FOOD_STACK_MAX) seedCount++;
+  } else if (k == ML_SNACK) {
+    if (foodCount[FOOD_ONIGIRI] < FOOD_STACK_MAX) foodCount[FOOD_ONIGIRI]++;
+  } else {
+    f.coins = (uint8_t)earnCoins(mineCoinsFor((uint8_t)random(255)), false);
+  }
+  f.kind = k;
+  save();
+  return f;
 }
 
 // ---------- the kitchen ----------
@@ -3118,7 +3305,7 @@ GiftKind Pet::claimHolidayGift() {
 }
 
 void Pet::dozeOff() {
-  if (isEgg() || ceremony != CER_NONE || sleeping || screenIsOff || !isDozeHour()) return;
+  if (isEgg() || ceremony != CER_NONE || sleeping || screenIsOff || !dozeWindow()) return;
   sleeping = true;
   sleepAuto = SLEEP_PLAYER;
   lightOn = true;
@@ -3418,6 +3605,13 @@ void Pet::save() {
   prefs.putUChar("stdn", studyToday);
   prefs.putUChar("qzhi", quizHi);
   prefs.putUChar("pbed", parentBed);
+  prefs.putUChar("dzs", dozeStart);
+  prefs.putBytes("tbst", tourBest, sizeof(tourBest));
+  prefs.putUShort("tmg", tourGold);
+  prefs.putUShort("tms", tourSilver);
+  prefs.putUShort("tmb", tourBronze);
+  prefs.putUInt("tgd", tourGoldDay);
+  prefs.putUChar("cpc", carePace);
   prefs.putUChar("pgam", parentGames);
   prefs.putUChar("gmtd", gamesToday);
   prefs.putUChar("advR", advRoute);
@@ -3428,6 +3622,11 @@ void Pet::save() {
   prefs.putUInt("gymW", gymLastWinDay);
   prefs.putUInt("fshd", fishDay);
   prefs.putUChar("fshn", fishToday);
+  prefs.putUInt("mnd", mineDay);
+  prefs.putUChar("mnn", mineToday);
+  prefs.putUChar("msh", mineAmber);
+  prefs.putBytes("frt", fruitCount, sizeof(fruitCount));
+  prefs.putUShort("mnf", fossilDex);
   prefs.putBool("alOn", alarmOn);
   prefs.putUChar("alH", alarmH);
   prefs.putUChar("alM", alarmM);
@@ -3708,6 +3907,16 @@ void Pet::load() {
   quizHi = prefs.getUChar("qzhi", 0);
   parentBed = prefs.getUChar("pbed", 0);
   if (parentBed && (parentBed < PARENT_BED_MIN || parentBed > PARENT_BED_MAX)) parentBed = 0;
+  memset(tourBest, 0, sizeof(tourBest));
+  loadBlob(prefs, "tbst", (uint8_t *)tourBest, sizeof(tourBest));
+  tourGold = prefs.getUShort("tmg", 0);
+  tourSilver = prefs.getUShort("tms", 0);
+  tourBronze = prefs.getUShort("tmb", 0);
+  tourGoldDay = prefs.getUInt("tgd", 0);
+  dozeStart = prefs.getUChar("dzs", 21);
+  if (dozeStart != 0 && (dozeStart < 21 || dozeStart > 23)) dozeStart = 21;
+  carePace = prefs.getUChar("cpc", CARE_PACE_DEFAULT);
+  if (carePace > 2) carePace = CARE_PACE_DEFAULT;
   parentGames = prefs.getUChar("pgam", 0);
   gamesToday = prefs.getUChar("gmtd", 0);
   advRoute = prefs.getUChar("advR", 0) % ROUTE_COUNT;
@@ -3719,6 +3928,12 @@ void Pet::load() {
   gymLastWinDay = prefs.getUInt("gymW", 0);      // phase 36: none in an older save, so no week to wait
   fishDay = prefs.getUInt("fshd", 0);
   fishToday = prefs.getUChar("fshn", 0);
+  mineDay = prefs.getUInt("mnd", 0);
+  mineToday = prefs.getUChar("mnn", 0);
+  loadBlob(prefs, "frt", fruitCount, sizeof(fruitCount));
+  for (int i = 0; i < FRUIT_KINDS; i++) if (fruitCount[i] > FRUIT_STACK_MAX) fruitCount[i] = FRUIT_STACK_MAX;
+  mineAmber = prefs.getUChar("msh", 0); if (mineAmber >= AMBER_PER_FOSSIL) mineAmber = AMBER_PER_FOSSIL - 1;
+  fossilDex = prefs.getUShort("mnf", 0); if (!isFossilDex((int16_t)fossilDex)) fossilDex = 0;
   alarmOn = prefs.getBool("alOn", false);
   alarmH = prefs.getUChar("alH", 7) % 24;
   alarmM = prefs.getUChar("alM", 0) % 60;
@@ -3779,6 +3994,7 @@ void Pet::load() {
   if (nursery.aDex < 0 || nursery.aDex > DEX_COUNT || nursery.bDex < 0 || nursery.bDex > DEX_COUNT) nursery.aDex = nursery.bDex = 0;
   if (nursery.eggDex < 0 || nursery.eggDex > DEX_COUNT) nursery.eggDex = 0;
   eggBred = prefs.getBool("eggB", false) && nursery.eggDex > 0 && isEgg();
+  eggFossil = fossilDex && isEgg() && !eggBred && eggTarget == (int16_t)fossilDex;
   {
     const char *k[3] = { "acF", "acN", "acB" };
     for (int s = 0; s < 3; s++) { int8_t v = prefs.getChar(k[s], -1); accOn[s] = (v >= 0 && v < ACC_COUNT && accSlot(v) == s && ownsAcc(v)) ? v : -1; }

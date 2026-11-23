@@ -34,6 +34,9 @@ extern uint32_t choiceUntil;
 extern bool galleryDirty;
 extern Combatant btlYou, btlFoe;
 extern int16_t monFor;
+extern bool gStandbyOn, tourOpen, clockOpen; extern uint8_t mapPage, placeScene, settingsPage;
+void openStadium(); void tourTap(int16_t, int16_t); void tourLeave();
+static void tourPhaseReset() { tourLeave(); }
 void emuSetSpriteDir(const char *);
 
 static const char *gOut = ".";
@@ -141,6 +144,15 @@ int main(int argc, char **argv) {
   for (uint8_t g = 0; g < 4; g++) { closeAll(); startFunPackGame(g); pump(6); shot(GAME[g]); }
   closeAll(); fpOpen = false;
   pump(4);
+  // 1.6.0: the standby clock, the Stadium, the mine and the care page
+  careFor(36); ensureMon();
+  mapOpen = true; mapPage = 2; pump(2); shot("map_more"); closeAll();
+  gStandbyOn = true; pump(2); shot("standby"); gStandbyOn = false;
+  openStadium(); pump(2); shot("stadium");
+  tourTap(233, 132); skip(4500); pump(2); shot("stadium_race"); tourOpen = false; tourPhaseReset();
+  placeScene = 20; pump(2); shot("mine"); placeScene = 0;
+  clockOpen = true; settingsPage = 6; pump(2); shot("care_page");
+  setLang(LANG_ES); pump(2); shot("care_page_es"); setLang(LANG_EN); clockOpen = false; settingsPage = 0;
   setLang(LANG_ZH); cardOpen = true; cardPage = 3; pump(2); shot("card_growth_zh");
   setLang(LANG_KO); pump(2); shot("card_growth_ko");
   setLang(LANG_EN);

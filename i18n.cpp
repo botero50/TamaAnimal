@@ -143,7 +143,13 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 44
     "Hierba alta", "SNACKS", "Snack", "Snack Fino", "Snack Top", "Aparece %s!", "Atrapaste a %s!", "Se fue a la caja.", "%s se escapo!", "Equipo y caja llenos", "Sin snacks: hay en la tienda", "Encontraste un snack!", "Algo se mueve en la hierba!", "Camina %u pasos mas", "Ahora esta durmiendo", "No hay nadie en la hierba", "Se usan en la hierba alta",
     // phase 45
-    "Excursion", "De excursion", "De vuelta!", "%s se fue de excursion!", "Ya no hay excursiones hoy", "Es tarde: manana sera", "Llamar", "Llamarlo? Sin historia", "%s fue al rio", "y encontro %u monedas!", "%s busco entre los arbustos", "y encontro un snack!", "%s conocio a %s", "y compartieron un bocadillo!", "%s paseo por el pueblo", "y le dieron una galleta!", "%s jugo en el jardin", "y encontro una semilla!", "%s salto en los charcos", "y trajo un jabon!", "%s vio algo moverse", "en la hierba alta!", "%s subio a una colina", "y encontro un snack fino!", "Cria", "Joven", "Adulto", },
+    "Excursion", "De excursion", "De vuelta!", "%s se fue de excursion!", "Ya no hay excursiones hoy", "Es tarde: manana sera", "Llamar", "Llamarlo? Sin historia", "%s fue al rio", "y encontro %u monedas!", "%s busco entre los arbustos", "y encontro un snack!", "%s conocio a %s", "y compartieron un bocadillo!", "%s paseo por el pueblo", "y le dieron una galleta!", "%s jugo en el jardin", "y encontro una semilla!", "%s salto en los charcos", "y trajo un jabon!", "%s vio algo moverse", "en la hierba alta!", "%s subio a una colina", "y encontro un snack fino!", "Cria", "Joven", "Adulto",
+    "Despertar tactil", "Duerme a las", "CUIDADO", "Ritmo de cuidado", "Normal", "Relajado", "Lento", "Ahorro pantalla off", "DOM", "LUN",
+    "MAR", "MIE", "JUE", "VIE", "SAB", "Estadio", "Torneo", "100 m", "Vallas", "50 m libres",
+    "Salto de longitud", "Salto de altura", "Pesas", "Escalada", "Saltos al agua", "Patinaje", "Antorcha", "Campo a traves", "Demasiado cansado", "ORO!",
+    "PLATA", "BRONCE", "NUEVO RECORD!", "Primer oro de hoy: +%u monedas", "+%u monedas", "Mejor", "Oro en el Torneo", "CAMBIAR", "Toca otra vez para cambiar", "Ahora no: dormido, de viaje o en ceremonia",
+    "Ahorro de bateria", "Auto", "Siempre", "Normal", "Ahorrando", "Critico", "%d%% %d.%02dV  %s", "Cantera", "TOCA LA ROCA!", "Picadas: %u",
+    "Ambar %u/10", "Muy cansado para picar", "Hoy no quedan picadas", "Un trozo de ambar!", "Fosil! Huevo de %s", "Baya Fuerza", "Baya Guardia", "Baya Rapida", "Entrenamiento +%u", "Ya esta al maximo", },
   // ---------------- EN ----------------
   {
     "Growing up!", "Yum yum!", "It likes it!", "It's hungry!", "Needs a bath!",
@@ -281,7 +287,13 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 44
     "Tall Grass", "SNACKS", "Snack", "Fine Snack", "Top Snack", "%s appears!", "You caught %s!", "It went to the box.", "%s broke free!", "Team and box are full", "No snacks: buy some in the shop", "You found a snack!", "Something stirs in the grass!", "Walk %u more steps", "It's asleep right now", "Nobody is in the grass", "Use them in the Tall Grass",
     // phase 45
-    "Trip", "On a trip", "Back home!", "%s set off on a trip!", "No more trips today", "Too late: try tomorrow", "Call back", "Call it back? No story", "%s went to the river", "and found %u coins!", "%s looked under a bush", "and found a snack!", "%s met %s", "and they shared a snack!", "%s walked through town", "and was given a cookie!", "%s played in a garden", "and found a seed!", "%s splashed in puddles", "and brought home soap!", "%s saw something move", "in the tall grass!", "%s climbed a hill", "and found a fine snack!", "Cub", "Juvenile", "Adult", },
+    "Trip", "On a trip", "Back home!", "%s set off on a trip!", "No more trips today", "Too late: try tomorrow", "Call back", "Call it back? No story", "%s went to the river", "and found %u coins!", "%s looked under a bush", "and found a snack!", "%s met %s", "and they shared a snack!", "%s walked through town", "and was given a cookie!", "%s played in a garden", "and found a seed!", "%s splashed in puddles", "and brought home soap!", "%s saw something move", "in the tall grass!", "%s climbed a hill", "and found a fine snack!", "Cub", "Juvenile", "Adult",
+    "Tap wake", "Dozes off at", "CARE", "Care pace", "Normal", "Relaxed", "Slow", "Screen-off saver", "SUN", "MON",
+    "TUE", "WED", "THU", "FRI", "SAT", "Stadium", "Tournament", "100 m", "Hurdles", "50 m swim",
+    "Long jump", "High jump", "Weights", "Climbing", "Diving", "Skating", "Torch run", "Trail run", "Too tired to compete", "GOLD!",
+    "SILVER", "BRONZE", "NEW RECORD!", "First gold today: +%u coins", "+%u coins", "Best", "Tournament gold", "SWAP", "Tap again to swap", "Not now: asleep, away or in a ceremony",
+    "Battery saver", "Auto", "Always", "Normal", "Saving", "Critical", "%d%% %d.%02dV  %s", "Mine", "TAP THE ROCK!", "Digs left: %u",
+    "Amber %u/10", "Too tired to dig", "No digs left today", "A piece of amber!", "A fossil! %s egg next", "Power Fruit", "Guard Fruit", "Swift Fruit", "Training +%u", "Already at its best", },
   // ---------------- FR ----------------
   {
     "Il grandit !", "Miam miam!", "Il aime ca!", "Il a faim!", "Besoin d'un bain!",
@@ -418,7 +430,13 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 44
     "Hautes herbes", "SNACKS", "Snack", "Super Snack", "Top Snack", "%s apparait !", "%s est capture !", "Il va dans la boite.", "%s s'est libere !", "Equipe et boite pleines", "Plus de snacks: voir la boutique", "Tu trouves un snack !", "Ca bouge dans les herbes !", "Encore %u pas", "Il dort pour l'instant", "Personne dans les herbes", "A utiliser dans les herbes",
     // phase 45
-    "Balade", "En balade", "De retour !", "%s part en balade !", "Plus de balade aujourd'hui", "Trop tard: a demain", "Rappeler", "Rappeler ? Pas d'histoire", "%s est alle a la riviere", "et trouve %u pieces !", "%s a fouille un buisson", "et trouve un snack !", "%s a rencontre %s", "et ils ont goute ensemble !", "%s a traverse la ville", "et a recu un biscuit !", "%s a joue au jardin", "et trouve une graine !", "%s a saute dans les flaques", "et rapporte du savon !", "%s a vu bouger quelque chose", "dans les hautes herbes !", "%s a grimpe une colline", "et trouve un super snack !", "Petit", "Jeune", "Adulte", },
+    "Balade", "En balade", "De retour !", "%s part en balade !", "Plus de balade aujourd'hui", "Trop tard: a demain", "Rappeler", "Rappeler ? Pas d'histoire", "%s est alle a la riviere", "et trouve %u pieces !", "%s a fouille un buisson", "et trouve un snack !", "%s a rencontre %s", "et ils ont goute ensemble !", "%s a traverse la ville", "et a recu un biscuit !", "%s a joue au jardin", "et trouve une graine !", "%s a saute dans les flaques", "et rapporte du savon !", "%s a vu bouger quelque chose", "dans les hautes herbes !", "%s a grimpe une colline", "et trouve un super snack !", "Petit", "Jeune", "Adulte",
+    "Reveil tactile", "S'endort a", "SOINS", "Rythme des soins", "Normal", "Detendu", "Lent", "Eco ecran eteint", "DIM", "LUN",
+    "MAR", "MER", "JEU", "VEN", "SAM", "Stade", "Tournoi", "100 m", "Haies", "50 m nage",
+    "Saut en longueur", "Saut en hauteur", "Halteres", "Escalade", "Plongeon", "Patinage", "Course du flambeau", "Cross", "Trop fatigue", "OR!",
+    "ARGENT", "BRONZE", "RECORD!", "Premier or du jour: +%u pieces", "+%u pieces", "Meilleur", "Or au tournoi", "ECHANGER", "Touche encore pour echanger", "Pas maintenant: endormi, parti ou en ceremonie",
+    "Economie batterie", "Auto", "Toujours", "Normal", "Economie", "Critique", "%d%% %d.%02dV  %s", "Mine", "TAPE LE ROCHER!", "Forages: %u",
+    "Ambre %u/10", "Trop fatigue pour miner", "Plus de forage ce jour", "Un morceau d'ambre!", "Fossile! Oeuf de %s", "Fruit Force", "Fruit Garde", "Fruit Vite", "Entrainement +%u", "Deja au maximum", },
   // ---------------- DE ----------------
   {
     "Es waechst!", "Mampf mampf!", "Gefaellt ihm!", "Hat Hunger!", "Braucht ein Bad!",
@@ -555,7 +573,13 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 44
     "Hohes Gras", "SNACKS", "Snack", "Super Snack", "Top Snack", "%s taucht auf!", "%s gefangen!", "Es kommt in die Box.", "%s hat sich befreit!", "Team und Box sind voll", "Keine Baelle: im Laden kaufen", "Du findest einen Snack!", "Es raschelt im Gras!", "Noch %u Schritte", "Es schlaeft gerade", "Niemand ist im Gras", "Fuer das hohe Gras",
     // phase 45
-    "Ausflug", "Auf Ausflug", "Wieder da!", "%s macht einen Ausflug!", "Heute keine Ausfluege mehr", "Zu spaet: morgen wieder", "Zurueckrufen", "Zurueckrufen? Keine Story", "%s war am Fluss", "und fand %u Muenzen!", "%s suchte im Gebuesch", "und fand einen Snack!", "%s traf %s", "und sie teilten einen Snack!", "%s lief durch die Stadt", "und bekam einen Keks!", "%s spielte im Garten", "und fand einen Samen!", "%s sprang in Pfuetzen", "und brachte Seife mit!", "%s sah etwas sich bewegen", "im hohen Gras!", "%s stieg auf einen Huegel", "und fand einen Super Snack!", "Junges", "Jungtier", "Erwachsen", },
+    "Ausflug", "Auf Ausflug", "Wieder da!", "%s macht einen Ausflug!", "Heute keine Ausfluege mehr", "Zu spaet: morgen wieder", "Zurueckrufen", "Zurueckrufen? Keine Story", "%s war am Fluss", "und fand %u Muenzen!", "%s suchte im Gebuesch", "und fand einen Snack!", "%s traf %s", "und sie teilten einen Snack!", "%s lief durch die Stadt", "und bekam einen Keks!", "%s spielte im Garten", "und fand einen Samen!", "%s sprang in Pfuetzen", "und brachte Seife mit!", "%s sah etwas sich bewegen", "im hohen Gras!", "%s stieg auf einen Huegel", "und fand einen Super Snack!", "Junges", "Jungtier", "Erwachsen",
+    "Antippen weckt", "Schlaeft ein um", "PFLEGE", "Pflegetempo", "Normal", "Entspannt", "Langsam", "Sparmodus Display aus", "SO", "MO",
+    "DI", "MI", "DO", "FR", "SA", "Stadion", "Turnier", "100 m", "Huerden", "50 m Schwimmen",
+    "Weitsprung", "Hochsprung", "Gewichtheben", "Klettern", "Turmspringen", "Eislauf", "Fackellauf", "Gelaendelauf", "Zu muede", "GOLD!",
+    "SILBER", "BRONZE", "REKORD!", "Erstes Gold heute: +%u Muenzen", "+%u Muenzen", "Beste", "Turnier-Gold", "TAUSCHEN", "Nochmal tippen zum Tauschen", "Jetzt nicht: schlaeft, weg oder Zeremonie",
+    "Akku-Sparmodus", "Auto", "Immer", "Normal", "Sparend", "Kritisch", "%d%% %d.%02dV  %s", "Mine", "TIPPE AUF DEN FELS!", "Grabungen: %u",
+    "Bernstein %u/10", "Zu muede zum Graben", "Heute keine Grabung mehr", "Ein Stueck Bernstein!", "Fossil! %s-Ei als Naechstes", "Kraftfrucht", "Wehrfrucht", "Flinkfrucht", "Training +%u", "Schon am Maximum", },
   // ---------------- IT ----------------
   {
     "Sta crescendo!", "Gnam gnam!", "Gli piace!", "Ha fame!", "Vuole un bagno!",
@@ -692,7 +716,13 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 44
     "Erba alta", "SNACK", "Snack", "Super Snack", "Top Snack", "Ecco %s!", "Hai preso %s!", "Va nel box.", "%s si e liberato!", "Squadra e box pieni", "Niente snack: vai al negozio", "Hai trovato uno snack!", "Qualcosa si muove nell'erba!", "Ancora %u passi", "Ora sta dormendo", "Nessuno nell'erba", "Da usare nell'erba alta",
     // phase 45
-    "Gita", "In gita", "Di ritorno!", "%s parte per una gita!", "Niente piu gite oggi", "Troppo tardi: a domani", "Richiama", "Richiamarlo? Niente storia", "%s e andato al fiume", "e ha trovato %u monete!", "%s ha frugato un cespuglio", "e ha trovato uno snack!", "%s ha incontrato %s", "e hanno fatto merenda!", "%s ha girato in citta", "e ha avuto un biscotto!", "%s ha giocato in giardino", "e ha trovato un seme!", "%s ha saltato nelle pozzanghere", "e ha portato del sapone!", "%s ha visto muoversi qualcosa", "nell'erba alta!", "%s e salito su una collina", "e ha trovato un super snack!", "Cucciolo", "Giovane", "Adulto", },
+    "Gita", "In gita", "Di ritorno!", "%s parte per una gita!", "Niente piu gite oggi", "Troppo tardi: a domani", "Richiama", "Richiamarlo? Niente storia", "%s e andato al fiume", "e ha trovato %u monete!", "%s ha frugato un cespuglio", "e ha trovato uno snack!", "%s ha incontrato %s", "e hanno fatto merenda!", "%s ha girato in citta", "e ha avuto un biscotto!", "%s ha giocato in giardino", "e ha trovato un seme!", "%s ha saltato nelle pozzanghere", "e ha portato del sapone!", "%s ha visto muoversi qualcosa", "nell'erba alta!", "%s e salito su una collina", "e ha trovato un super snack!", "Cucciolo", "Giovane", "Adulto",
+    "Tocco sveglia", "Si addormenta alle", "CURE", "Ritmo delle cure", "Normale", "Rilassato", "Lento", "Risparmio schermo off", "DOM", "LUN",
+    "MAR", "MER", "GIO", "VEN", "SAB", "Stadio", "Torneo", "100 m", "Ostacoli", "50 m nuoto",
+    "Salto in lungo", "Salto in alto", "Pesi", "Arrampicata", "Tuffi", "Pattinaggio", "Corsa della torcia", "Corsa nel bosco", "Troppo stanco", "ORO!",
+    "ARGENTO", "BRONZO", "RECORD!", "Primo oro di oggi: +%u monete", "+%u monete", "Migliore", "Oro al torneo", "SCAMBIA", "Tocca ancora per scambiare", "Non ora: dorme, via o in cerimonia",
+    "Risparmio batteria", "Auto", "Sempre", "Normale", "Risparmio", "Critico", "%d%% %d.%02dV  %s", "Miniera", "TOCCA LA ROCCIA!", "Scavi: %u",
+    "Ambra %u/10", "Troppo stanco per scavare", "Niente scavi oggi", "Un pezzo d'ambra!", "Fossile! Uovo di %s", "Frutto Forza", "Frutto Guardia", "Frutto Rapido", "Allenamento +%u", "Gia al massimo", },
   // ---------------- PT ----------------
   {
     "Crescendo!", "Nham nham!", "Ele gosta!", "Esta com fome!", "Precisa de banho!",
@@ -829,7 +859,13 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 44
     "Mato alto", "LANCHES", "Lanche", "Lanche Fino", "Lanche Top", "Surge %s!", "Pegou %s!", "Foi para a caixa.", "%s escapou!", "Equipe e caixa cheias", "Sem lanches: compre na loja", "Achou um lanche!", "Algo se mexe no mato!", "Ande mais %u passos", "Esta dormindo agora", "Ninguem no mato", "Use no mato alto",
     // phase 45
-    "Passeio", "Em passeio", "De volta!", "%s saiu em passeio!", "Sem passeios hoje", "Tarde: so amanha", "Chamar", "Chamar? Sem historia", "%s foi ao rio", "e achou %u moedas!", "%s olhou num arbusto", "e achou um lanche!", "%s conheceu %s", "e dividiram um lanche!", "%s andou pela cidade", "e ganhou um biscoito!", "%s brincou no jardim", "e achou uma semente!", "%s pulou em pocas", "e trouxe sabao!", "%s viu algo se mexer", "no mato alto!", "%s subiu um morro", "e achou um lanche fino!", "Filhote", "Jovem", "Adulto", },
+    "Passeio", "Em passeio", "De volta!", "%s saiu em passeio!", "Sem passeios hoje", "Tarde: so amanha", "Chamar", "Chamar? Sem historia", "%s foi ao rio", "e achou %u moedas!", "%s olhou num arbusto", "e achou um lanche!", "%s conheceu %s", "e dividiram um lanche!", "%s andou pela cidade", "e ganhou um biscoito!", "%s brincou no jardim", "e achou uma semente!", "%s pulou em pocas", "e trouxe sabao!", "%s viu algo se mexer", "no mato alto!", "%s subiu um morro", "e achou um lanche fino!", "Filhote", "Jovem", "Adulto",
+    "Toque acorda", "Adormece as", "CUIDADOS", "Ritmo de cuidados", "Normal", "Relaxado", "Lento", "Poupanca tela apagada", "DOM", "SEG",
+    "TER", "QUA", "QUI", "SEX", "SAB", "Estadio", "Torneio", "100 m", "Barreiras", "50 m nado",
+    "Salto em distancia", "Salto em altura", "Pesos", "Escalada", "Saltos ornamentais", "Patinacao", "Corrida da tocha", "Corrida na trilha", "Cansado demais", "OURO!",
+    "PRATA", "BRONZE", "RECORDE!", "Primeiro ouro do dia: +%u moedas", "+%u moedas", "Melhor", "Ouro no torneio", "TROCAR", "Toque de novo para trocar", "Agora nao: dormindo, fora ou em cerimonia",
+    "Economia de bateria", "Auto", "Sempre", "Normal", "Economia", "Critico", "%d%% %d.%02dV  %s", "Pedreira", "TOQUE NA ROCHA!", "Escavacoes: %u",
+    "Ambar %u/10", "Cansado demais para cavar", "Sem escavacoes hoje", "Um pedaco de ambar!", "Fossil! Ovo de %s", "Fruta Forca", "Fruta Guarda", "Fruta Veloz", "Treino +%u", "Ja esta no maximo", },
   // ---------------- ZH (simplified) ----------------
   // The only rows allowed non-ASCII: glyphs come from cjkfont.h (tools/gen_cjk.py).
   {
@@ -968,7 +1004,13 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 44
     "草丛", "零食", "零食", "高级零食", "顶级零食", "%s 出现了!", "抓到了 %s!", "送进了箱子.", "%s 挣脱了!", "队伍和箱子都满了", "没有零食了: 去商店买", "找到了零食!", "草丛里有动静!", "再走 %u 步", "它正在睡觉", "草丛里没有人", "在草丛里使用",
     // phase 45
-    "旅行", "旅行中", "回来了!", "%s 出发旅行了!", "今天不能再旅行了", "太晚了: 明天吧", "叫回来", "叫回来? 没有故事", "%s 去了河边", "找到了 %u 枚金币!", "%s 在灌木下找东西", "找到了零食!", "%s 遇见了 %s", "一起吃了点心!", "%s 逛了小镇", "得到了一块饼干!", "%s 在花园里玩", "找到了一颗种子!", "%s 踩了水坑", "带回了肥皂!", "%s 看到有东西在动", "在草丛里!", "%s 爬上了小山", "找到了高级零食!", "幼崽", "少年", "成年", },
+    "旅行", "旅行中", "回来了!", "%s 出发旅行了!", "今天不能再旅行了", "太晚了: 明天吧", "叫回来", "叫回来? 没有故事", "%s 去了河边", "找到了 %u 枚金币!", "%s 在灌木下找东西", "找到了零食!", "%s 遇见了 %s", "一起吃了点心!", "%s 逛了小镇", "得到了一块饼干!", "%s 在花园里玩", "找到了一颗种子!", "%s 踩了水坑", "带回了肥皂!", "%s 看到有东西在动", "在草丛里!", "%s 爬上了小山", "找到了高级零食!", "幼崽", "少年", "成年",
+    "触摸唤醒", "几点打瞌睡", "照顾", "照顾节奏", "正常", "轻松", "缓慢", "息屏省电", "周日", "周一",
+    "周二", "周三", "周四", "周五", "周六", "体育场", "锦标赛", "100米", "跨栏", "50米游泳",
+    "跳远", "跳高", "举重", "攀岩", "跳水", "滑冰", "火炬跑", "越野跑", "太累了", "金牌!",
+    "银牌", "铜牌", "新纪录!", "今日首金: +%u金币", "+%u金币", "最好", "锦标赛金牌", "交换", "再点一次交换", "现在不行: 睡觉、外出或仪式中",
+    "省电模式", "自动", "总是", "正常", "省电中", "电量极低", "%d%% %d.%02dV  %s", "矿洞", "敲打岩石!", "剩余挖掘: %u",
+    "琥珀 %u/10", "太累了,不能挖", "今天不能再挖了", "一块琥珀!", "化石! 下个是%s的蛋", "力量果", "守护果", "迅捷果", "训练 +%u", "已经是最强了", },
   // ---------------- KO ----------------
   {
     "자라는 중!", "냠냠!", "좋아해요!", "배고파요!", "목욕이 필요해요!",
@@ -1106,7 +1148,13 @@ static const char *const STRINGS[LANG_COUNT][STR_COUNT] = {
     // phase 44
     "풀숲", "간식", "간식", "고급 간식", "최고급 간식", "%s 나타났다!", "%s 잡았다!", "상자로 보냈어.", "%s 빠져나왔어!", "팀과 상자가 꽉 찼어", "간식이 없어: 상점에서 사자", "간식을 찾았어!", "풀숲에서 뭔가 움직여!", "%u 걸음 더 걷자", "지금 자고 있어", "풀숲에 아무도 없어", "풀숲에서 쓰자",
     // phase 45
-    "여행", "여행 중", "돌아왔어!", "%s 여행을 떠났어!", "오늘은 여행 끝", "늦었어: 내일 가자", "부르기", "부를까? 이야기 없어", "%s 강에 갔어", "코인 %u개를 찾았어!", "%s 덤불을 뒤졌어", "간식을 찾았어!", "%s, %s 만났어", "간식을 나눠 먹었어!", "%s 마을을 걸었어", "쿠키를 받았어!", "%s 정원에서 놀았어", "씨앗을 찾았어!", "%s 물웅덩이에서 놀았어", "비누를 가져왔어!", "%s 뭔가 움직이는 걸 봤어", "풀숲에서!", "%s 언덕에 올랐어", "고급 간식을 찾았어!", "새끼", "청소년", "성체", },
+    "여행", "여행 중", "돌아왔어!", "%s 여행을 떠났어!", "오늘은 여행 끝", "늦었어: 내일 가자", "부르기", "부를까? 이야기 없어", "%s 강에 갔어", "코인 %u개를 찾았어!", "%s 덤불을 뒤졌어", "간식을 찾았어!", "%s, %s 만났어", "간식을 나눠 먹었어!", "%s 마을을 걸었어", "쿠키를 받았어!", "%s 정원에서 놀았어", "씨앗을 찾았어!", "%s 물웅덩이에서 놀았어", "비누를 가져왔어!", "%s 뭔가 움직이는 걸 봤어", "풀숲에서!", "%s 언덕에 올랐어", "고급 간식을 찾았어!", "새끼", "청소년", "성체",
+    "터치 깨우기", "잠드는 시각", "돌봄", "돌봄 속도", "보통", "여유", "느림", "화면 꺼짐 절전", "일", "월",
+    "화", "수", "목", "금", "토", "경기장", "대회", "100m", "허들", "수영 50m",
+    "멀리뛰기", "높이뛰기", "역도", "암벽 등반", "다이빙", "스케이팅", "횃불 달리기", "숲길 달리기", "너무 피곤해요", "금메달!",
+    "은메달", "동메달", "신기록!", "오늘의 첫 금: +%u코인", "+%u코인", "최고", "대회 금메달", "교체", "한 번 더 누르면 교체", "지금은 안 돼요: 잠, 외출, 의식 중",
+    "절전 모드", "자동", "항상", "보통", "절전 중", "위험", "%d%% %d.%02dV  %s", "광산", "바위를 두드려요!", "남은 채굴: %u",
+    "호박 %u/10", "너무 피곤해요", "오늘은 더 못 캐요", "호박 조각!", "화석! 다음 알은 %s", "힘 열매", "수호 열매", "신속 열매", "훈련 +%u", "이미 최고예요", },
 };
 
 // Medal names in their three lengths [language][medal].

@@ -39,10 +39,24 @@ struct PartyMon {
   bool empty() const { return dex < 1; }
 };
 
+// What a banked record cannot hold about a companion that was still being raised: its exact age, its
+// birthday, its bond and its needs. Kept in a SEPARATE key (like the box) so the stored team format
+// does not change. live = 1 means "swapped out while growing": it comes back growing, where it left off.
+// An all-zero record (an older save, or a retired companion) is a frozen one, as before.
+struct __attribute__((packed)) PartyExt {
+  uint32_t ageMinutes;
+  uint32_t bornDay;
+  uint8_t bond, fullness, joy, energy, hygiene;
+  uint8_t live;
+};
+
 class Party {
 public:
+  PartyExt ext[PARTY_SLOTS];
+  PartyExt boxExt[BOX_SLOTS];
   PartyMon slots[PARTY_SLOTS];
   PartyMon box[BOX_SLOTS];
+  Party() { memset(ext, 0, sizeof(ext)); memset(boxExt, 0, sizeof(boxExt)); }
 
   void begin();                 // load from NVS
   uint8_t count() const;

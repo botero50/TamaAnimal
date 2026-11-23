@@ -74,14 +74,23 @@ void Party::begin() {
     if (s.dex < 1 || s.dex > DEX_COUNT) s.dex = 0;
     s.nick[sizeof(s.nick) - 1] = 0;
   }
+  // the raising state of swapped-out companions: absent on an older save = all frozen, as before
+  memset(ext, 0, sizeof(ext));
+  memset(boxExt, 0, sizeof(boxExt));
+  if (prefs.getBytesLength("pxp") == sizeof(ext)) prefs.getBytes("pxp", ext, sizeof(ext));
+  if (prefs.getBytesLength("pxb") == sizeof(boxExt)) prefs.getBytes("pxb", boxExt, sizeof(boxExt));
+  for (int i = 0; i < PARTY_SLOTS; i++) if (slots[i].empty() || ext[i].live > 1) memset(&ext[i], 0, sizeof(PartyExt));
+  for (int i = 0; i < BOX_SLOTS; i++) if (box[i].empty() || boxExt[i].live > 1) memset(&boxExt[i], 0, sizeof(PartyExt));
 }
 
 void Party::save() {
   prefs.putBytes("party", slots, sizeof(slots));
+  prefs.putBytes("pxp", ext, sizeof(ext));
 }
 
 void Party::boxSave() {
   prefs.putBytes("box", box, sizeof(box));
+  prefs.putBytes("pxb", boxExt, sizeof(boxExt));
 }
 
 uint8_t Party::boxCount() const {
@@ -101,6 +110,7 @@ bool Party::boxAdd(const PartyMon &m) {
   int i = boxFirstFree();
   if (i < 0) return false;
   box[i] = m;
+  memset(&boxExt[i], 0, sizeof(PartyExt));
   boxSave();
   return true;
 }
@@ -108,6 +118,7 @@ bool Party::boxAdd(const PartyMon &m) {
 void Party::boxReleaseAt(uint8_t i) {
   if (i >= BOX_SLOTS) return;
   box[i] = PartyMon();
+  memset(&boxExt[i], 0, sizeof(PartyExt));
   boxSave();
 }
 
@@ -116,6 +127,9 @@ void Party::swapPartyBox(uint8_t partyIdx, uint8_t boxIdx) {
   PartyMon t = slots[partyIdx];
   slots[partyIdx] = box[boxIdx];
   box[boxIdx] = t;
+  PartyExt x = ext[partyIdx];                   // and its raising state
+  ext[partyIdx] = boxExt[boxIdx];
+  boxExt[boxIdx] = x;
   save();
   boxSave();
 }
@@ -137,6 +151,7 @@ bool Party::add(const PartyMon &m) {
   int i = firstFree();
   if (i < 0) return false;
   slots[i] = m;
+  memset(&ext[i], 0, sizeof(PartyExt));
   save();
   return true;
 }
@@ -144,12 +159,14 @@ bool Party::add(const PartyMon &m) {
 void Party::replaceAt(uint8_t i, const PartyMon &m) {
   if (i >= PARTY_SLOTS) return;
   slots[i] = m;
+  memset(&ext[i], 0, sizeof(PartyExt));
   save();
 }
 
 void Party::releaseAt(uint8_t i) {
   if (i >= PARTY_SLOTS) return;
   slots[i] = PartyMon();
+  memset(&ext[i], 0, sizeof(PartyExt));
   save();
 }
 
