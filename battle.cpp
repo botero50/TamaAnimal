@@ -15,10 +15,18 @@ static void fill(Combatant &c, int16_t dex, uint8_t lvl, uint16_t hp,
   c.base[SI_SPA] = sa; c.base[SI_SPD] = sd; c.base[SI_SPE] = sp;
 }
 
+// An animal with no moves at all (an old banked record, or one swapped in as the companion) would
+// arrive with an empty FIGHT menu and nothing to do but run: it gets POUNCE, which any animal can use.
+static void neverMoveless(Combatant &c) {
+  for (int i = 0; i < MOVE_SLOTS; i++) if (c.moves[i]) return;
+  c.moves[0] = MV_POUNCE;
+}
+
 void combatantFromPet(Combatant &c, const Pet &p) {
   fill(c, p.speciesId, p.level(), p.vitStat(), p.atkStat(), p.defStat(),
        p.spaStat(), p.spdStat(), p.speStat());
   for (int i = 0; i < MOVE_SLOTS; i++) c.moves[i] = p.moves[i];
+  neverMoveless(c);
   c.shiny = p.shiny;
   c.growth = p.growth;
   const char *nm = p.nick[0] ? p.nick : dexName(p.speciesId);
@@ -29,6 +37,7 @@ void combatantFromParty(Combatant &c, const PartyMon &m) {
   fill(c, m.dex, (uint8_t)m.level, party.vitOf(m), party.atkOf(m), party.defOf(m),
        party.spaOf(m), party.spdOf(m), party.speOf(m));
   for (int i = 0; i < MOVE_SLOTS; i++) c.moves[i] = m.moves[i];
+  neverMoveless(c);
   c.shiny = m.shiny != 0;
   c.growth = m.growth;
   const char *nm = m.nick[0] ? m.nick : dexName(m.dex);

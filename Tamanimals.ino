@@ -7320,8 +7320,10 @@ static void renderPlayerBadges() {
   // of what is missing is still visible.
   for (int i = 0; i < TRAINER_GYMS; i++) {
     int bx = 140 + (i % 4) * 62, by = 202 + (i / 4) * 60;
-    bool got = pet.hasBadge(playerBadgeRegion, i, false);
     bool hard = pet.hasBadge(playerBadgeRegion, i, true);
+    // The hard ladder is separate: a ranger beaten only on hard has no easy
+    // stamp, and used to draw as an empty outline inside its gold halo.
+    bool got = hard || pet.hasBadge(playerBadgeRegion, i, false);
     if (hard) {
       // Beaten on hard: a golden halo. Concentric rings, not a filled disc --
       // a disc sat behind the art and read as a gold coin rather than a glow.

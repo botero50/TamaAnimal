@@ -9,6 +9,8 @@
 #include "party.h"
 #include "standby.h"
 #include "tourney.h"
+#include "moves.h"
+#include "battle.h"
 #include "esp_sleep.h"
 #include <chrono>
 #include <thread>
@@ -399,6 +401,19 @@ static void fruitBagTests() {
   bagOpen = false; bagCat = -1;
 }
 
+static void emptyMovesTests() {
+  PartyMon e; e.dex = 5; e.level = 1;
+  Combatant c; combatantFromParty(c, e);
+  ck(c.moves[0] == MV_POUNCE && !c.moves[1], "a team member with no moves fights with POUNCE");
+  e.moves[0] = 3; combatantFromParty(c, e);
+  ck(c.moves[0] == 3 && !c.moves[1], "one that has moves keeps exactly them");
+  readyPet();
+  for (int i = 0; i < MOVE_SLOTS; i++) pet.moves[i] = 0;
+  combatantFromPet(c, pet);
+  ck(c.moves[0] == MV_POUNCE, "and so does a companion with none");
+  readyPet();
+}
+
 int main() {
   setup();
   pumpMs(120);
@@ -407,6 +422,7 @@ int main() {
   click(233, 145);
   if (pet.awaitingStarter()) { printf("FAIL: no starter\n"); return 1; }
   pumpMs(120);
+  emptyMovesTests();
   moonRepro();
   idleWrapTest();
   standbyTests();
