@@ -148,6 +148,25 @@ ones sway under circling stars.
 Also: feeding, sleep, baths, chores, furniture, hats, missions, a step counter, the weather, a
 12 h or 24 h clock, and a "tap to wake" switch so a pocket cannot wake the screen.
 
+## The Stadium, the mine and an easier life (1.6.0)
+
+| | | |
+|:---:|:---:|:---:|
+| <img src="docs/screens/stadium_race.png" width="240"> | <img src="docs/screens/mine.png" width="240"> | <img src="docs/screens/standby.png" width="240"> |
+| The Stadium: 11 events | The mine: amber and fossils | Plugged in: a standby clock |
+| <img src="docs/screens/care_page.png" width="240"> | <img src="docs/screens/stadium.png" width="240"> | <img src="docs/screens/map_more.png" width="240"> |
+| Care pace and battery savers | Your best mark in each event | Where to find them |
+
+- **The Stadium:** eleven events, from the 100 m to diving, decided by stats, training, talents and growth.
+- **The mine:** tap the rock. Ten pieces of amber hold a fossil, and it hatches a prehistoric animal.
+- **Swap** your companion with any team member; each keeps its age and growth stage.
+- **Care pace:** Normal, Relaxed (the default) or Slow.
+- **Longer battery:** a deeper sleep with the screen off that still counts steps, a battery saver, a truer
+  percentage and a safe power-off.
+- **Training fruits** from the garden, lighter steps counted, and one touch on the moon wakes your pet.
+
+Updating an animal raised before 1.6.0: its needs now fall at the Relaxed pace; change it on the Care page.
+
 ## Eight languages
 
 English, Spanish, French, German, Italian, Portuguese, Chinese and Korean.
